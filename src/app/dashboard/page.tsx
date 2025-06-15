@@ -86,7 +86,7 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.push('/');
+      window.location.href = '/'; // Force page refresh
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -180,7 +180,7 @@ export default function DashboardPage() {
     }
   };
 
-  // Fetch posts and mind wall issues
+  // Fetch posts and mind wall issues with refresh functionality
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -205,7 +205,7 @@ export default function DashboardPage() {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, activeSection]); // Added activeSection to trigger refresh on navigation
 
   const handleRefresh = async () => {
     try {
@@ -413,12 +413,12 @@ export default function DashboardPage() {
     if (activeSection === 'home' || activeSection === 'feed') {
       posts.forEach(post => {
         if (post.content.toLowerCase().includes(query) || 
-            post.author.toLowerCase().includes(query)) {
+            (post as any).authorName?.toLowerCase().includes(query)) {
           results.push({
             type: 'post',
             id: post.id,
             title: post.content.substring(0, 50) + '...',
-            description: `By ${post.author}`,
+            description: `By ${(post as any).authorName || 'Anonymous'}`,
             action: () => setActiveSection('home')
           });
         }
@@ -506,7 +506,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Global CSS for hiding scrollbars and 3-column layout */}
+      {/* Global CSS for hiding scrollbars and responsive layout */}
       <style jsx global>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
@@ -516,10 +516,10 @@ export default function DashboardPage() {
           display: none;
         }
         
-        /* 3-Column Layout CSS */
+        /* Mobile-first responsive layout */
         .three-column-layout {
           display: grid;
-          grid-template-columns: auto 1fr auto;
+          grid-template-columns: auto 1fr;
           min-height: 100vh;
           width: 100vw;
         }
@@ -531,23 +531,20 @@ export default function DashboardPage() {
           height: 100vh;
           width: 4rem;
           z-index: 40;
+          background: black;
+          border-right: 1px solid rgb(55, 65, 81);
         }
         
         .center-content {
           margin-left: 4rem;
           min-height: 100vh;
           background: black;
+          width: calc(100vw - 4rem);
+          border-right: 1px solid rgb(55, 65, 81);
         }
         
         .right-sidebar {
-          position: fixed;
-          right: 0;
-          top: 0;
-          height: 100vh;
-          width: 20rem;
-          z-index: 30;
-          background: black;
-          border-left: 1px solid rgb(55, 65, 81);
+          display: none;
         }
         
         .sticky-search {
@@ -555,107 +552,216 @@ export default function DashboardPage() {
           top: 0;
           z-index: 30;
           backdrop-filter: blur(12px);
+          background: rgba(0, 0, 0, 0.9);
+          border-bottom: 1px solid rgb(55, 65, 81);
+        }
+        
+        /* Mobile search improvements */
+        .mobile-search-container {
+          padding: 0.75rem 1rem;
+        }
+        
+        .mobile-search-input {
+          width: 100%;
+          background: rgb(17, 24, 39);
+          border: 1px solid rgb(75, 85, 99);
+          border-radius: 9999px;
+          padding: 0.75rem 1rem 0.75rem 2.5rem;
+          color: white;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+        }
+        
+        .mobile-search-input:focus {
+          outline: none;
+          border-color: rgb(59, 130, 246);
+          box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
         }
         
         /* Twitter-like hover effects */
         .tweet-hover:hover {
           background-color: rgba(255, 255, 255, 0.03);
+          transition: background-color 0.2s ease;
         }
         
         .card-hover:hover {
           background-color: rgba(255, 255, 255, 0.02);
+          transition: background-color 0.2s ease;
         }
         
         .btn-hover-scale:hover {
           transform: scale(1.02);
+          transition: transform 0.2s ease;
         }
         
-        /* Responsive adjustments */
+        /* Desktop responsive adjustments */
         @media (min-width: 768px) {
+          .mobile-search-container {
+            padding: 1rem 1.5rem;
+          }
+          
+          .mobile-search-input {
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            font-size: 1rem;
+          }
+          
+          .left-sidebar {
+            width: 5rem;
+          }
+          
           .center-content {
-            margin-left: 4rem;
+            margin-left: 5rem;
+            width: calc(100vw - 5rem);
           }
         }
         
-        @media (min-width: 1280px) {
+        @media (min-width: 1024px) {
           .left-sidebar {
             width: 16rem;
           }
           .center-content {
             margin-left: 16rem;
+            width: calc(100vw - 16rem);
+          }
+        }
+        
+        @media (min-width: 1280px) {
+          .three-column-layout {
+            grid-template-columns: auto 1fr auto;
+          }
+          
+          .left-sidebar {
+            width: 16rem;
+          }
+          
+          .center-content {
+            margin-left: 16rem;
             margin-right: 20rem;
-            max-width: calc(100vw - 36rem);
+            width: calc(100vw - 36rem);
+            border-right: none;
+          }
+          
+          .right-sidebar {
+            display: block;
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            width: 20rem;
+            z-index: 30;
+            background: black;
+            border-left: 1px solid rgb(55, 65, 81);
           }
         }
         
         @media (min-width: 1536px) {
+          .left-sidebar {
+            width: 18rem;
+          }
+          
           .right-sidebar {
             width: 24rem;
           }
+          
           .center-content {
+            margin-left: 18rem;
             margin-right: 24rem;
-            max-width: calc(100vw - 40rem);
+            width: calc(100vw - 42rem);
           }
         }
         
-        /* Hide right sidebar on smaller screens */
-        @media (max-width: 1279px) {
-          .right-sidebar {
+        /* Mobile profile button improvements */
+        .mobile-profile-in-sidebar {
+          display: block;
+        }
+        
+        .mobile-profile-fab {
+          display: none;
+        }
+        
+        @media (min-width: 1280px) {
+          .mobile-profile-in-sidebar {
             display: none;
           }
-          .center-content {
-            margin-right: 0 !important;
-            max-width: calc(100vw - 4rem) !important;
+          
+          .mobile-profile-fab {
+            display: block;
           }
         }
         
-        /* Custom cursor for interactive elements */
-        .custom-cursor {
-          cursor: pointer;
+        /* Desktop profile icon - only visible on desktop */
+        .desktop-profile-icon {
+          display: none;
+        }
+        
+        @media (min-width: 1280px) {
+          .desktop-profile-icon {
+            display: block;
+          }
         }
       `}</style>
 
-      {/* Left Navigation - Fixed positioned */}
-      <div className="left-sidebar bg-black">
+      {/* Left Navigation - Fixed positioned with mobile profile */}
+      <div className="left-sidebar">
         <SideNav 
-          onSelectSection={setActiveSection} 
+          onSelectSection={(section) => {
+            setActiveSection(section);
+            // Force refresh data when switching sections
+            if (section !== activeSection) {
+              setForceRefresh(prev => prev + 1);
+            }
+          }} 
           activeSection={activeSection}
           onCreatePost={() => setShowCreateModal(true)}
+          user={user}
+          userData={userData}
+          onProfileClick={() => setShowProfileDropdown(!showProfileDropdown)}
+          showProfileDropdown={showProfileDropdown}
+          onSignOut={handleSignOut}
+          onEditProfile={() => {
+            setShowProfileEditor(true);
+            setShowProfileDropdown(false);
+          }}
+          onDeleteAccount={() => {
+            setShowDeleteConfirm(true);
+            setShowProfileDropdown(false);
+          }}
+          forceRefresh={forceRefresh}
         />
       </div>
       
       {/* Center Content - Main Feed */}
-      <div className="center-content bg-black">
-        {/* Sticky Header with Search */}
-        <div className="sticky-search h-14 bg-black border-b border-gray-800 flex items-center justify-center px-4">
-          <div className="w-full max-w-md relative">
+      <div className="center-content">
+        {/* Mobile-optimized Sticky Header with Search */}
+        <div className="sticky-search h-16 flex items-center">
+          <div className="mobile-search-container w-full">
             <div className="relative">
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-base" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-black border border-gray-600 rounded-full py-2.5 pl-12 pr-6 text-white placeholder-gray-400 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all duration-200 text-base hover:border-gray-400"
+                className="mobile-search-input"
                 placeholder="Search everything..."
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 >
                   <FiX className="w-4 h-4" />
                 </button>
               )}
             </div>
             
-            {/* Search Results Dropdown */}
+            {/* Mobile-optimized Search Results Dropdown */}
             <AnimatePresence>
               {searchResults && searchResults.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-black border border-gray-700 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto scrollbar-hide"
+                  className="absolute top-full left-0 right-0 mt-2 mx-3 bg-black border border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto scrollbar-hide"
                 >
                   <div className="py-2">
                     {searchResults.map((result, index) => (
@@ -677,82 +783,22 @@ export default function DashboardPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
                               <h3 className="text-white font-medium text-sm truncate">{result.title}</h3>
-                              {result.type === 'section' && (
-                                <span className="bg-blue-600 text-blue-100 px-2 py-0.5 rounded text-xs font-medium">
-                                  Section
-                                </span>
-                              )}
-                              {result.type === 'post' && (
-                                <span className="bg-green-600 text-green-100 px-2 py-0.5 rounded text-xs font-medium">
-                                  Post
-                                </span>
-                              )}
-                              {result.type === 'mindwall' && (
-                                <span className="bg-purple-600 text-purple-100 px-2 py-0.5 rounded text-xs font-medium">
-                                  Mind Wall
-                                </span>
-                              )}
-                              {result.type === 'wellness' && (
-                                <span className="bg-pink-600 text-pink-100 px-2 py-0.5 rounded text-xs font-medium">
-                                  Wellness
-                                </span>
-                              )}
+                              <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                result.type === 'section' ? 'bg-blue-600 text-blue-100' :
+                                result.type === 'post' ? 'bg-green-600 text-green-100' :
+                                result.type === 'mindwall' ? 'bg-purple-600 text-purple-100' :
+                                'bg-pink-600 text-pink-100'
+                              }`}>
+                                {result.type === 'section' ? 'Section' :
+                                 result.type === 'post' ? 'Post' :
+                                 result.type === 'mindwall' ? 'Mind Wall' : 'Wellness'}
+                              </span>
                             </div>
                             <p className="text-gray-400 text-xs line-clamp-2">{result.description}</p>
-                            {result.author && (
-                              <p className="text-gray-500 text-xs mt-1">by {result.author}</p>
-                            )}
-                            {result.votes !== undefined && (
-                              <p className="text-gray-500 text-xs mt-1">{result.votes} votes • {result.category}</p>
-                            )}
                           </div>
                         </div>
                       </button>
                     ))}
-                  </div>
-                  
-                  {searchResults.length === 0 && (
-                    <div className="px-4 py-6 text-center">
-                      <FiSearch className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                      <p className="text-gray-400 text-sm">No results found</p>
-                      <p className="text-gray-500 text-xs mt-1">Try searching for posts, sections, or topics</p>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-            
-            {/* Search suggestions when no query */}
-            <AnimatePresence>
-              {!searchQuery && searchQuery !== '' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-black border border-gray-700 rounded-xl shadow-2xl z-50"
-                >
-                  <div className="py-2">
-                    <div className="px-4 py-2 text-gray-400 text-xs font-medium border-b border-gray-800">
-                      Quick Search
-                    </div>
-                    <button
-                      onClick={() => setSearchQuery('mind wall')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-900 transition-colors text-gray-300 text-sm"
-                    >
-                      Mind Wall
-                    </button>
-                    <button
-                      onClick={() => setSearchQuery('activities')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-900 transition-colors text-gray-300 text-sm"
-                    >
-                      Activities
-                    </button>
-                    <button
-                      onClick={() => setSearchQuery('wellness')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-900 transition-colors text-gray-300 text-sm"
-                    >
-                      Wellness Resources
-                    </button>
                   </div>
                 </motion.div>
               )}
@@ -760,9 +806,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="overflow-y-auto scrollbar-hide" style={{ height: 'calc(100vh - 56px)' }}>
-          <div className="max-w-2xl mx-auto">
+        {/* Main Content Area - Mobile optimized */}
+        <div className="overflow-y-auto scrollbar-hide" style={{ height: 'calc(100vh - 64px)' }}>
+          <div className="max-w-full px-0">
             {/* Feed Content */}
             {(activeSection === 'feed' || activeSection === 'activities' || activeSection === 'concerns') && (
               <div>
@@ -1149,57 +1195,6 @@ export default function DashboardPage() {
                   <p className="text-gray-400 text-xs">@{user?.email?.split('@')[0]}</p>
                 </div>
               </div>
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-all"
-                >
-                  <FiChevronDown className="w-4 h-4" />
-                </button>
-                
-                {/* Desktop Profile Dropdown */}
-                <AnimatePresence>
-                  {showProfileDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute top-12 right-0 bg-black border border-gray-700 rounded-xl shadow-2xl w-56 z-50 overflow-hidden"
-                    >
-                      <div className="py-1">
-                        <button 
-                          onClick={() => {
-                            setShowProfileEditor(true);
-                            setShowProfileDropdown(false);
-                          }}
-                          className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-900 transition-colors text-white text-sm"
-                        >
-                          <FiEdit className="mr-3 text-gray-400 w-4 h-4" />
-                          <span>Edit Profile</span>
-                        </button>
-                        <button
-                          onClick={handleSignOut}
-                          className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-900 transition-colors text-white text-sm"
-                        >
-                          <FiLogOut className="mr-3 text-gray-400 w-4 h-4" />
-                          <span>Sign Out</span>
-                        </button>
-                        <div className="border-t border-gray-700 my-1"></div>
-                        <button
-                          onClick={() => {
-                            setShowDeleteConfirm(true);
-                            setShowProfileDropdown(false);
-                          }}
-                          className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-900 transition-colors text-red-400 text-sm"
-                        >
-                          <FiTrash2 className="mr-3 w-4 h-4" />
-                          <span>Delete Account</span>
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
           </div>
 
@@ -1455,11 +1450,11 @@ export default function DashboardPage() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Profile Button */}
-      <div className="xl:hidden absolute right-4" ref={dropdownRef}>
+      {/* Desktop Profile Button - Only visible on desktop (xl and above) */}
+      <div className="desktop-profile-icon fixed top-4 right-4 z-50" ref={dropdownRef}>
         <button 
           onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-          className="w-8 h-8 bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center hover:border-gray-500 transition-all overflow-hidden"
+          className="w-10 h-10 bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center hover:border-gray-500 transition-all overflow-hidden shadow-lg"
         >
           {user?.photoURL ? (
             <img 
@@ -1468,18 +1463,18 @@ export default function DashboardPage() {
               className="w-full h-full object-cover rounded-full"
             />
           ) : (
-            <FiUser className="text-gray-400 text-sm" />
+            <FiUser className="text-gray-400 text-lg" />
           )}
         </button>
         
-        {/* Mobile Profile Dropdown */}
+        {/* Desktop Profile Dropdown */}
         <AnimatePresence>
           {showProfileDropdown && (
             <motion.div
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute top-10 right-0 bg-black border border-gray-700 rounded-xl shadow-2xl w-56 z-50 overflow-hidden"
+              className="absolute top-12 right-0 bg-black border border-gray-700 rounded-xl shadow-2xl w-56 z-50 overflow-hidden"
             >
               <div className="py-1">
                 <button 

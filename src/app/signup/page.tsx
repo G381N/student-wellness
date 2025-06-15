@@ -160,7 +160,7 @@ export default function SignupPage() {
       });
       
       console.log('✅ Account created successfully');
-      router.push('/dashboard');
+      window.location.href = '/dashboard'; // Force page refresh after signup
     } catch (error: unknown) {
       console.error('Signup error:', error);
       
@@ -219,7 +219,7 @@ export default function SignupPage() {
       });
       
       console.log('✅ Google sign-up successful');
-      router.push('/dashboard');
+      window.location.href = '/dashboard'; // Force page refresh after signup
     } catch (error: unknown) {
       console.error('Google sign-up error:', error);
       
@@ -264,7 +264,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -272,12 +272,12 @@ export default function SignupPage() {
         className="w-full max-w-md"
       >
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <Link
             href="/"
-            className="inline-flex items-center text-white hover:text-gray-300 mb-6 transition-colors"
+            className="inline-flex items-center text-white hover:text-gray-300 mb-4 sm:mb-6 transition-colors text-sm"
           >
-            <FiArrowLeft className="mr-2" />
+            <FiArrowLeft className="mr-2 w-4 h-4" />
             Back to Home
           </Link>
           
@@ -285,13 +285,13 @@ export default function SignupPage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
-            className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
+            className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg"
           >
-            <FiHeart className="text-black text-2xl" />
+            <FiHeart className="text-black text-lg sm:text-2xl" />
           </motion.div>
           
-          <h1 className="text-3xl font-bold text-white mb-2">Join CampusWell</h1>
-          <p className="text-gray-400">Create your account to get started</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Join CampusWell</h1>
+          <p className="text-gray-400 text-sm sm:text-base">Create your account to get started</p>
         </div>
 
         {/* Signup Form */}
@@ -299,7 +299,7 @@ export default function SignupPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800"
+          className="bg-gray-900 rounded-2xl shadow-xl p-4 sm:p-8 border border-gray-800"
         >
           {/* Google Sign-up Button */}
           <motion.button
@@ -308,28 +308,28 @@ export default function SignupPage() {
             disabled={loading}
             whileHover={{ scale: loading ? 1 : 1.02 }}
             whileTap={{ scale: loading ? 1 : 0.98 }}
-            className="w-full flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-lg shadow-lg bg-gray-900/50 backdrop-blur-sm text-white hover:bg-gray-800/50 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-sm"
+            className="w-full flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-lg shadow-lg bg-gray-900/50 backdrop-blur-sm text-white hover:bg-gray-800/50 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-xs sm:text-sm"
           >
-            <FcGoogle className="h-4 w-4 mr-2" />
+            <FcGoogle className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
             Sign up with Google
           </motion.button>
 
-          <div className="relative mb-6">
+          <div className="relative my-4 sm:mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-700" />
             </div>
-            <div className="relative flex justify-center text-sm">
+            <div className="relative flex justify-center text-xs sm:text-sm">
               <span className="px-2 bg-gray-900 text-gray-400">Or sign up with email</span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* General Error */}
             {generalError && (
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded-xl text-sm"
+                className="bg-red-900 border border-red-700 text-red-300 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm"
               >
                 {generalError}
               </motion.div>
@@ -337,7 +337,7 @@ export default function SignupPage() {
 
             {/* First Name */}
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="firstName" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                 First Name
               </label>
               <input
@@ -348,7 +348,7 @@ export default function SignupPage() {
                 required
                 value={formData.firstName}
                 onChange={handleInputChange}
-                className={`block w-full px-3 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                className={`block w-full px-3 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                   errors.firstName 
                     ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                     : 'border-gray-700 hover:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20'
@@ -356,13 +356,13 @@ export default function SignupPage() {
                 placeholder="Enter your first name"
               />
               {errors.firstName && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.firstName}</p>
+                <p className="mt-1 sm:mt-1.5 text-xs text-red-400">{errors.firstName}</p>
               )}
             </div>
 
             {/* Last Name */}
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="lastName" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                 Last Name
               </label>
               <input
@@ -373,7 +373,7 @@ export default function SignupPage() {
                 required
                 value={formData.lastName}
                 onChange={handleInputChange}
-                className={`block w-full px-3 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                className={`block w-full px-3 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                   errors.lastName 
                     ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                     : 'border-gray-700 hover:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20'
@@ -381,13 +381,13 @@ export default function SignupPage() {
                 placeholder="Enter your last name"
               />
               {errors.lastName && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.lastName}</p>
+                <p className="mt-1 sm:mt-1.5 text-xs text-red-400">{errors.lastName}</p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                 Email Address
               </label>
               <input
@@ -398,7 +398,7 @@ export default function SignupPage() {
                 required
                 value={formData.email}
                 onChange={handleEmailChange}
-                className={`block w-full px-3 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                className={`block w-full px-3 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                   errors.email 
                     ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                     : 'border-gray-700 hover:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20'
@@ -406,13 +406,13 @@ export default function SignupPage() {
                 placeholder="your.email@christuniversity.in"
               />
               {errors.email && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.email}</p>
+                <p className="mt-1 sm:mt-1.5 text-xs text-red-400">{errors.email}</p>
               )}
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                 Password
               </label>
               <div className="relative">
@@ -424,7 +424,7 @@ export default function SignupPage() {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`block w-full px-3 pr-10 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                  className={`block w-full px-3 pr-8 sm:pr-10 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                     errors.password 
                       ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                       : 'border-gray-700 hover:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20'
@@ -437,20 +437,20 @@ export default function SignupPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <FiEyeOff className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                    <FiEyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
                   ) : (
-                    <FiEye className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                    <FiEye className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.password}</p>
+                <p className="mt-1 sm:mt-1.5 text-xs text-red-400">{errors.password}</p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -462,7 +462,7 @@ export default function SignupPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className={`block w-full px-3 pr-10 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                  className={`block w-full px-3 pr-8 sm:pr-10 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                     errors.confirmPassword 
                       ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                       : 'border-gray-700 hover:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20'
@@ -475,14 +475,14 @@ export default function SignupPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showConfirmPassword ? (
-                    <FiEyeOff className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                    <FiEyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
                   ) : (
-                    <FiEye className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                    <FiEye className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.confirmPassword}</p>
+                <p className="mt-1 sm:mt-1.5 text-xs text-red-400">{errors.confirmPassword}</p>
               )}
             </div>
 
@@ -492,17 +492,17 @@ export default function SignupPage() {
               disabled={loading}
               whileHover={{ scale: loading ? 1 : 1.02 }}
               whileTap={{ scale: loading ? 1 : 0.98 }}
-              className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
+              className="w-full flex justify-center items-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-lg text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
             >
               {loading ? (
                 <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
                   Creating account...
                 </div>
               ) : (
                 <>
                   Create Account
-                  <FiArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <FiArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </>
               )}
             </motion.button>

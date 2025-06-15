@@ -61,7 +61,7 @@ export default function LoginPage() {
     
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      router.push('/dashboard');
+      window.location.href = '/dashboard'; // Force page refresh after login
     } catch (error: unknown) {
       console.error('Login error:', error);
       
@@ -108,7 +108,7 @@ export default function LoginPage() {
       }
       
       console.log('✅ Google sign-in successful');
-      router.push('/dashboard');
+      window.location.href = '/dashboard'; // Force page refresh after login
     } catch (error: unknown) {
       console.error('Google sign-in error:', error);
       
@@ -210,9 +210,9 @@ export default function LoginPage() {
       {/* Grid Pattern Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
 
-      <div className="relative z-10 min-h-screen flex">
-        {/* Left Side - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-20">
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row">
+        {/* Left Side - Branding - Hidden on mobile, shown on desktop */}
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-8 xl:px-20">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -222,13 +222,13 @@ export default function LoginPage() {
               <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
                 <span className="text-2xl font-bold text-black">CU</span>
               </div>
-              <h1 className="text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight">
+              <h1 className="text-4xl xl:text-6xl font-bold text-white mb-6 leading-tight">
                 Welcome to<br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   Student Wellness
                 </span>
               </h1>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="text-lg xl:text-xl text-gray-300 mb-8 leading-relaxed">
                 Connect with your campus community, share experiences, and prioritize your mental health journey.
               </p>
             </div>
@@ -282,24 +282,46 @@ export default function LoginPage() {
           </motion.div>
         </div>
 
-        {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        {/* Right Side - Login Form - Full width on mobile */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-md w-full space-y-8"
+            className="max-w-md w-full space-y-6 lg:space-y-8"
           >
-            {/* Mobile Header */}
+            {/* Mobile Header - Shown only on mobile */}
             <div className="text-center lg:hidden">
               <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
                 <span className="text-2xl font-bold text-black">CU</span>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
-              <p className="text-gray-400">Sign in to your Christ University account</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome back</h1>
+              <p className="text-gray-400 text-sm sm:text-base">Sign in to your Christ University account</p>
+              
+              {/* Mobile feature highlights */}
+              <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 bg-blue-600 bg-opacity-20 rounded-lg flex items-center justify-center mb-2">
+                    <FiUsers className="text-blue-400 text-sm" />
+                  </div>
+                  <p className="text-gray-400 text-xs">Community</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 bg-purple-600 bg-opacity-20 rounded-lg flex items-center justify-center mb-2">
+                    <FiShield className="text-purple-400 text-sm" />
+                  </div>
+                  <p className="text-gray-400 text-xs">Safe Space</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 bg-pink-600 bg-opacity-20 rounded-lg flex items-center justify-center mb-2">
+                    <FiHeart className="text-pink-400 text-sm" />
+                  </div>
+                  <p className="text-gray-400 text-xs">Wellness</p>
+                </div>
+              </div>
             </div>
 
-            {/* Desktop Header */}
+            {/* Desktop Header - Hidden on mobile */}
             <div className="text-center hidden lg:block">
               <h2 className="text-3xl font-bold text-white mb-2">Sign in to your account</h2>
               <p className="text-gray-400">Enter your credentials to access the platform</p>
@@ -312,15 +334,15 @@ export default function LoginPage() {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="bg-green-900/20 border border-green-500/30 rounded-xl p-4 backdrop-blur-sm"
+                  className="bg-green-900/20 border border-green-500/30 rounded-xl p-3 sm:p-4 backdrop-blur-sm"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-green-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiCheckCircle className="text-green-400 text-sm" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <FiCheckCircle className="text-green-400 text-xs sm:text-sm" />
                     </div>
                     <div>
-                      <p className="text-green-400 font-medium text-sm">Password reset email sent!</p>
-                      <p className="text-green-300 text-xs mt-1">Check your inbox and follow the instructions to reset your password.</p>
+                      <p className="text-green-400 font-medium text-xs sm:text-sm">Password reset email sent!</p>
+                      <p className="text-green-300 text-xs mt-1">Check your inbox and follow the instructions.</p>
                     </div>
                   </div>
                 </motion.div>
@@ -331,29 +353,29 @@ export default function LoginPage() {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm"
+                  className="bg-red-900/20 border border-red-500/30 rounded-xl p-3 sm:p-4 backdrop-blur-sm"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiAlertCircle className="text-red-400 text-sm" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <FiAlertCircle className="text-red-400 text-xs sm:text-sm" />
                     </div>
-                    <p className="text-red-400 text-sm">{generalError}</p>
+                    <p className="text-red-400 text-xs sm:text-sm">{generalError}</p>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                   Email Address
                 </label>
                 <div className="relative group">
                   <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
                     focusedField === 'email' ? 'text-blue-400' : 'text-gray-400'
                   }`}>
-                    <FiMail className="h-4 w-4" />
+                    <FiMail className="h-3 w-3 sm:h-4 sm:w-4" />
                   </div>
                   <input
                     id="email"
@@ -365,7 +387,7 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                    className={`block w-full pl-8 sm:pl-10 pr-3 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                       errors.email 
                         ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                         : focusedField === 'email'
@@ -374,9 +396,6 @@ export default function LoginPage() {
                     }`}
                     placeholder="your.email@christuniversity.in"
                   />
-                  <div className={`absolute inset-0 rounded-lg pointer-events-none transition-all duration-200 ${
-                    focusedField === 'email' ? 'ring-1 ring-blue-400/20' : ''
-                  }`}></div>
                 </div>
                 <AnimatePresence>
                   {errors.email && (
@@ -384,9 +403,9 @@ export default function LoginPage() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="mt-1.5 text-xs text-red-400 flex items-center"
+                      className="mt-1 sm:mt-1.5 text-xs text-red-400 flex items-center"
                     >
-                      <FiAlertCircle className="mr-1.5 h-3 w-3 flex-shrink-0" />
+                      <FiAlertCircle className="mr-1 sm:mr-1.5 h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
                       {errors.email}
                     </motion.p>
                   )}
@@ -395,14 +414,14 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                   Password
                 </label>
                 <div className="relative group">
                   <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
                     focusedField === 'password' ? 'text-blue-400' : 'text-gray-400'
                   }`}>
-                    <FiLock className="h-4 w-4" />
+                    <FiLock className="h-3 w-3 sm:h-4 sm:w-4" />
                   </div>
                   <input
                     id="password"
@@ -414,7 +433,7 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm ${
+                    className={`block w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
                       errors.password 
                         ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
                         : focusedField === 'password'
@@ -429,14 +448,11 @@ export default function LoginPage() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-800/50 rounded-r-lg transition-colors duration-200"
                   >
                     {showPassword ? (
-                      <FiEyeOff className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                      <FiEyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
                     ) : (
-                      <FiEye className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                      <FiEye className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
                     )}
                   </button>
-                  <div className={`absolute inset-0 rounded-lg pointer-events-none transition-all duration-200 ${
-                    focusedField === 'password' ? 'ring-1 ring-blue-400/20' : ''
-                  }`}></div>
                 </div>
                 <AnimatePresence>
                   {errors.password && (
@@ -444,9 +460,9 @@ export default function LoginPage() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="mt-1.5 text-xs text-red-400 flex items-center"
+                      className="mt-1 sm:mt-1.5 text-xs text-red-400 flex items-center"
                     >
-                      <FiAlertCircle className="mr-1.5 h-3 w-3 flex-shrink-0" />
+                      <FiAlertCircle className="mr-1 sm:mr-1.5 h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
                       {errors.password}
                     </motion.p>
                   )}
@@ -471,17 +487,17 @@ export default function LoginPage() {
                 disabled={loading}
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
+                className="w-full flex justify-center items-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-lg text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
               >
                 {loading ? (
                   <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
                     Signing in...
                   </div>
                 ) : (
                   <>
                     Sign In
-                    <FiArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    <FiArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </>
                 )}
               </motion.button>
@@ -503,9 +519,9 @@ export default function LoginPage() {
                 disabled={loading}
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                className="w-full flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-lg shadow-lg bg-gray-900/50 backdrop-blur-sm text-white hover:bg-gray-800/50 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-sm"
+                className="w-full flex justify-center items-center py-2.5 sm:py-3 px-4 border border-gray-700 rounded-lg shadow-lg bg-gray-900/50 backdrop-blur-sm text-white hover:bg-gray-800/50 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-xs sm:text-sm"
               >
-                <FcGoogle className="h-4 w-4 mr-2" />
+                <FcGoogle className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 Sign in with Google
               </motion.button>
 

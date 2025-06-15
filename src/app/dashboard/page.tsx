@@ -1449,67 +1449,6 @@ export default function DashboardPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Desktop Profile Button - Only visible on desktop (xl and above) */}
-      <div className="desktop-profile-icon fixed top-4 right-4 z-50" ref={dropdownRef}>
-        <button 
-          onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-          className="w-10 h-10 bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center hover:border-gray-500 transition-all overflow-hidden shadow-lg"
-        >
-          {user?.photoURL ? (
-            <img 
-              src={`${user.photoURL}?t=${forceRefresh}`} 
-              alt="Profile" 
-              className="w-full h-full object-cover rounded-full"
-            />
-          ) : (
-            <FiUser className="text-gray-400 text-lg" />
-          )}
-        </button>
-        
-        {/* Desktop Profile Dropdown */}
-        <AnimatePresence>
-          {showProfileDropdown && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute top-12 right-0 bg-black border border-gray-700 rounded-xl shadow-2xl w-56 z-50 overflow-hidden"
-            >
-              <div className="py-1">
-                <button 
-                  onClick={() => {
-                    setShowProfileEditor(true);
-                    setShowProfileDropdown(false);
-                  }}
-                  className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-900 transition-colors text-white text-sm"
-                >
-                  <FiEdit className="mr-3 text-gray-400 w-4 h-4" />
-                  <span>Edit Profile</span>
-                </button>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-900 transition-colors text-white text-sm"
-                >
-                  <FiLogOut className="mr-3 text-gray-400 w-4 h-4" />
-                  <span>Sign Out</span>
-                </button>
-                <div className="border-t border-gray-700 my-1"></div>
-                <button
-                  onClick={() => {
-                    setShowDeleteConfirm(true);
-                    setShowProfileDropdown(false);
-                  }}
-                  className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-900 transition-colors text-red-400 text-sm"
-                >
-                  <FiTrash2 className="mr-3 w-4 h-4" />
-                  <span>Delete Account</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
     </div>
   );
 } 

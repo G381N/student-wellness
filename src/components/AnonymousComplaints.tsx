@@ -113,32 +113,32 @@ export default function AnonymousComplaints() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-black text-white p-3 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Anonymous Complaints</h1>
-          <p className="text-gray-400">Manage and review anonymous complaints from students</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Anonymous Complaints</h1>
+          <p className="text-sm sm:text-base text-gray-400">Manage and review anonymous complaints from students</p>
         </div>
 
         {complaints.length === 0 ? (
-          <div className="text-center py-12">
-            <FiAlertTriangle className="mx-auto text-6xl text-gray-600 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No Complaints</h3>
-            <p className="text-gray-400">There are currently no anonymous complaints to review.</p>
+          <div className="text-center py-8 sm:py-12">
+            <FiAlertTriangle className="mx-auto text-4xl sm:text-6xl text-gray-600 mb-4" />
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Complaints</h3>
+            <p className="text-sm sm:text-base text-gray-400">There are currently no anonymous complaints to review.</p>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {complaints.map((complaint) => (
               <motion.div
                 key={complaint.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gray-900 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors"
+                className="bg-gray-900 border border-gray-700 rounded-lg p-4 sm:p-6 hover:border-gray-600 transition-colors"
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">{complaint.title}</h3>
-                    <p className="text-gray-300 mb-4">{complaint.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-white mb-2">{complaint.title}</h3>
+                    <p className="text-sm sm:text-base text-gray-300 mb-4">{complaint.description}</p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(complaint.severity)}`}>
@@ -152,7 +152,7 @@ export default function AnonymousComplaints() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-xs sm:text-sm text-gray-500">
                       <FiClock className="mr-1" />
                       {formatTimestamp(complaint.timestamp)}
                     </div>
@@ -163,7 +163,7 @@ export default function AnonymousComplaints() {
                       setSelectedComplaint(complaint);
                       setAdminNotes(complaint.adminNotes || '');
                     }}
-                    className="ml-4 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    className="w-full sm:w-auto sm:ml-4 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
                     <FiEye className="text-sm" />
                     Review
@@ -172,7 +172,7 @@ export default function AnonymousComplaints() {
                 
                 {complaint.adminNotes && (
                   <div className="mt-4 p-3 bg-gray-800 rounded-lg border-l-4 border-blue-500">
-                    <p className="text-sm text-gray-300">
+                    <p className="text-xs sm:text-sm text-gray-300">
                       <strong className="text-blue-400">Admin Notes:</strong> {complaint.adminNotes}
                     </p>
                   </div>
@@ -190,42 +190,42 @@ export default function AnonymousComplaints() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-3 sm:p-4 z-50"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-black border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-black border border-gray-700 rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Review Complaint</h2>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-bold text-white">Review Complaint</h2>
                 <button
                   onClick={() => setSelectedComplaint(null)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors p-1"
                 >
-                  <FiX className="text-xl" />
+                  <FiX className="text-lg sm:text-xl" />
                 </button>
               </div>
 
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                 <div>
-                  <h3 className="font-semibold text-white mb-2">Title</h3>
-                  <p className="text-gray-300">{selectedComplaint.title}</p>
+                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Title</h3>
+                  <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.title}</p>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-white mb-2">Description</h3>
-                  <p className="text-gray-300">{selectedComplaint.description}</p>
+                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Description</h3>
+                  <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.description}</p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-semibold text-white mb-2">Category</h3>
-                    <p className="text-gray-300">{selectedComplaint.category}</p>
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Category</h3>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.category}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white mb-2">Severity</h3>
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Severity</h3>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedComplaint.severity)}`}>
                       {selectedComplaint.severity}
                     </span>
@@ -233,45 +233,45 @@ export default function AnonymousComplaints() {
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-white mb-2">Current Status</h3>
+                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Current Status</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedComplaint.status)}`}>
                     {selectedComplaint.status}
                   </span>
                 </div>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <label className="block text-sm font-medium text-white mb-2">
                   Admin Notes
                 </label>
                 <textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base"
                   rows={3}
                   placeholder="Add notes about this complaint..."
                 />
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                 <button
                   onClick={() => handleUpdateStatus('Under Review')}
                   disabled={updating}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50"
+                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
-                  Mark Under Review
+                  Under Review
                 </button>
                 <button
                   onClick={() => handleUpdateStatus('Resolved')}
                   disabled={updating}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   Mark Resolved
                 </button>
                 <button
                   onClick={() => handleUpdateStatus('Closed')}
                   disabled={updating}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   Close
                 </button>

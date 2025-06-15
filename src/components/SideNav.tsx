@@ -18,7 +18,8 @@ import {
   FiLogOut,
   FiEdit,
   FiTrash2,
-  FiChevronDown
+  FiChevronDown,
+  FiBell
 } from 'react-icons/fi';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -56,6 +57,18 @@ export default function SideNav({
   const { isModerator, isAdmin } = useAuth();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Add missing state variables
+  const [showMobileProfile, setShowMobileProfile] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
+  // Determine user role
+  const userRole = userData?.isAdmin ? 'admin' : userData?.isModerator ? 'moderator' : 'student';
+
+  // Reset image error when user photo changes
+  useEffect(() => {
+    setImageError(false);
+  }, [user?.photoURL, forceRefresh]);
 
   // Handle clicks outside dropdown to close it
   useEffect(() => {
@@ -126,7 +139,7 @@ export default function SideNav({
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center xl:mr-3">
             <FiHeart className="text-black text-lg" />
           </div>
-          <h1 className="hidden xl:block text-xl font-bold text-white">CampusWell</h1>
+          <h1 className="hidden lg:block text-xl font-bold text-white">CampusWell</h1>
         </div>
       </div>
 
@@ -162,7 +175,7 @@ export default function SideNav({
                 <Icon className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
                   isActive ? 'text-black' : 'text-gray-400 group-hover:text-white'
                 }`} />
-                <span className={`hidden xl:block font-medium text-base ${isActive ? 'text-black font-bold' : 'text-white'}`}>
+                <span className={`hidden lg:block font-medium text-base ${isActive ? 'text-black font-bold' : 'text-white'}`}>
                   {item.label}
                 </span>
               </motion.button>
@@ -179,135 +192,253 @@ export default function SideNav({
             whileTap={{ scale: 0.98 }}
           >
             <FiPlus className="text-lg sm:text-xl xl:mr-2" />
-            <span className="hidden xl:block">Post</span>
+            <span className="hidden lg:block">Post</span>
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Profile Section - Only visible on mobile/tablet */}
-      {user && (
-        <div className="lg:hidden border-t border-gray-800 p-4">
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={onProfileClick}
-              className="w-full flex items-center justify-center space-x-3 p-4 rounded-2xl hover:bg-gray-900/50 active:bg-gray-800/50 transition-all duration-300 group border border-transparent hover:border-gray-700/50 shadow-lg hover:shadow-xl"
-            >
-              <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700 rounded-full overflow-hidden flex-shrink-0 group-hover:border-blue-500/50 transition-all duration-300 shadow-lg group-hover:shadow-blue-500/20">
-                {user?.photoURL ? (
+      {/* Mobile Profile Section - Compact profile button only */}
+      <div className="sm:hidden mx-2 mb-4">
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          {/* Compact Profile Button */}
+          <button
+            onClick={() => setShowMobileProfile(!showMobileProfile)}
+            className="w-full p-3 flex items-center justify-center hover:bg-gray-800 transition-all duration-200"
+          >
+            {/* Profile Picture Only */}
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-600 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg">
+                {user?.photoURL && !imageError ? (
                   <img 
-                    src={`${user.photoURL}?t=${forceRefresh}`} 
+                    src={user.photoURL} 
                     alt="Profile" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover transition-opacity duration-200"
+                    onError={() => setImageError(true)}
+                    onLoad={() => setImageError(false)}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300">
-                    <span className="text-white text-lg font-bold group-hover:scale-110 transition-transform duration-300">
-                      {getUserInitials()}
-                    </span>
+                  <div className="flex items-center justify-center w-full h-full">
+                    {user?.displayName || user?.email ? (
+                      <div className="text-white text-sm font-bold bg-gradient-to-br from-blue-500 to-purple-600 w-full h-full flex items-center justify-center rounded-full">
+                        {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
+                      </div>
+                    ) : (
+                      <FiUser size={20} className="text-gray-400" />
+                    )}
                   </div>
                 )}
-              </div>
-              <div className="flex-1 text-center min-w-0 hidden sm:block">
-                <div className="text-white font-bold text-base truncate group-hover:text-blue-300 transition-colors duration-300">
-                  {getUserDisplayName()}
-                </div>
-                <div className="text-gray-400 text-sm truncate group-hover:text-gray-300 transition-colors duration-300">
-                  @{user?.email?.split('@')[0]}
+                
+                {/* Online Status Indicator */}
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border-2 border-gray-900 rounded-full flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                 </div>
               </div>
-              <FiChevronDown className={`w-5 h-5 text-gray-400 transition-all duration-300 hidden sm:block group-hover:text-blue-400 ${
-                showProfileDropdown ? 'rotate-180 text-blue-400' : ''
-              }`} />
-            </button>
+            </div>
+          </button>
+        </div>
+      </div>
 
-            {/* Mobile Profile Dropdown */}
-            <AnimatePresence>
-              {showProfileDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute bottom-full left-0 right-0 mb-4 bg-black/95 backdrop-blur-xl border border-gray-700/50 rounded-3xl shadow-2xl overflow-hidden z-50 min-w-[280px] w-full"
+      {/* Mobile Profile Modal */}
+      <AnimatePresence>
+        {showMobileProfile && (
+          <>
+            {/* Modal Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] sm:hidden"
+              onClick={() => setShowMobileProfile(false)}
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ 
+                duration: 0.4, 
+                ease: [0.4, 0.0, 0.2, 1],
+                type: "spring",
+                damping: 25,
+                stiffness: 300
+              }}
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 max-w-[90vw] bg-gray-900 rounded-3xl border border-gray-700 shadow-2xl z-[70] sm:hidden overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 p-6 text-center">
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowMobileProfile(false)}
+                  className="absolute top-4 right-4 w-8 h-8 bg-gray-800/50 hover:bg-gray-700 rounded-full flex items-center justify-center transition-all duration-200"
                 >
-                  {/* Profile Header in Dropdown */}
-                  <div className="px-6 py-6 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-gray-800/50">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-600 rounded-full overflow-hidden flex-shrink-0 shadow-lg">
-                        {user?.photoURL ? (
-                          <img 
-                            src={`${user.photoURL}?t=${forceRefresh}`} 
-                            alt="Profile" 
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
-                            <span className="text-white text-xl font-bold">
-                              {getUserInitials()}
-                            </span>
+                  <FiChevronDown className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+
+                {/* Large Profile Picture */}
+                <div className="relative mx-auto mb-4">
+                  <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-600 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-xl mx-auto">
+                    {user?.photoURL && !imageError ? (
+                      <img 
+                        src={user.photoURL} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover transition-opacity duration-200"
+                        onError={() => setImageError(true)}
+                        onLoad={() => setImageError(false)}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full">
+                        {user?.displayName || user?.email ? (
+                          <div className="text-white text-xl font-bold bg-gradient-to-br from-blue-500 to-purple-600 w-full h-full flex items-center justify-center rounded-full">
+                            {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
                           </div>
+                        ) : (
+                          <FiUser size={28} className="text-gray-400" />
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white font-bold text-xl truncate">
-                          {getUserDisplayName()}
-                        </div>
-                        <div className="text-gray-400 text-base truncate">
-                          @{user?.email?.split('@')[0]}
-                        </div>
-                      </div>
+                    )}
+                    
+                    {/* Online Status Indicator */}
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-gray-900 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Dropdown Options */}
-                  <div className="py-4">
-                    <button 
-                      onClick={onEditProfile}
-                      className="w-full flex items-center px-6 py-5 text-left hover:bg-gray-900/50 active:bg-gray-800/50 transition-all duration-300 text-white text-lg font-medium group"
-                    >
-                      <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mr-5 group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-300 shadow-lg">
-                        <FiEdit className="text-blue-400 w-6 h-6 group-hover:text-white transition-colors duration-300" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-white font-semibold text-lg group-hover:text-blue-300 transition-colors duration-300">Edit Profile</div>
-                        <div className="text-gray-400 text-base mt-1 group-hover:text-gray-300 transition-colors duration-300">Update your information</div>
-                      </div>
-                    </button>
-                    
-                    <button
-                      onClick={onSignOut}
-                      className="w-full flex items-center px-6 py-5 text-left hover:bg-gray-900/50 active:bg-gray-800/50 transition-all duration-300 text-white text-lg font-medium group"
-                    >
-                      <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mr-5 group-hover:from-green-600 group-hover:to-green-700 transition-all duration-300 shadow-lg">
-                        <FiLogOut className="text-green-400 w-6 h-6 group-hover:text-white transition-colors duration-300" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-white font-semibold text-lg group-hover:text-green-300 transition-colors duration-300">Sign Out</div>
-                        <div className="text-gray-400 text-base mt-1 group-hover:text-gray-300 transition-colors duration-300">Log out of your account</div>
-                      </div>
-                    </button>
-                    
-                    <div className="border-t border-gray-700/50 my-4 mx-6"></div>
-                    
-                    <button
-                      onClick={onDeleteAccount}
-                      className="w-full flex items-center px-6 py-5 text-left hover:bg-red-900/20 active:bg-red-900/30 transition-all duration-300 text-red-400 text-lg font-medium group"
-                    >
-                      <div className="w-12 h-12 bg-gradient-to-br from-red-900/30 to-red-800/30 rounded-xl flex items-center justify-center mr-5 group-hover:from-red-600 group-hover:to-red-700 transition-all duration-300 shadow-lg">
-                        <FiTrash2 className="text-red-400 w-6 h-6 group-hover:text-white transition-colors duration-300" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-red-400 font-semibold text-lg group-hover:text-red-300 transition-colors duration-300">Delete Account</div>
-                        <div className="text-red-300 text-base opacity-70 mt-1 group-hover:opacity-90 transition-all duration-300">Permanently remove account</div>
-                      </div>
-                    </button>
+                {/* User Info */}
+                <div className="space-y-2">
+                  <h3 className="text-white font-bold text-xl leading-tight">
+                    {user?.displayName || user?.email?.split('@')[0] || 'User'}
+                  </h3>
+                  <p className="text-gray-400 text-sm break-all">
+                    {user?.email}
+                  </p>
+                  
+                  {/* Role Badge */}
+                  <div className="flex justify-center mt-3">
+                    <span className={`px-3 py-1.5 rounded-full text-sm font-medium border ${
+                      userRole === 'admin' 
+                        ? 'bg-red-900/50 text-red-300 border-red-700' 
+                        : userRole === 'moderator'
+                        ? 'bg-blue-900/50 text-blue-300 border-blue-700'
+                        : 'bg-gray-800/50 text-gray-300 border-gray-600'
+                    }`}>
+                      {userRole === 'admin' ? '👑 Admin' : userRole === 'moderator' ? '🛡️ Moderator' : '🎓 Student'}
+                    </span>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      )}
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-6">
+                {/* Quick Stats - Only show if we have real data */}
+                {(userData?.postsCount || userData?.helpCount) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {userData?.postsCount !== undefined && (
+                      <div className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-xl p-4 text-center border border-gray-600">
+                        <div className="text-white font-bold text-lg">{userData.postsCount}</div>
+                        <div className="text-gray-400 text-sm">Posts</div>
+                      </div>
+                    )}
+                    {userData?.helpCount !== undefined && (
+                      <div className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-xl p-4 text-center border border-gray-600">
+                        <div className="text-white font-bold text-lg">{userData.helpCount}</div>
+                        <div className="text-gray-400 text-sm">Helped</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* User Details */}
+                <div className="space-y-3">
+                  <div className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-xl p-4 border border-gray-600">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Member since:</span>
+                        <span className="text-white">
+                          {user?.metadata?.creationTime 
+                            ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short' 
+                              })
+                            : 'Recently'
+                          }
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Last active:</span>
+                        <span className="text-white">
+                          {user?.metadata?.lastSignInTime 
+                            ? new Date(user.metadata.lastSignInTime).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })
+                            : 'Today'
+                          }
+                        </span>
+                      </div>
+                      {userData?.department && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Department:</span>
+                          <span className="text-white">{userData.department}</span>
+                        </div>
+                      )}
+                      {userData?.year && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Year:</span>
+                          <span className="text-white">{userData.year}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Actions */}
+                <div className="space-y-2">
+                  <button
+                    onClick={() => {
+                      if (onEditProfile) {
+                        onEditProfile();
+                      } else {
+                        onSelectSection('profile');
+                      }
+                      setShowMobileProfile(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-gray-800 hover:to-gray-700 rounded-xl transition-all duration-200 flex items-center border border-transparent hover:border-gray-600"
+                  >
+                    <FiUser className="mr-3 text-blue-400" size={18} />
+                    <span className="font-medium">Edit Profile</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (onDeleteAccount) {
+                        onDeleteAccount();
+                      }
+                      setShowMobileProfile(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-orange-400 hover:text-orange-300 hover:bg-gradient-to-r hover:from-orange-900/20 hover:to-orange-800/20 rounded-xl transition-all duration-200 flex items-center border border-transparent hover:border-orange-700/50"
+                  >
+                    <FiTrash2 className="mr-3" size={18} />
+                    <span className="font-medium">Delete Profile</span>
+                  </button>
+                </div>
+
+                {/* Sign Out Button */}
+                <div className="pt-4 border-t border-gray-700">
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-4 py-3 text-red-400 hover:text-red-300 hover:bg-gradient-to-r hover:from-red-900/20 hover:to-red-800/20 rounded-xl transition-all duration-200 flex items-center font-medium border border-transparent hover:border-red-700/50"
+                  >
+                    <FiLogOut className="mr-3" size={18} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 } 

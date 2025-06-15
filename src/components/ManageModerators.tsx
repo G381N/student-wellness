@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiShield, FiPlus, FiTrash2, FiMail, FiCalendar, FiUser, FiAlertTriangle } from 'react-icons/fi';
+import { FiShield, FiPlus, FiTrash2, FiMail, FiCalendar, FiUser, FiAlertTriangle, FiUsers, FiUserPlus, FiUserMinus } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { Moderator, getModerators, addModerator, removeModerator } from '@/lib/firebase-utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -122,196 +122,128 @@ export default function ManageModerators() {
   const inactiveModerators = moderators.filter(mod => !mod.isActive);
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-2 sm:p-6 space-y-3 sm:space-y-6 max-w-full overflow-hidden min-h-screen">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          <FiShield className="text-white text-3xl mr-3" />
-          <h1 className="text-3xl font-bold text-white">Manage Moderators</h1>
+      <div className="text-center mb-4 sm:mb-8">
+        <div className="flex items-center justify-center mb-3 sm:mb-4">
+          <FiUsers className="text-white text-xl sm:text-3xl mr-2 sm:mr-3 flex-shrink-0" />
+          <h1 className="text-xl sm:text-3xl font-bold text-white break-words leading-tight">Manage Moderators</h1>
         </div>
-        <p className="text-gray-400 text-lg">Add and manage platform moderators</p>
+        <p className="text-gray-400 text-sm sm:text-lg px-2 break-words">Add and manage moderators for the platform</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-900 rounded-2xl p-4 border border-gray-800 text-center">
-          <div className="text-2xl font-bold text-white">{activeModerators.length}</div>
-          <div className="text-sm text-gray-400">Active Moderators</div>
+      {/* Statistics */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-3 sm:mb-6">
+        <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
+          <div className="text-lg sm:text-2xl font-bold text-blue-400">{activeModerators.length}</div>
+          <div className="text-xs sm:text-sm text-gray-400 break-words">Total Moderators</div>
         </div>
-        <div className="bg-gray-900 rounded-2xl p-4 border border-gray-800 text-center">
-          <div className="text-2xl font-bold text-gray-400">{inactiveModerators.length}</div>
-          <div className="text-sm text-gray-400">Inactive</div>
+        <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
+          <div className="text-lg sm:text-2xl font-bold text-green-400">{activeModerators.length}</div>
+          <div className="text-xs sm:text-sm text-gray-400 break-words">Active Moderators</div>
         </div>
-        <div className="bg-gray-900 rounded-2xl p-4 border border-gray-800 text-center">
-          <div className="text-2xl font-bold text-blue-400">{moderators.length}</div>
-          <div className="text-sm text-gray-400">Total</div>
-        </div>
-      </div>
-
-      {/* Add Moderator Button */}
-      <div className="flex justify-end mb-6">
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-gray-200 transition-colors flex items-center"
-        >
-          <FiPlus className="mr-2" />
-          Add Moderator
-        </button>
       </div>
 
       {/* Add Moderator Form */}
-      {showAddForm && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-6"
-        >
-          <h3 className="text-xl font-bold text-white mb-4">Add New Moderator</h3>
-          <form onSubmit={handleAddModerator} className="space-y-4">
-            <div>
-              <label className="text-gray-400 text-sm block mb-2">Email Address</label>
-              <input
-                type="email"
-                value={newModeratorEmail}
-                onChange={(e) => setNewModeratorEmail(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                placeholder="Enter moderator's email address"
-                required
-              />
-            </div>
-            <div className="flex space-x-3">
-              <button
-                type="submit"
-                disabled={adding || !newModeratorEmail.trim()}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-700 text-white px-6 py-3 rounded-lg font-bold transition-colors flex items-center"
-              >
-                {adding ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <FiPlus className="mr-2" />
-                    Add Moderator
-                  </>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddForm(false);
-                  setNewModeratorEmail('');
-                }}
-                className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </motion.div>
-      )}
-
-      {/* Active Moderators */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Active Moderators</h2>
-        {activeModerators.length === 0 ? (
-          <div className="text-center py-12">
-            <FiShield className="text-gray-600 text-6xl mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">No active moderators</p>
+      <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800 mb-3 sm:mb-6">
+        <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Add New Moderator</h3>
+        <form onSubmit={handleAddModerator} className="space-y-3 sm:space-y-4">
+          <div>
+            <label className="text-gray-400 text-xs sm:text-sm block mb-2">Email Address</label>
+            <input
+              type="email"
+              value={newModeratorEmail}
+              onChange={(e) => setNewModeratorEmail(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
+              placeholder="Enter moderator's email"
+              required
+            />
           </div>
-        ) : (
-          activeModerators.map((moderator, index) => (
-            <motion.div
-              key={moderator.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-gray-900 rounded-2xl p-6 border border-gray-800 hover:border-gray-700 transition-all"
+          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
+            <button
+              type="submit"
+              disabled={adding}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold transition-colors flex items-center justify-center text-sm sm:text-base w-full sm:w-auto"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    <FiShield className="text-blue-400 mr-3" />
-                    <h3 className="text-xl font-bold text-white">{moderator.email}</h3>
-                    <span className="ml-3 bg-green-900 text-green-300 px-3 py-1 rounded-full text-sm font-medium">
-                      Active
-                    </span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-gray-400 text-sm">
-                    <div className="flex items-center">
-                      <FiUser className="mr-2" />
-                      <span>Added by: {moderator.addedBy}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FiCalendar className="mr-2" />
-                      <span>Added: {formatTimestamp(moderator.addedAt)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleRemoveModerator(moderator.id)}
-                  disabled={removing === moderator.id}
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center"
-                >
-                  {removing === moderator.id ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Removing...
-                    </>
-                  ) : (
-                    <>
-                      <FiTrash2 className="mr-2" />
-                      Remove
-                    </>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          ))
-        )}
+              <FiUserPlus className="mr-2 flex-shrink-0" />
+              <span className="whitespace-nowrap">{adding ? 'Adding...' : 'Add Moderator'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewModeratorEmail('')}
+              className="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold transition-colors text-sm sm:text-base w-full sm:w-auto"
+            >
+              Clear
+            </button>
+          </div>
+        </form>
       </div>
 
-      {/* Inactive Moderators */}
-      {inactiveModerators.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-400">Inactive Moderators</h2>
-          {inactiveModerators.map((moderator, index) => (
-            <motion.div
-              key={moderator.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-gray-900 rounded-2xl p-6 border border-gray-800 opacity-60"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    <FiShield className="text-gray-500 mr-3" />
-                    <h3 className="text-xl font-bold text-gray-400">{moderator.email}</h3>
-                    <span className="ml-3 bg-red-900 text-red-300 px-3 py-1 rounded-full text-sm font-medium">
-                      Inactive
-                    </span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-gray-500 text-sm">
-                    <div className="flex items-center">
-                      <FiUser className="mr-2" />
-                      <span>Added by: {moderator.addedBy}</span>
+      {/* Current Moderators */}
+      <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800">
+        <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Current Moderators</h3>
+        
+        {moderators.length === 0 ? (
+          <div className="text-center py-6 sm:py-12 px-4">
+            <FiUsers className="text-gray-600 text-3xl sm:text-6xl mx-auto mb-4" />
+            <p className="text-gray-400 text-sm sm:text-lg break-words">No moderators found</p>
+            <p className="text-gray-500 text-xs sm:text-sm mt-2 break-words">Add your first moderator to get started</p>
+          </div>
+        ) : (
+          <div className="space-y-2 sm:space-y-4">
+            {moderators.map((moderator, index) => (
+              <div
+                key={moderator.id}
+                className="bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-700 hover:border-gray-600 transition-all"
+              >
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start mb-2">
+                      <FiUser className="text-blue-400 mr-2 flex-shrink-0 mt-1" />
+                      <h4 className="text-sm sm:text-lg font-bold text-white break-words flex-1 min-w-0">{moderator.email}</h4>
                     </div>
-                    <div className="flex items-center">
-                      <FiCalendar className="mr-2" />
-                      <span>Added: {formatTimestamp(moderator.addedAt)}</span>
+                    <div className="flex flex-col gap-1 sm:gap-2 text-gray-400 text-xs sm:text-sm">
+                      <div className="flex items-center">
+                        <FiMail className="mr-2 flex-shrink-0" />
+                        <span className="break-words min-w-0 flex-1">{moderator.email}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FiCalendar className="mr-2 flex-shrink-0" />
+                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.addedAt)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        moderator.isActive 
+                          ? 'bg-green-900 text-green-300' 
+                          : 'bg-red-900 text-red-300'
+                      }`}>
+                        {moderator.isActive ? 'Active' : 'Inactive'}
+                      </span>
                     </div>
                   </div>
+                  {moderator.isActive && (
+                    <div className="flex justify-end flex-shrink-0">
+                      <button
+                        onClick={() => handleRemoveModerator(moderator.id)}
+                        disabled={removing === moderator.id}
+                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white p-2 rounded-lg transition-colors"
+                        title="Remove Moderator"
+                      >
+                        {removing === moderator.id ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <FiUserMinus className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 } 

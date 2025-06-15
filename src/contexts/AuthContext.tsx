@@ -1,0 +1,211 @@
+'use client';
+
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { 
+  onAuthStateChanged, 
+  User as FirebaseUser, 
+  signOut as firebaseSignOut
+} from 'firebase/auth';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { User, startActivityCleanup, stopActivityCleanup } from '@/lib/firebase-utils';
+
+interface AuthContextType {
+  user: FirebaseUser | null;
+  userData: User | null;
+  loading: boolean;
+  userRole: string;
+  isAdmin: boolean;
+  isModerator: boolean;
+  signOut: () => Promise<void>;
+  refreshUserData: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  userData: null,
+  loading: true,
+  userRole: 'user',
+  isAdmin: false,
+  isModerator: false,
+  signOut: async () => {},
+  refreshUserData: async () => {},
+});
+
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [userData, setUserData] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string>('user');
+
+  const refreshUserData = async () => {
+    if (!user) return;
+    
+    try {
+      // First, reload the Firebase Auth user to get latest profile data
+      await user.reload();
+      
+      // Get the refreshed user from auth
+      const refreshedUser = auth.currentUser;
+      if (refreshedUser) {
+        setUser(refreshedUser);
+      }
+      
+      // Then update Firestore data
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
+        setUserData(userData);
+        setUserRole(userData.role || 'user');
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      
+      if (firebaseUser) {
+        try {
+          // Get user data from Firestore
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const userSnap = await getDoc(userRef);
+          
+          if (userSnap.exists()) {
+            // User exists - update their data with latest info from Firebase Auth
+            const existingUserData = userSnap.data() as User;
+            
+            // Prepare updated data
+            const updatedData = {
+              ...existingUserData,
+              email: firebaseUser.email || existingUserData.email,
+              displayName: firebaseUser.displayName || existingUserData.displayName,
+              photoURL: firebaseUser.photoURL || existingUserData.photoURL,
+              lastLogin: serverTimestamp()
+            };
+            
+            // Only update if there are actual changes
+            const hasChanges = 
+              existingUserData.email !== updatedData.email ||
+              existingUserData.displayName !== updatedData.displayName ||
+              existingUserData.photoURL !== updatedData.photoURL;
+            
+            if (hasChanges) {
+              await updateDoc(userRef, updatedData);
+              console.log('✅ User data updated with latest auth info');
+            } else {
+              // Just update last login
+              await updateDoc(userRef, { lastLogin: serverTimestamp() });
+            }
+            
+            setUserData(updatedData as User);
+            setUserRole(existingUserData.role || 'user');
+          } else {
+            // New user - create user document
+            const email = firebaseUser.email || '';
+            const displayName = firebaseUser.displayName || email.split('@')[0] || 'Anonymous';
+            
+            // Try to extract first and last name from display name or email
+            let firstName = '', lastName = '';
+            
+            if (displayName && displayName.includes(' ')) {
+              // If display name has a space, use it to split into first and last name
+              const nameParts = displayName.split(' ');
+              firstName = nameParts[0];
+              lastName = nameParts.slice(1).join(' ');
+            } else if (email && email.includes('.') && email.includes('@')) {
+              // Try to extract from email if it's in the format firstname.lastname@domain
+              const localPart = email.split('@')[0];
+              if (localPart.includes('.')) {
+                const nameParts = localPart.split('.');
+                firstName = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
+                lastName = nameParts[1].charAt(0).toUpperCase() + nameParts[1].slice(1);
+              } else {
+                firstName = displayName;
+                lastName = '';
+              }
+            } else {
+              firstName = displayName;
+              lastName = '';
+            }
+            
+            const newUserData: User = {
+              uid: firebaseUser.uid,
+              email,
+              displayName,
+              firstName,
+              lastName,
+              photoURL: firebaseUser.photoURL || null,
+              role: 'user' // Default role
+            };
+            
+            // Save user data to Firestore
+            await setDoc(userRef, {
+              ...newUserData,
+              createdAt: serverTimestamp(),
+              lastLogin: serverTimestamp()
+            });
+            
+            console.log('✅ New user created in Firestore');
+            setUserData(newUserData);
+            setUserRole('user');
+          }
+        } catch (error) {
+          console.error('Error handling user authentication:', error);
+        }
+      } else {
+        setUserData(null);
+        setUserRole('user');
+      }
+      
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Start activity cleanup service when the provider mounts
+  useEffect(() => {
+    const cleanupInterval = startActivityCleanup();
+    
+    // Cleanup when component unmounts
+    return () => {
+      stopActivityCleanup(cleanupInterval);
+    };
+  }, []);
+
+  const signOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+      setUser(null);
+      setUserData(null);
+      setUserRole('user');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const isAdmin = userRole === 'admin';
+  const isModerator = userRole === 'moderator' || userRole === 'admin';
+
+  return (
+    <AuthContext.Provider value={{ 
+      user, 
+      userData, 
+      loading, 
+      userRole, 
+      isAdmin, 
+      isModerator, 
+      signOut,
+      refreshUserData
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}; 

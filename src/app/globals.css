@@ -24,3 +24,284 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hide scrollbars */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom cursor effects */
+.custom-cursor {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.custom-cursor:hover {
+  transform: scale(1.02);
+}
+
+/* Button hover effects */
+.btn-hover-scale {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-hover-scale:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Smooth transitions for all interactive elements */
+button, .clickable {
+  transition: all 0.2s ease;
+}
+
+/* Enhanced focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* Loading spinner improvements */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  /* Mobile optimizations */
+  .card-hover {
+    padding: 1rem;
+  }
+  
+  .custom-cursor:hover {
+    cursor: pointer; /* Fallback for touch devices */
+  }
+}
+
+@media (max-width: 640px) {
+  /* Small mobile optimizations */
+  body {
+    font-size: 14px;
+  }
+  
+  .btn-hover-scale {
+    transform: none; /* Disable scale on very small screens */
+  }
+  
+  .btn-hover-scale:hover {
+    transform: none;
+  }
+}
+
+/* Zoom level optimizations */
+@media (max-resolution: 1dppx) {
+  /* Low resolution/zoomed out */
+  * {
+    font-size: inherit;
+    line-height: 1.4;
+  }
+}
+
+@media (min-resolution: 2dppx) {
+  /* High resolution/zoomed in */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Layout improvements for different zoom levels */
+.responsive-container {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+@media (max-width: 1200px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Flexible text sizing */
+.responsive-text {
+  font-size: clamp(0.875rem, 2.5vw, 1.125rem);
+  line-height: 1.5;
+}
+
+.responsive-title {
+  font-size: clamp(1.25rem, 4vw, 1.875rem);
+  line-height: 1.3;
+}
+
+/* Adaptive spacing */
+.adaptive-padding {
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.adaptive-margin {
+  margin: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+/* Ultra-wide monitor optimizations */
+@media (min-width: 1920px) {
+  /* 1920px+ screens */
+  .center-content {
+    max-width: 1400px;
+  }
+  
+  /* Better typography scaling */
+  .responsive-text {
+    font-size: clamp(1rem, 1.2vw, 1.25rem);
+  }
+  
+  .responsive-title {
+    font-size: clamp(1.5rem, 2vw, 2.25rem);
+  }
+}
+
+@media (min-width: 2560px) {
+  /* 2K+ screens */
+  body {
+    font-size: 16px;
+  }
+  
+  .responsive-text {
+    font-size: clamp(1.125rem, 1vw, 1.375rem);
+  }
+  
+  .responsive-title {
+    font-size: clamp(1.75rem, 1.5vw, 2.5rem);
+  }
+  
+  .center-content {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 3440px) {
+  /* Ultra-wide screens (21:9 aspect ratio) */
+  .center-content {
+    margin-left: 18rem !important;
+    margin-right: 22rem !important;
+    width: calc(100vw - 40rem) !important;
+  }
+  
+  .left-sidebar {
+    width: 18rem !important;
+  }
+  
+  .right-sidebar {
+    width: 22rem !important;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+  /* Sharper borders and shadows for high DPI */
+  .border {
+    border-width: 0.5px;
+  }
+  
+  .shadow-lg {
+    box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.1), 0 2px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Content width constraints for readability */
+.content-width {
+  max-width: 65ch; /* Optimal reading width */
+  margin: 0 auto;
+}
+
+/* Improved scrollbar for webkit browsers */
+@media (min-width: 1024px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Improved container constraints for ultra-wide screens */
+.center-content {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Typography improvements */
+.text-responsive-sm {
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+}
+
+/* Enhanced card styling */
+.enhanced-card {
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  transition: all 0.3s ease;
+}
+
+.enhanced-card:hover {
+  background: rgba(17, 24, 39, 0.9);
+  border-color: rgba(75, 85, 99, 0.5);
+  transform: translateY(-1px);
+}

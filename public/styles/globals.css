@@ -1,0 +1,33 @@
+/* Global styles for form elements */
+input,
+textarea,
+select {
+  color: #1f2937 !important; /* Dark gray text for visibility */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important; /* Medium gray for placeholders */
+}
+
+/* Ensure text is visible in input fields with white backgrounds */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+textarea {
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+  color: #1f2937 !important;
+}
+
+/* Focus states with visible outline */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+  outline: none !important;
+} 

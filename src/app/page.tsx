@@ -1,103 +1,100 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { FiHeart } from 'react-icons/fi';
+import { useState } from 'react';
+
+export default function HomePage() {
+  const [isLogoAnimating, setIsLogoAnimating] = useState(true);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-black text-white flex">
+      {/* Left Side - Logo and Branding */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="max-w-md text-center">
+          {/* Logo */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ 
+              duration: 1.2, 
+              type: "spring", 
+              stiffness: 100,
+              onComplete: () => setIsLogoAnimating(false)
+            }}
+            className="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl"
+          >
+            <motion.div
+              animate={isLogoAnimating ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <FiHeart className="text-black text-6xl" />
+            </motion.div>
+          </motion.div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="text-center"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <h1 className="text-6xl font-bold mb-4">CampusWell</h1>
+            <p className="text-xl text-gray-400 leading-relaxed">
+              Connect. Share. Support.
+            </p>
+          </motion.div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+
+      {/* Right Side - Login/Signup */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="max-w-md w-full"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <div className="mb-12">
+            <h2 className="text-6xl font-bold mb-6">Happening now</h2>
+            <h3 className="text-3xl font-bold mb-8">Join today.</h3>
+          </div>
+
+          <div className="space-y-4">
+            <Link
+              href="/signup"
+              className="w-full bg-white text-black py-4 px-8 rounded-full font-bold text-lg hover:bg-gray-200 transition-all duration-200 block text-center"
+            >
+              Create account
+            </Link>
+
+            <div className="flex items-center my-6">
+              <div className="flex-1 border-t border-gray-700"></div>
+              <span className="px-4 text-gray-500 text-sm">or</span>
+              <div className="flex-1 border-t border-gray-700"></div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-lg font-bold mb-4">Already have an account?</p>
+              <Link
+                href="/login"
+                className="w-full border border-gray-600 text-white py-4 px-8 rounded-full font-bold text-lg hover:bg-gray-900 transition-all duration-200 block text-center"
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-xs text-gray-500 mt-8">
+            <p>
+              By signing up, you agree to the{' '}
+              <a href="#" className="text-white hover:underline">Terms of Service</a>{' '}
+              and{' '}
+              <a href="#" className="text-white hover:underline">Privacy Policy</a>.
+            </p>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

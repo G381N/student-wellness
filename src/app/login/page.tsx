@@ -387,12 +387,12 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
-                    className={`block w-full pl-8 sm:pl-10 pr-3 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
+                    className={`block w-full pl-8 sm:pl-10 pr-3 py-3 sm:py-4 border rounded-xl bg-black/80 backdrop-blur-sm text-white placeholder-gray-500 focus:outline-none transition-all duration-300 text-sm sm:text-base shadow-lg ${
                       errors.email 
-                        ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
+                        ? 'border-red-500/50 focus:border-red-400 focus:ring-2 focus:ring-red-400/20 shadow-red-500/20' 
                         : focusedField === 'email'
-                        ? 'border-blue-500 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20'
-                        : 'border-gray-700 hover:border-gray-600'
+                        ? 'border-blue-500/50 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 shadow-blue-500/20'
+                        : 'border-gray-800 hover:border-gray-700 shadow-gray-900/50'
                     }`}
                     placeholder="your.email@christuniversity.in"
                   />
@@ -433,24 +433,24 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    className={`block w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
+                    className={`block w-full pl-8 sm:pl-10 pr-10 sm:pr-12 py-3 sm:py-4 border rounded-xl bg-black/80 backdrop-blur-sm text-white placeholder-gray-500 focus:outline-none transition-all duration-300 text-sm sm:text-base shadow-lg ${
                       errors.password 
-                        ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
+                        ? 'border-red-500/50 focus:border-red-400 focus:ring-2 focus:ring-red-400/20 shadow-red-500/20' 
                         : focusedField === 'password'
-                        ? 'border-blue-500 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20'
-                        : 'border-gray-700 hover:border-gray-600'
+                        ? 'border-blue-500/50 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 shadow-blue-500/20'
+                        : 'border-gray-800 hover:border-gray-700 shadow-gray-900/50'
                     }`}
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-800/50 rounded-r-lg transition-colors duration-200"
+                    className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center hover:bg-gray-800/30 rounded-r-xl transition-all duration-300 group"
                   >
                     {showPassword ? (
-                      <FiEyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
+                      <FiEyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 group-hover:text-gray-300 transition-colors duration-200" />
                     ) : (
-                      <FiEye className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 hover:text-gray-300" />
+                      <FiEye className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 group-hover:text-gray-300 transition-colors duration-200" />
                     )}
                   </button>
                 </div>
@@ -487,17 +487,17 @@ export default function LoginPage() {
                 disabled={loading}
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                className="w-full flex justify-center items-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-lg text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
+                className="w-full flex justify-center items-center py-3 sm:py-4 px-4 border border-transparent rounded-xl shadow-xl text-sm sm:text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 group"
               >
                 {loading ? (
                   <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
                     Signing in...
                   </div>
                 ) : (
                   <>
                     Sign In
-                    <FiArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    <FiArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform duration-200" />
                   </>
                 )}
               </motion.button>
@@ -505,10 +505,10 @@ export default function LoginPage() {
               {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-700" />
+                  <div className="w-full border-t border-gray-800" />
                 </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="px-3 bg-black text-gray-400 font-medium">Or continue with</span>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-black text-gray-400 font-medium">Or continue with</span>
                 </div>
               </div>
 
@@ -519,9 +519,9 @@ export default function LoginPage() {
                 disabled={loading}
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                className="w-full flex justify-center items-center py-2.5 sm:py-3 px-4 border border-gray-700 rounded-lg shadow-lg bg-gray-900/50 backdrop-blur-sm text-white hover:bg-gray-800/50 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-xs sm:text-sm"
+                className="w-full flex justify-center items-center py-3 sm:py-4 px-4 border border-gray-800 rounded-xl shadow-lg bg-black/80 backdrop-blur-sm text-white hover:bg-gray-900/80 hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium text-sm sm:text-base"
               >
-                <FcGoogle className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                <FcGoogle className="h-4 w-4 sm:h-5 sm:w-5 mr-3" />
                 Sign in with Google
               </motion.button>
 

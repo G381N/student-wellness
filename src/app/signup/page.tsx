@@ -398,10 +398,10 @@ export default function SignupPage() {
                 required
                 value={formData.email}
                 onChange={handleEmailChange}
-                className={`block w-full px-3 py-2 sm:py-2.5 border rounded-lg bg-gray-900/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 text-xs sm:text-sm ${
+                className={`block w-full pl-8 sm:pl-10 pr-3 py-3 sm:py-4 border rounded-xl bg-black/80 backdrop-blur-sm text-white placeholder-gray-500 focus:outline-none transition-all duration-300 text-sm sm:text-base shadow-lg ${
                   errors.email 
-                    ? 'border-red-500 focus:border-red-400 focus:ring-1 focus:ring-red-400/20' 
-                    : 'border-gray-700 hover:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20'
+                    ? 'border-red-500/50 focus:border-red-400 focus:ring-2 focus:ring-red-400/20 shadow-red-500/20' 
+                    : 'border-gray-800 hover:border-gray-700 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-400/20 shadow-gray-900/50'
                 }`}
                 placeholder="your.email@christuniversity.in"
               />

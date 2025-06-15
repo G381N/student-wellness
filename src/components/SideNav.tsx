@@ -186,37 +186,37 @@ export default function SideNav({
 
       {/* Mobile Profile Section - Only visible on mobile/tablet */}
       {user && (
-        <div className="lg:hidden border-t border-gray-800 p-3">
+        <div className="lg:hidden border-t border-gray-800 p-4">
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={onProfileClick}
-              className="w-full flex items-center space-x-3 p-3 rounded-full hover:bg-gray-900 transition-all duration-200 group"
+              className="w-full flex items-center justify-center space-x-3 p-4 rounded-2xl hover:bg-gray-900/50 active:bg-gray-800/50 transition-all duration-300 group border border-transparent hover:border-gray-700/50 shadow-lg hover:shadow-xl"
             >
-              <div className="w-10 h-10 bg-gray-900 border border-gray-700 rounded-full overflow-hidden flex-shrink-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700 rounded-full overflow-hidden flex-shrink-0 group-hover:border-blue-500/50 transition-all duration-300 shadow-lg group-hover:shadow-blue-500/20">
                 {user?.photoURL ? (
                   <img 
                     src={`${user.photoURL}?t=${forceRefresh}`} 
                     alt="Profile" 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300">
+                    <span className="text-white text-lg font-bold group-hover:scale-110 transition-transform duration-300">
                       {getUserInitials()}
                     </span>
                   </div>
                 )}
               </div>
-              <div className="flex-1 text-left min-w-0 hidden sm:block">
-                <div className="text-white font-bold text-sm truncate">
+              <div className="flex-1 text-center min-w-0 hidden sm:block">
+                <div className="text-white font-bold text-base truncate group-hover:text-blue-300 transition-colors duration-300">
                   {getUserDisplayName()}
                 </div>
-                <div className="text-gray-400 text-xs truncate">
+                <div className="text-gray-400 text-sm truncate group-hover:text-gray-300 transition-colors duration-300">
                   @{user?.email?.split('@')[0]}
                 </div>
               </div>
-              <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 hidden sm:block ${
-                showProfileDropdown ? 'rotate-180' : ''
+              <FiChevronDown className={`w-5 h-5 text-gray-400 transition-all duration-300 hidden sm:block group-hover:text-blue-400 ${
+                showProfileDropdown ? 'rotate-180 text-blue-400' : ''
               }`} />
             </button>
 
@@ -228,12 +228,12 @@ export default function SideNav({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute bottom-full left-0 right-0 mb-3 bg-black border border-gray-700 rounded-2xl shadow-2xl overflow-hidden z-50 min-w-[280px] w-full"
+                  className="absolute bottom-full left-0 right-0 mb-4 bg-black/95 backdrop-blur-xl border border-gray-700/50 rounded-3xl shadow-2xl overflow-hidden z-50 min-w-[280px] w-full"
                 >
                   {/* Profile Header in Dropdown */}
-                  <div className="px-6 py-5 border-b border-gray-700 bg-gray-900">
+                  <div className="px-6 py-6 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-gray-800/50">
                     <div className="flex items-center space-x-4">
-                      <div className="w-14 h-14 bg-gray-800 border border-gray-600 rounded-full overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-600 rounded-full overflow-hidden flex-shrink-0 shadow-lg">
                         {user?.photoURL ? (
                           <img 
                             src={`${user.photoURL}?t=${forceRefresh}`} 
@@ -241,15 +241,15 @@ export default function SideNav({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-white text-lg font-bold">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
+                            <span className="text-white text-xl font-bold">
                               {getUserInitials()}
                             </span>
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-white font-bold text-lg truncate">
+                        <div className="text-white font-bold text-xl truncate">
                           {getUserDisplayName()}
                         </div>
                         <div className="text-gray-400 text-base truncate">
@@ -260,45 +260,45 @@ export default function SideNav({
                   </div>
 
                   {/* Dropdown Options */}
-                  <div className="py-3">
+                  <div className="py-4">
                     <button 
                       onClick={onEditProfile}
-                      className="w-full flex items-center px-6 py-5 text-left hover:bg-gray-900 active:bg-gray-800 transition-colors text-white text-lg font-medium"
+                      className="w-full flex items-center px-6 py-5 text-left hover:bg-gray-900/50 active:bg-gray-800/50 transition-all duration-300 text-white text-lg font-medium group"
                     >
-                      <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mr-5">
-                        <FiEdit className="text-blue-400 w-6 h-6" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mr-5 group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-300 shadow-lg">
+                        <FiEdit className="text-blue-400 w-6 h-6 group-hover:text-white transition-colors duration-300" />
                       </div>
                       <div className="flex-1">
-                        <div className="text-white font-semibold text-lg">Edit Profile</div>
-                        <div className="text-gray-400 text-base mt-1">Update your information</div>
+                        <div className="text-white font-semibold text-lg group-hover:text-blue-300 transition-colors duration-300">Edit Profile</div>
+                        <div className="text-gray-400 text-base mt-1 group-hover:text-gray-300 transition-colors duration-300">Update your information</div>
                       </div>
                     </button>
                     
                     <button
                       onClick={onSignOut}
-                      className="w-full flex items-center px-6 py-5 text-left hover:bg-gray-900 active:bg-gray-800 transition-colors text-white text-lg font-medium"
+                      className="w-full flex items-center px-6 py-5 text-left hover:bg-gray-900/50 active:bg-gray-800/50 transition-all duration-300 text-white text-lg font-medium group"
                     >
-                      <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mr-5">
-                        <FiLogOut className="text-green-400 w-6 h-6" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mr-5 group-hover:from-green-600 group-hover:to-green-700 transition-all duration-300 shadow-lg">
+                        <FiLogOut className="text-green-400 w-6 h-6 group-hover:text-white transition-colors duration-300" />
                       </div>
                       <div className="flex-1">
-                        <div className="text-white font-semibold text-lg">Sign Out</div>
-                        <div className="text-gray-400 text-base mt-1">Log out of your account</div>
+                        <div className="text-white font-semibold text-lg group-hover:text-green-300 transition-colors duration-300">Sign Out</div>
+                        <div className="text-gray-400 text-base mt-1 group-hover:text-gray-300 transition-colors duration-300">Log out of your account</div>
                       </div>
                     </button>
                     
-                    <div className="border-t border-gray-700 my-3 mx-6"></div>
+                    <div className="border-t border-gray-700/50 my-4 mx-6"></div>
                     
                     <button
                       onClick={onDeleteAccount}
-                      className="w-full flex items-center px-6 py-5 text-left hover:bg-red-900 hover:bg-opacity-20 active:bg-red-900 active:bg-opacity-30 transition-colors text-red-400 text-lg font-medium"
+                      className="w-full flex items-center px-6 py-5 text-left hover:bg-red-900/20 active:bg-red-900/30 transition-all duration-300 text-red-400 text-lg font-medium group"
                     >
-                      <div className="w-12 h-12 bg-red-900 bg-opacity-20 rounded-full flex items-center justify-center mr-5">
-                        <FiTrash2 className="text-red-400 w-6 h-6" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-red-900/30 to-red-800/30 rounded-xl flex items-center justify-center mr-5 group-hover:from-red-600 group-hover:to-red-700 transition-all duration-300 shadow-lg">
+                        <FiTrash2 className="text-red-400 w-6 h-6 group-hover:text-white transition-colors duration-300" />
                       </div>
                       <div className="flex-1">
-                        <div className="text-red-400 font-semibold text-lg">Delete Account</div>
-                        <div className="text-red-300 text-base opacity-70 mt-1">Permanently remove account</div>
+                        <div className="text-red-400 font-semibold text-lg group-hover:text-red-300 transition-colors duration-300">Delete Account</div>
+                        <div className="text-red-300 text-base opacity-70 mt-1 group-hover:opacity-90 transition-all duration-300">Permanently remove account</div>
                       </div>
                     </button>
                   </div>

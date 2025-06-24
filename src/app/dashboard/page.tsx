@@ -15,8 +15,9 @@ import MindWall from '@/components/MindWall';
 import CreatePostModal from '@/components/CreatePostModal';
 import AnonymousComplaints from '@/components/AnonymousComplaints';
 import DepartmentComplaints from '@/components/DepartmentComplaints';
-import ManageModerators from '@/components/ManageModerators';
+import DepartmentManagement from '@/components/DepartmentManagement';
 import DepartmentHeadManagement from '@/components/DepartmentHeadManagement';
+import ManageModerators from '@/components/ManageModerators';
 import ModeratorAnnouncements from '@/components/ModeratorAnnouncements';
 import GuidedBreathing from '@/components/GuidedBreathing';
 import { signOut, updateProfile, deleteUser } from 'firebase/auth';
@@ -1171,6 +1172,10 @@ export default function DashboardPage() {
 
             {activeSection === 'department-complaints' && (
               <DepartmentComplaints />
+            )}
+
+            {activeSection === 'department-management' && (
+              <DepartmentManagement />
             )}
 
             {activeSection === 'department-heads' && (

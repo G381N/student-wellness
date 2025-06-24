@@ -19,7 +19,8 @@ import {
   FiEdit,
   FiTrash2,
   FiChevronDown,
-  FiBell
+  FiBell,
+  FiBriefcase
 } from 'react-icons/fi';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -62,8 +63,8 @@ export default function SideNav({
   const [showMobileProfile, setShowMobileProfile] = useState(false);
   const [imageError, setImageError] = useState(false);
   
-  // Determine user role based on existing userData structure
-  const userRole = userData?.role || (userData?.isAdmin ? 'admin' : userData?.isModerator ? 'moderator' : 'student');
+  // Determine user role
+  const userRole = userData?.isAdmin ? 'admin' : userData?.isModerator ? 'moderator' : 'student';
 
   // Reset image error when user photo changes
   useEffect(() => {
@@ -181,63 +182,26 @@ export default function SideNav({
               </motion.button>
             );
           })}
-        </div>
 
-        {/* Create Post Button - Twitter-like */}
-        <div className="mt-6 sm:mt-8 mb-4">
-          <motion.button
-            onClick={onCreatePost}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 sm:py-3.5 xl:py-4 px-3 sm:px-4 xl:px-6 rounded-full transition-all duration-200 flex items-center justify-center text-sm sm:text-base xl:text-lg shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FiPlus className="text-lg sm:text-xl xl:mr-2" />
-            <span className="hidden lg:block">Post</span>
-          </motion.button>
-        </div>
-
-        {/* Complaints - separate for different types */}
-        <div className="space-y-1 sm:space-y-2">
-          {(userRole === 'moderator' || userRole === 'admin') && (
+          {/* Department Management - Admin only */}
+          {userRole === 'admin' && (
             <motion.button
-              onClick={() => onSelectSection('anonymous-complaints')}
+              onClick={() => onSelectSection('department-management')}
               className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
-                activeSection === 'anonymous-complaints'
+                activeSection === 'department-management'
                   ? 'bg-white text-black shadow-lg font-bold' 
                   : 'text-gray-300 hover:bg-gray-900 hover:text-white'
               }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <FiMessageCircle className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
-                activeSection === 'anonymous-complaints' ? 'text-black' : 'text-gray-400 group-hover:text-white'
+              <FiBriefcase className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
+                activeSection === 'department-management' ? 'text-black' : 'text-gray-400 group-hover:text-white'
               }`} />
               <span className={`hidden lg:block font-medium text-base ${
-                activeSection === 'anonymous-complaints' ? 'text-black font-bold' : 'text-white'
+                activeSection === 'department-management' ? 'text-black font-bold' : 'text-white'
               }`}>
-                Anonymous Complaints
-              </span>
-            </motion.button>
-          )}
-          
-          {(userRole === 'admin' || userRole === 'department_head') && (
-            <motion.button
-              onClick={() => onSelectSection('department-complaints')}
-              className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
-                activeSection === 'department-complaints'
-                  ? 'bg-white text-black shadow-lg font-bold' 
-                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <FiSettings className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
-                activeSection === 'department-complaints' ? 'text-black' : 'text-gray-400 group-hover:text-white'
-              }`} />
-              <span className={`hidden lg:block font-medium text-base ${
-                activeSection === 'department-complaints' ? 'text-black font-bold' : 'text-white'
-              }`}>
-                Department Complaints
+                Department Management
               </span>
             </motion.button>
           )}
@@ -264,6 +228,19 @@ export default function SideNav({
               </span>
             </motion.button>
           )}
+        </div>
+
+        {/* Create Post Button - Twitter-like */}
+        <div className="mt-6 sm:mt-8 mb-4">
+          <motion.button
+            onClick={onCreatePost}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 sm:py-3.5 xl:py-4 px-3 sm:px-4 xl:px-6 rounded-full transition-all duration-200 flex items-center justify-center text-sm sm:text-base xl:text-lg shadow-lg hover:shadow-xl"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <FiPlus className="text-lg sm:text-xl xl:mr-2" />
+            <span className="hidden lg:block">Post</span>
+          </motion.button>
         </div>
       </div>
 

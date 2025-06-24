@@ -15,8 +15,10 @@ interface AuthContextType {
   userData: User | null;
   loading: boolean;
   userRole: string;
+  userDepartment: string | null;
   isAdmin: boolean;
   isModerator: boolean;
+  isDepartmentHead: boolean;
   signOut: () => Promise<void>;
   refreshUserData: () => Promise<void>;
 }
@@ -26,8 +28,10 @@ const AuthContext = createContext<AuthContextType>({
   userData: null,
   loading: true,
   userRole: 'user',
+  userDepartment: null,
   isAdmin: false,
   isModerator: false,
+  isDepartmentHead: false,
   signOut: async () => {},
   refreshUserData: async () => {},
 });
@@ -193,6 +197,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAdmin = userRole === 'admin';
   const isModerator = userRole === 'moderator' || userRole === 'admin';
+  const isDepartmentHead = userRole === 'department_head';
+  const userDepartment = userData?.department || null;
 
   return (
     <AuthContext.Provider value={{ 
@@ -200,8 +206,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       userData, 
       loading, 
       userRole, 
+      userDepartment,
       isAdmin, 
       isModerator, 
+      isDepartmentHead,
       signOut,
       refreshUserData
     }}>

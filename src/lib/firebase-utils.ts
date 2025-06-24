@@ -68,7 +68,8 @@ export interface User {
   firstName: string;
   lastName: string;
   photoURL?: string | null;
-  role: 'user' | 'moderator' | 'admin';
+  role: 'user' | 'moderator' | 'admin' | 'department_head';
+  department?: string; // For department heads
   createdAt?: any;
   lastLogin?: any;
 }
@@ -603,6 +604,44 @@ export interface AnonymousComplaint {
   resolved?: boolean;
 }
 
+// Department Head interface
+export interface DepartmentHead {
+  id: string;
+  email: string;
+  department: string;
+  addedBy: string; // Admin who added this department head
+  addedAt: any;
+  isActive: boolean;
+}
+
+// Department Complaint interface  
+export interface DepartmentComplaint {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  department: string;
+  severity: 'Low' | 'Medium' | 'High' | 'Critical';
+  timestamp: Timestamp;
+  status: 'Open' | 'Under Review' | 'Resolved' | 'Closed';
+  adminNotes?: string;
+  resolved?: boolean;
+  studentName?: string;
+  studentPhone?: string;
+  source?: string;
+}
+
+// Department configuration interface
+export interface Department {
+  id: string;
+  name: string;
+  code: string;
+  school: string;
+  contactPhone?: string;
+  isActive: boolean;
+  createdAt: any;
+}
+
 // Role Management Functions
 
 // Get user role
@@ -633,6 +672,30 @@ export const isModerator = async (userId: string): Promise<boolean> => {
 export const isAdmin = async (userId: string): Promise<boolean> => {
   const role = await getUserRole(userId);
   return role === 'admin';
+};
+
+// Check if user is department head
+export const isDepartmentHead = async (userId: string): Promise<boolean> => {
+  const role = await getUserRole(userId);
+  return role === 'department_head';
+};
+
+// Get user's department (for department heads)
+export const getUserDepartment = async (userId: string): Promise<string | null> => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      return userData.department || null;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error getting user department:', error);
+    return null;
+  }
 };
 
 // Add a new moderator (admin only)
@@ -941,5 +1004,312 @@ export const manualCleanupExpiredActivities = async () => {
       deletedCount: 0,
       message: 'Failed to clean up expired activities'
     };
+  }
+};
+
+// Department Head Management Functions
+
+// Add a new department head (admin only)
+export const addDepartmentHead = async (email: string, department: string) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('User not authenticated');
+
+    // Check if current user is admin
+    const isCurrentUserAdmin = await isAdmin(currentUser.uid);
+    if (!isCurrentUserAdmin) {
+      throw new Error('Only admins can add department heads');
+    }
+
+    // Check if email already exists as department head for this department
+    const deptHeadsRef = collection(db, 'departmentHeads');
+    const q = query(deptHeadsRef, orderBy('addedAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    
+    const existingDeptHead = querySnapshot.docs.find(doc => 
+      doc.data().email === email && doc.data().department === department && doc.data().isActive
+    );
+    
+    if (existingDeptHead) {
+      throw new Error('User is already a department head for this department');
+    }
+
+    // Add to departmentHeads collection
+    const newDeptHead = {
+      email,
+      department,
+      addedBy: currentUser.uid,
+      addedAt: serverTimestamp(),
+      isActive: true
+    };
+
+    const docRef = await addDoc(collection(db, 'departmentHeads'), newDeptHead);
+
+    // Update user role if they exist in users collection
+    const usersRef = collection(db, 'users');
+    const userQuery = query(usersRef);
+    const userSnapshot = await getDocs(userQuery);
+    
+    const userDoc = userSnapshot.docs.find(doc => doc.data().email === email);
+    if (userDoc) {
+      await updateDoc(doc(db, 'users', userDoc.id), {
+        role: 'department_head',
+        department: department
+      });
+    }
+
+    return { id: docRef.id, ...newDeptHead };
+  } catch (error) {
+    console.error('Error adding department head:', error);
+    throw error;
+  }
+};
+
+// Get all department heads (admin only)
+export const getDepartmentHeads = async () => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('User not authenticated');
+
+    // Check if current user is admin
+    const isCurrentUserAdmin = await isAdmin(currentUser.uid);
+    if (!isCurrentUserAdmin) {
+      throw new Error('Only admins can view department heads');
+    }
+
+    const q = query(collection(db, 'departmentHeads'), orderBy('addedAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      addedAt: processTimestamp(doc.data().addedAt)
+    })) as DepartmentHead[];
+  } catch (error) {
+    console.error('Error getting department heads:', error);
+    throw error;
+  }
+};
+
+// Remove department head (admin only)
+export const removeDepartmentHead = async (deptHeadId: string) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('User not authenticated');
+
+    // Check if current user is admin
+    const isCurrentUserAdmin = await isAdmin(currentUser.uid);
+    if (!isCurrentUserAdmin) {
+      throw new Error('Only admins can remove department heads');
+    }
+
+    // Get department head data
+    const deptHeadRef = doc(db, 'departmentHeads', deptHeadId);
+    const deptHeadSnap = await getDoc(deptHeadRef);
+    
+    if (!deptHeadSnap.exists()) {
+      throw new Error('Department head not found');
+    }
+
+    const deptHeadData = deptHeadSnap.data();
+
+    // Deactivate department head
+    await updateDoc(deptHeadRef, {
+      isActive: false
+    });
+
+    // Update user role back to 'user' if they exist in users collection
+    const usersRef = collection(db, 'users');
+    const userQuery = query(usersRef);
+    const userSnapshot = await getDocs(userQuery);
+    
+    const userDoc = userSnapshot.docs.find(doc => doc.data().email === deptHeadData.email);
+    if (userDoc) {
+      await updateDoc(doc(db, 'users', userDoc.id), {
+        role: 'user',
+        department: null
+      });
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error removing department head:', error);
+    throw error;
+  }
+};
+
+// Department Management Functions
+
+// Add a new department (admin only)
+export const addDepartment = async (departmentData: {
+  name: string;
+  code: string;
+  school: string;
+  contactPhone?: string;
+}) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('User not authenticated');
+
+    // Check if current user is admin
+    const isCurrentUserAdmin = await isAdmin(currentUser.uid);
+    if (!isCurrentUserAdmin) {
+      throw new Error('Only admins can add departments');
+    }
+
+    const newDepartment = {
+      ...departmentData,
+      isActive: true,
+      createdAt: serverTimestamp()
+    };
+
+    const docRef = await addDoc(collection(db, 'departments'), newDepartment);
+    return { id: docRef.id, ...newDepartment };
+  } catch (error) {
+    console.error('Error adding department:', error);
+    throw error;
+  }
+};
+
+// Get all departments
+export const getDepartments = async (): Promise<Department[]> => {
+  try {
+    const q = query(
+      collection(db, 'departments'),
+      orderBy('school'),
+      orderBy('name')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: processTimestamp(doc.data().createdAt)
+    })) as Department[];
+  } catch (error) {
+    console.error('Error getting departments:', error);
+    throw error;
+  }
+};
+
+// Department Complaints Functions
+
+// Add a department complaint
+export const addDepartmentComplaint = async (complaint: {
+  title: string;
+  description: string;
+  category: string;
+  department: string;
+  severity: 'Low' | 'Medium' | 'High' | 'Critical';
+  studentName?: string;
+  studentPhone?: string;
+  source?: string;
+}): Promise<DepartmentComplaint> => {
+  try {
+    const docRef = await addDoc(collection(db, 'departmentComplaints'), {
+      ...complaint,
+      timestamp: serverTimestamp(),
+      status: 'Open',
+      resolved: false
+    });
+
+    return {
+      id: docRef.id,
+      ...complaint,
+      timestamp: Timestamp.now(),
+      status: 'Open',
+      resolved: false
+    } as DepartmentComplaint;
+  } catch (error) {
+    console.error('Error adding department complaint:', error);
+    throw new Error('Failed to submit department complaint');
+  }
+};
+
+// Get department complaints (admin sees all, department heads see only their department)
+export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('User not authenticated');
+
+    // Check user role and department
+    const userRole = await getUserRole(currentUser.uid);
+    const userDepartment = await getUserDepartment(currentUser.uid);
+
+    if (userRole !== 'admin' && userRole !== 'department_head') {
+      throw new Error('Access denied');
+    }
+
+    let q;
+    if (userRole === 'admin') {
+      // Admin sees all department complaints
+      q = query(
+        collection(db, 'departmentComplaints'),
+        orderBy('timestamp', 'desc')
+      );
+    } else if (userRole === 'department_head' && userDepartment) {
+      // Department head sees only their department's complaints
+      q = query(
+        collection(db, 'departmentComplaints'),
+        where('department', '==', userDepartment),
+        orderBy('timestamp', 'desc')
+      );
+    } else {
+      throw new Error('Invalid access configuration');
+    }
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as DepartmentComplaint[];
+  } catch (error) {
+    console.error('Error fetching department complaints:', error);
+    throw new Error('Failed to fetch department complaints');
+  }
+};
+
+// Update department complaint status
+export const updateDepartmentComplaintStatus = async (
+  complaintId: string, 
+  status: 'Open' | 'Under Review' | 'Resolved' | 'Closed',
+  adminNotes?: string
+): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('User not authenticated');
+
+  try {
+    // Check if user has permission (admin or department head)
+    const userRole = await getUserRole(user.uid);
+    if (userRole !== 'admin' && userRole !== 'department_head') {
+      throw new Error('Access denied');
+    }
+
+    // If department head, verify they can access this complaint
+    if (userRole === 'department_head') {
+      const userDepartment = await getUserDepartment(user.uid);
+      const complaintRef = doc(db, 'departmentComplaints', complaintId);
+      const complaintSnap = await getDoc(complaintRef);
+      
+      if (!complaintSnap.exists()) {
+        throw new Error('Complaint not found');
+      }
+      
+      const complaintData = complaintSnap.data();
+      if (complaintData.department !== userDepartment) {
+        throw new Error('Access denied - complaint not in your department');
+      }
+    }
+
+    const complaintRef = doc(db, 'departmentComplaints', complaintId);
+    await updateDoc(complaintRef, {
+      status,
+      adminNotes: adminNotes || '',
+      resolved: status === 'Resolved',
+      lastUpdated: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error updating department complaint status:', error);
+    throw new Error('Failed to update complaint status');
   }
 }; 

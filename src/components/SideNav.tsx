@@ -62,8 +62,8 @@ export default function SideNav({
   const [showMobileProfile, setShowMobileProfile] = useState(false);
   const [imageError, setImageError] = useState(false);
   
-  // Determine user role
-  const userRole = userData?.isAdmin ? 'admin' : userData?.isModerator ? 'moderator' : 'student';
+  // Determine user role based on existing userData structure
+  const userRole = userData?.role || (userData?.isAdmin ? 'admin' : userData?.isModerator ? 'moderator' : 'student');
 
   // Reset image error when user photo changes
   useEffect(() => {
@@ -194,6 +194,76 @@ export default function SideNav({
             <FiPlus className="text-lg sm:text-xl xl:mr-2" />
             <span className="hidden lg:block">Post</span>
           </motion.button>
+        </div>
+
+        {/* Complaints - separate for different types */}
+        <div className="space-y-1 sm:space-y-2">
+          {(userRole === 'moderator' || userRole === 'admin') && (
+            <motion.button
+              onClick={() => onSelectSection('anonymous-complaints')}
+              className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
+                activeSection === 'anonymous-complaints'
+                  ? 'bg-white text-black shadow-lg font-bold' 
+                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FiMessageCircle className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
+                activeSection === 'anonymous-complaints' ? 'text-black' : 'text-gray-400 group-hover:text-white'
+              }`} />
+              <span className={`hidden lg:block font-medium text-base ${
+                activeSection === 'anonymous-complaints' ? 'text-black font-bold' : 'text-white'
+              }`}>
+                Anonymous Complaints
+              </span>
+            </motion.button>
+          )}
+          
+          {(userRole === 'admin' || userRole === 'department_head') && (
+            <motion.button
+              onClick={() => onSelectSection('department-complaints')}
+              className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
+                activeSection === 'department-complaints'
+                  ? 'bg-white text-black shadow-lg font-bold' 
+                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FiSettings className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
+                activeSection === 'department-complaints' ? 'text-black' : 'text-gray-400 group-hover:text-white'
+              }`} />
+              <span className={`hidden lg:block font-medium text-base ${
+                activeSection === 'department-complaints' ? 'text-black font-bold' : 'text-white'
+              }`}>
+                Department Complaints
+              </span>
+            </motion.button>
+          )}
+
+          {/* Department Head Management - Admin only */}
+          {userRole === 'admin' && (
+            <motion.button
+              onClick={() => onSelectSection('department-heads')}
+              className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
+                activeSection === 'department-heads'
+                  ? 'bg-white text-black shadow-lg font-bold' 
+                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FiUsers className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
+                activeSection === 'department-heads' ? 'text-black' : 'text-gray-400 group-hover:text-white'
+              }`} />
+              <span className={`hidden lg:block font-medium text-base ${
+                activeSection === 'department-heads' ? 'text-black font-bold' : 'text-white'
+              }`}>
+                Department Heads
+              </span>
+            </motion.button>
+          )}
         </div>
       </div>
 

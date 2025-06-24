@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string>('user');
 
   const refreshUserData = async () => {
     if (!user) return;
@@ -64,7 +63,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (userSnap.exists()) {
         const userData = userSnap.data() as User;
         setUserData(userData);
-        setUserRole(userData.role || 'user');
       }
     } catch (error) {
       console.error('Error refreshing user data:', error);
@@ -109,7 +107,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
             
             setUserData(updatedData as User);
-            setUserRole(existingUserData.role || 'user');
           } else {
             // New user - create user document
             const email = firebaseUser.email || '';
@@ -158,14 +155,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             
             console.log('✅ New user created in Firestore');
             setUserData(newUserData);
-            setUserRole('user');
           }
         } catch (error) {
           console.error('Error handling user authentication:', error);
         }
       } else {
         setUserData(null);
-        setUserRole('user');
       }
       
       setLoading(false);
@@ -189,16 +184,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await firebaseSignOut(auth);
       setUser(null);
       setUserData(null);
-      setUserRole('user');
     } catch (error) {
       console.error('Error signing out:', error);
     }
   };
 
+  const userRole = userData?.role || 'user';
+  const userDepartment = userData?.department || null;
   const isAdmin = userRole === 'admin';
   const isModerator = userRole === 'moderator' || userRole === 'admin';
   const isDepartmentHead = userRole === 'department_head';
-  const userDepartment = userData?.department || null;
 
   return (
     <AuthContext.Provider value={{ 

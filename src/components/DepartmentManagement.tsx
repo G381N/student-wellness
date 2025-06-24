@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   getDepartments, 
   saveDepartment, 
-  getDepartmentById,
   getDepartmentHeads,
   addDepartmentHead,
   removeDepartmentHead 
@@ -12,10 +11,23 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { Department, DepartmentHead } from '@/lib/firebase-utils';
 
+// Extended interfaces for the component
+interface ExtendedDepartment extends Department {
+  category?: string;
+  hodName?: string;
+  hodEmail?: string;
+  hodPhone?: string;
+}
+
+interface ExtendedDepartmentHead extends DepartmentHead {
+  department?: string;
+  assignedAt?: any;
+}
+
 const DepartmentManagement: React.FC = () => {
   const { user, isAdmin } = useAuth();
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [departmentHeads, setDepartmentHeads] = useState<DepartmentHead[]>([]);
+  const [departments, setDepartments] = useState<ExtendedDepartment[]>([]);
+  const [departmentHeads, setDepartmentHeads] = useState<ExtendedDepartmentHead[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddHODForm, setShowAddHODForm] = useState(false);
@@ -48,8 +60,8 @@ const DepartmentManagement: React.FC = () => {
         getDepartments(),
         getDepartmentHeads()
       ]);
-      setDepartments(deptData);
-      setDepartmentHeads(hodData);
+      setDepartments(deptData as ExtendedDepartment[]);
+      setDepartmentHeads(hodData as ExtendedDepartmentHead[]);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -60,7 +72,15 @@ const DepartmentManagement: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await saveDepartment(formData);
+      // Create proper department object
+      const departmentData = {
+        name: formData.name,
+        description: formData.description,
+        isActive: formData.isActive,
+        createdAt: new Date()
+      };
+      
+      await saveDepartment(departmentData);
       setFormData({
         name: '',
         description: '',
@@ -80,7 +100,24 @@ const DepartmentManagement: React.FC = () => {
   const handleAddHOD = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addDepartmentHead(hodFormData.email, hodFormData.department);
+      // Find the department ID for the selected department
+      const selectedDept = departments.find(d => d.name === hodFormData.department);
+      if (!selectedDept) {
+        console.error('Department not found');
+        return;
+      }
+
+      // Create HOD data object
+      const hodData = {
+        name: hodFormData.name || hodFormData.email.split('@')[0],
+        email: hodFormData.email,
+        phoneNumber: hodFormData.phone || '',
+        departmentId: selectedDept.id,
+        isActive: true,
+        createdAt: new Date()
+      };
+
+      await addDepartmentHead(hodData);
       setHodFormData({ email: '', name: '', department: '', phone: '' });
       setShowAddHODForm(false);
       await fetchData();
@@ -186,43 +223,6 @@ const DepartmentManagement: React.FC = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  HOD Name (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.hodName}
-                  onChange={(e) => setFormData({ ...formData, hodName: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  HOD Email (Optional)
-                </label>
-                <input
-                  type="email"
-                  value={formData.hodEmail}
-                  onChange={(e) => setFormData({ ...formData, hodEmail: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  HOD Phone (Optional)
-                </label>
-                <input
-                  type="tel"
-                  value={formData.hodPhone}
-                  onChange={(e) => setFormData({ ...formData, hodPhone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="+91XXXXXXXXXX"
-                />
-              </div>
-
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -261,6 +261,19 @@ const DepartmentManagement: React.FC = () => {
             <form onSubmit={handleAddHOD} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={hodFormData.name}
+                  onChange={(e) => setHodFormData({ ...hodFormData, name: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
                 </label>
                 <input
@@ -269,6 +282,19 @@ const DepartmentManagement: React.FC = () => {
                   onChange={(e) => setHodFormData({ ...hodFormData, email: e.target.value })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={hodFormData.phone}
+                  onChange={(e) => setHodFormData({ ...hodFormData, phone: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="+91XXXXXXXXXX"
                 />
               </div>
 
@@ -324,10 +350,7 @@ const DepartmentManagement: React.FC = () => {
                   Department
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  HOD Information
+                  Description
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
@@ -338,34 +361,14 @@ const DepartmentManagement: React.FC = () => {
               {departments.map((department) => (
                 <tr key={department.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {department.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {department.description}
-                      </div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {department.name}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {department.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {department.hodName ? (
-                      <div>
-                        <div className="font-medium">{department.hodName}</div>
-                        {department.hodEmail && (
-                          <div className="text-gray-500">{department.hodEmail}</div>
-                        )}
-                        {department.hodPhone && (
-                          <div className="text-gray-500">{department.hodPhone}</div>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">Not assigned</span>
-                    )}
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-500">
+                      {department.description}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -393,13 +396,16 @@ const DepartmentManagement: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Department
+                  Phone
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Assigned Date
+                  Department
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -407,27 +413,33 @@ const DepartmentManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {departmentHeads.map((hod) => (
-                <tr key={hod.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {hod.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {hod.department}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {hod.assignedAt ? new Date(hod.assignedAt.seconds * 1000).toLocaleDateString() : 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleRemoveHOD(hod.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {departmentHeads.map((hod) => {
+                const department = departments.find(d => d.id === hod.departmentId);
+                return (
+                  <tr key={hod.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {hod.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {hod.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {hod.phoneNumber || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {department?.name || 'Unknown Department'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => handleRemoveHOD(hod.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

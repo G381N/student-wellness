@@ -20,6 +20,18 @@ import {
 import { db, auth, storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
+// WhatsApp notification function (imported from WhatsApp bot)
+let sendWhatsAppNotification: Function | null = null;
+
+try {
+  // Dynamically import the notification function from WhatsApp bot
+  const whatsappNotifications = require('../../WhatsapWellness/config/firebase');
+  sendWhatsAppNotification = whatsappNotifications.sendComplaintStatusNotification;
+} catch (error) {
+  console.log('WhatsApp notifications not available in this environment');
+  sendWhatsAppNotification = null;
+}
+
 // Helper function to ensure timestamp consistency
 export const processTimestamp = (timestamp: any): Date => {
   if (!timestamp) return new Date();
@@ -137,7 +149,9 @@ export interface DepartmentComplaint {
   studentId: string;
   studentName: string;
   studentEmail: string;
+  studentPhone?: string;
   departmentId: string;
+  department?: string;
   category: string;
   severity: 'Low' | 'Medium' | 'High' | 'Critical';
   title: string;
@@ -656,6 +670,10 @@ export const updateDepartmentComplaintStatus = async (
   resolvedBy?: string
 ): Promise<void> => {
   try {
+    // Get the current complaint data for notification
+    const complaintDoc = await getDoc(doc(db, 'departmentComplaints', complaintId));
+    const complaintData = complaintDoc.data();
+    
     const updateData: any = {
       status,
       isResolved: status === 'Resolved',
@@ -672,6 +690,24 @@ export const updateDepartmentComplaintStatus = async (
     }
     
     await updateDoc(doc(db, 'departmentComplaints', complaintId), updateData);
+
+    // Send WhatsApp notification if student has phone number
+    if (sendWhatsAppNotification && complaintData?.studentPhone) {
+      try {
+        await sendWhatsAppNotification(
+          complaintData.studentPhone,
+          {
+            department: complaintData.department,
+            category: complaintData.category,
+            title: complaintData.title
+          },
+          status,
+          notes
+        );
+      } catch (notificationError) {
+        console.log('WhatsApp notification failed, but status update succeeded:', notificationError);
+      }
+    }
   } catch (error) {
     console.error('Error updating department complaint status:', error);
     throw error;
@@ -721,6 +757,10 @@ export const updateComplaintStatus = async (
   adminNotes?: string
 ): Promise<void> => {
   try {
+    // Get the current complaint data for notification
+    const complaintDoc = await getDoc(doc(db, 'anonymousComplaints', complaintId));
+    const complaintData = complaintDoc.data();
+    
     const updateData: any = {
       status,
       isResolved: status === 'Resolved',
@@ -736,6 +776,24 @@ export const updateComplaintStatus = async (
     }
     
     await updateDoc(doc(db, 'anonymousComplaints', complaintId), updateData);
+
+    // Send WhatsApp notification for anonymous complaints if phone is available
+    if (sendWhatsAppNotification && complaintData?.studentPhone) {
+      try {
+        await sendWhatsAppNotification(
+          complaintData.studentPhone,
+          {
+            department: 'Anonymous',
+            category: complaintData.category,
+            title: complaintData.title
+          },
+          status,
+          adminNotes
+        );
+      } catch (notificationError) {
+        console.log('WhatsApp notification failed, but status update succeeded:', notificationError);
+      }
+    }
   } catch (error) {
     console.error('Error updating complaint status:', error);
     throw error;

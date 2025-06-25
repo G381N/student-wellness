@@ -2,35 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiUser, FiPlus, FiTrash2, FiMail, FiBriefcase, FiCheck, FiX, FiAlertTriangle } from 'react-icons/fi';
-import { addDepartmentHead, getDepartmentHeads, removeDepartmentHead, DepartmentHead } from '@/lib/firebase-utils';
+import { FiUser, FiPlus, FiTrash2, FiMail, FiBriefcase, FiCheck, FiX, FiAlertTriangle, FiPhone } from 'react-icons/fi';
+import { addDepartmentHead, getDepartmentHeads, removeDepartmentHead, getDepartments, DepartmentHead, Department } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
-
-const DEPARTMENTS = [
-  'Computer Science & Engineering',
-  'Electronics & Communication',
-  'Mechanical Engineering', 
-  'Civil Engineering',
-  'Business Administration',
-  'Commerce',
-  'Psychology',
-  'Social Work',
-  'Arts & Humanities',
-  'Law',
-  'Medicine',
-  'Nursing',
-  'Physiotherapy',
-  'Pharmacy'
-];
 
 export default function DepartmentHeadManagement() {
   const { isAdmin } = useAuth();
   const [departmentHeads, setDepartmentHeads] = useState<DepartmentHead[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
-    department: ''
+    phoneNumber: '',
+    departmentId: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -38,18 +24,22 @@ export default function DepartmentHeadManagement() {
 
   useEffect(() => {
     if (isAdmin) {
-      fetchDepartmentHeads();
+      fetchData();
     }
   }, [isAdmin]);
 
-  const fetchDepartmentHeads = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const heads = await getDepartmentHeads();
+      const [heads, depts] = await Promise.all([
+        getDepartmentHeads(),
+        getDepartments()
+      ]);
       setDepartmentHeads(heads);
+      setDepartments(depts);
     } catch (error) {
-      console.error('Error fetching department heads:', error);
-      setError('Failed to load department heads');
+      console.error('Error fetching data:', error);
+      setError('Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -58,18 +48,19 @@ export default function DepartmentHeadManagement() {
   const handleAddDepartmentHead = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email.trim() || !formData.department) {
-      setError('Please fill in all fields');
+    if (!formData.email.trim() || !formData.name.trim() || !formData.departmentId) {
+      setError('Please fill in all required fields');
       return;
     }
 
     // Check if department already has a head
     const existingHead = departmentHeads.find(head => 
-      head.department === formData.department && head.isActive
+      head.departmentId === formData.departmentId && head.isActive
     );
     
     if (existingHead) {
-      setError(`${formData.department} already has an active department head`);
+      const deptName = departments.find(d => d.id === formData.departmentId)?.name;
+      setError(`${deptName} already has an active department head`);
       return;
     }
 
@@ -77,14 +68,23 @@ export default function DepartmentHeadManagement() {
       setIsSubmitting(true);
       setError('');
       
-      await addDepartmentHead(formData.email.trim(), formData.department);
+      const headData = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phoneNumber: formData.phoneNumber.trim(),
+        departmentId: formData.departmentId,
+        isActive: true,
+        createdAt: new Date()
+      };
+      
+      await addDepartmentHead(headData);
       
       setSuccess('Department head added successfully');
-      setFormData({ email: '', department: '' });
+      setFormData({ name: '', email: '', phoneNumber: '', departmentId: '' });
       setShowAddForm(false);
       
       // Refresh the list
-      await fetchDepartmentHeads();
+      await fetchData();
       
       setTimeout(() => setSuccess(''), 3000);
     } catch (error: any) {
@@ -94,8 +94,8 @@ export default function DepartmentHeadManagement() {
     }
   };
 
-  const handleRemoveDepartmentHead = async (headId: string, email: string, department: string) => {
-    if (!confirm(`Are you sure you want to remove the department head for ${department}?`)) {
+  const handleRemoveDepartmentHead = async (headId: string, name: string, departmentName: string) => {
+    if (!confirm(`Are you sure you want to remove ${name} as department head for ${departmentName}?`)) {
       return;
     }
 
@@ -104,7 +104,7 @@ export default function DepartmentHeadManagement() {
       setSuccess('Department head removed successfully');
       
       // Refresh the list
-      await fetchDepartmentHeads();
+      await fetchData();
       
       setTimeout(() => setSuccess(''), 3000);
     } catch (error: any) {
@@ -123,6 +123,10 @@ export default function DepartmentHeadManagement() {
     } catch (error) {
       return 'Invalid date';
     }
+  };
+
+  const getDepartmentName = (departmentId: string) => {
+    return departments.find(dept => dept.id === departmentId)?.name || 'Unknown Department';
   };
 
   if (loading) {
@@ -211,7 +215,7 @@ export default function DepartmentHeadManagement() {
                 <button
                   onClick={() => {
                     setShowAddForm(false);
-                    setFormData({ email: '', department: '' });
+                    setFormData({ name: '', email: '', phoneNumber: '', departmentId: '' });
                     setError('');
                   }}
                   className="text-gray-400 hover:text-white transition-colors"
@@ -223,6 +227,21 @@ export default function DepartmentHeadManagement() {
               <form onSubmit={handleAddDepartmentHead} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
+                    <FiUser className="inline mr-2" />
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
+                    placeholder="Enter full name"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
                     <FiMail className="inline mr-2" />
                     Email Address
                   </label>
@@ -231,8 +250,22 @@ export default function DepartmentHeadManagement() {
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
-                    placeholder="Enter department head's email"
+                    placeholder="Enter email address"
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    <FiPhone className="inline mr-2" />
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
+                    placeholder="+91XXXXXXXXXX"
                   />
                 </div>
                 
@@ -242,14 +275,14 @@ export default function DepartmentHeadManagement() {
                     Department
                   </label>
                   <select
-                    value={formData.department}
-                    onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+                    value={formData.departmentId}
+                    onChange={(e) => setFormData(prev => ({ ...prev, departmentId: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-white"
                     required
                   >
                     <option value="">Select Department</option>
-                    {DEPARTMENTS.map((dept) => (
-                      <option key={dept} value={dept}>{dept}</option>
+                    {departments.filter(dept => dept.isActive).map((dept) => (
+                      <option key={dept.id} value={dept.id}>{dept.name}</option>
                     ))}
                   </select>
                 </div>
@@ -276,7 +309,7 @@ export default function DepartmentHeadManagement() {
                     type="button"
                     onClick={() => {
                       setShowAddForm(false);
-                      setFormData({ email: '', department: '' });
+                      setFormData({ name: '', email: '', phoneNumber: '', departmentId: '' });
                       setError('');
                     }}
                     className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
@@ -316,27 +349,39 @@ export default function DepartmentHeadManagement() {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <FiUser className="text-white" />
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                        <FiUser className="text-white text-lg" />
                       </div>
                       <div>
-                        <h3 className="text-base sm:text-lg font-semibold text-white">{head.email}</h3>
-                        <p className="text-sm text-gray-400">{head.department}</p>
+                        <h3 className="text-base sm:text-lg font-semibold text-white">{head.name}</h3>
+                        <p className="text-sm text-blue-400">{getDepartmentName(head.departmentId)}</p>
                       </div>
                     </div>
                     
-                    <div className="ml-13 space-y-1 text-xs sm:text-sm text-gray-500">
-                      <p>Added on: {formatTimestamp(head.addedAt)}</p>
-                      <p>Status: <span className={head.isActive ? 'text-green-400' : 'text-red-400'}>
-                        {head.isActive ? 'Active' : 'Inactive'}
-                      </span></p>
+                    <div className="ml-15 space-y-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <FiMail className="text-xs" />
+                        <span>{head.email}</span>
+                      </div>
+                      {head.phoneNumber && (
+                        <div className="flex items-center gap-2">
+                          <FiPhone className="text-xs" />
+                          <span>{head.phoneNumber}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-4 text-xs">
+                        <span>Added: {formatTimestamp(head.createdAt)}</span>
+                        <span>Status: <span className={head.isActive ? 'text-green-400' : 'text-red-400'}>
+                          {head.isActive ? 'Active' : 'Inactive'}
+                        </span></span>
+                      </div>
                     </div>
                   </div>
                   
                   {head.isActive && (
                     <button
-                      onClick={() => handleRemoveDepartmentHead(head.id, head.email, head.department)}
+                      onClick={() => handleRemoveDepartmentHead(head.id, head.name, getDepartmentName(head.departmentId))}
                       className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
                       <FiTrash2 className="text-sm" />

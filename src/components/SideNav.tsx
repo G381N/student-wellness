@@ -20,7 +20,8 @@ import {
   FiTrash2,
   FiChevronDown,
   FiBell,
-  FiBriefcase
+  FiBriefcase,
+  FiFileText
 } from 'react-icons/fi';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -118,11 +119,14 @@ export default function SideNav({
   ];
 
   const moderatorItems = [
-    { id: 'anonymous-complaints', icon: FiMessageCircle, label: 'Complaints' },
+    { id: 'anonymous-complaints', icon: FiMessageCircle, label: 'Anonymous Complaints' },
     { id: 'moderator-announcements', icon: FiShield, label: 'Announcements' },
   ];
 
   const adminItems = [
+    { id: 'department-complaints', icon: FiFileText, label: 'Dept Complaints' },
+    { id: 'department-management', icon: FiBriefcase, label: 'Dept Management' },
+    { id: 'department-heads', icon: FiUsers, label: 'Dept Heads' },
     { id: 'manage-moderators', icon: FiSettings, label: 'Manage Mods' },
   ];
 
@@ -182,52 +186,6 @@ export default function SideNav({
               </motion.button>
             );
           })}
-
-          {/* Department Management - Admin only */}
-          {userRole === 'admin' && (
-            <motion.button
-              onClick={() => onSelectSection('department-management')}
-              className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
-                activeSection === 'department-management'
-                  ? 'bg-white text-black shadow-lg font-bold' 
-                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <FiBriefcase className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
-                activeSection === 'department-management' ? 'text-black' : 'text-gray-400 group-hover:text-white'
-              }`} />
-              <span className={`hidden lg:block font-medium text-base ${
-                activeSection === 'department-management' ? 'text-black font-bold' : 'text-white'
-              }`}>
-                Department Management
-              </span>
-            </motion.button>
-          )}
-
-          {/* Department Head Management - Admin only */}
-          {userRole === 'admin' && (
-            <motion.button
-              onClick={() => onSelectSection('department-heads')}
-              className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-3 lg:py-3.5 rounded-full transition-all duration-200 group ${
-                activeSection === 'department-heads'
-                  ? 'bg-white text-black shadow-lg font-bold' 
-                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <FiUsers className={`w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0 ${
-                activeSection === 'department-heads' ? 'text-black' : 'text-gray-400 group-hover:text-white'
-              }`} />
-              <span className={`hidden lg:block font-medium text-base ${
-                activeSection === 'department-heads' ? 'text-black font-bold' : 'text-white'
-              }`}>
-                Department Heads
-              </span>
-            </motion.button>
-          )}
         </div>
 
         {/* Create Post Button - Twitter-like */}

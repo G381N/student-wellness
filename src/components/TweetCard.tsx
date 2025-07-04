@@ -33,7 +33,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
     
     try {
       setIsVoting(true);
-      const upvoted = await upvotePost(tweet.id);
+      const upvoted = await upvotePost(tweet.id, user.uid);
       
       // Update local state
       const updatedTweet = {
@@ -70,7 +70,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
     
     try {
       setIsVoting(true);
-      const downvoted = await downvotePost(tweet.id);
+      const downvoted = await downvotePost(tweet.id, user.uid);
       
       // Update local state
       const updatedTweet = {
@@ -107,11 +107,28 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
 
     try {
       setIsCommenting(true);
-      const comment = await addComment(tweet.id, newComment);
+      
+      // Create comment object with proper structure
+      const commentData = {
+        content: newComment,
+        author: user.displayName || user.email?.split('@')[0] || 'Anonymous',
+        authorId: user.uid,
+        timestamp: new Date(),
+        isAnonymous: false
+      };
+      
+      await addComment(tweet.id, commentData);
+      
+      // Create the comment with ID for local state update
+      const newCommentWithId = {
+        ...commentData,
+        id: Date.now().toString(),
+        timestamp: new Date()
+      };
       
       const updatedTweet = {
         ...tweet,
-        comments: [...tweet.comments, comment]
+        comments: [...tweet.comments, newCommentWithId]
       };
       
       onUpdate(updatedTweet);
@@ -301,7 +318,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                       </div>
                       <div className="bg-gray-900 rounded-2xl p-4 flex-grow hover:bg-gray-800 transition-colors duration-200">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-semibold text-gray-200">{comment.authorName}</span>
+                          <span className="text-sm font-semibold text-gray-200">{comment.author}</span>
                           <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
                             {formatTimestamp(comment.timestamp)}
                           </span>

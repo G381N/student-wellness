@@ -55,15 +55,19 @@ export const getUserDisplayInfo = (email: string | undefined): string => {
 // ============================================================================
 
 export interface User {
-  id: string;
+  uid: string;  // Firebase user ID
   email: string;
   displayName?: string;
+  firstName?: string;  // Add firstName
+  lastName?: string;   // Add lastName
   photoURL?: string;
   isAdmin?: boolean;
   isModerator?: boolean;
   bio?: string;
   createdAt: any;
-  role?: 'student' | 'moderator' | 'admin' | 'department_head';
+  lastLogin?: any;  // Add lastLogin
+  department?: string;  // Add department field
+  role?: 'user' | 'student' | 'moderator' | 'admin' | 'department_head';
 }
 
 export interface Comment {
@@ -86,11 +90,14 @@ export interface Post {
   content: string;
   author: string;
   authorId: string;
+  authorName?: string;  // Add this field for display names
   timestamp: any;
   category: string;
   upvotes: number;
   downvotes: number;
-  votedUsers: string[];
+  votedUsers: string[]; // Keep this for backward compatibility
+  upvotedBy: string[];  // Add this for upvote tracking
+  downvotedBy: string[]; // Add this for downvote tracking
   comments: Comment[];
   isAnonymous: boolean;
   participants?: ActivityParticipant[];
@@ -98,6 +105,7 @@ export interface Post {
   activityDate?: any;
   location?: string;
   eventType?: 'activity' | 'post';
+  type?: 'activity' | 'concern' | 'post';  // Add type field
 }
 
 export interface MindWallIssue {
@@ -105,15 +113,15 @@ export interface MindWallIssue {
   title: string;
   description: string;
   category: string;
-  severity: 'Low' | 'Medium' | 'High' | 'Critical';
-  status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  icon?: string;  // Add icon field
+  count: number;  // Change from upvotes to count
+  votedBy: string[];  // Change from votedUsers to votedBy
+  timestamp: any;  // Change from createdAt to timestamp
   authorId: string;
-  isAnonymous: boolean;
-  upvotes: number;
-  downvotes: number;
-  votedUsers: string[];
-  createdAt: any;
-  updatedAt: any;
+  isAnonymous?: boolean;
+  status?: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  severity?: 'Low' | 'Medium' | 'High' | 'Critical';
+  updatedAt?: any;
   resolvedAt?: any;
   resolvedBy?: string;
   adminNotes?: string;
@@ -133,6 +141,7 @@ export interface Department {
   code: string;           // Unique department code (e.g., "MSC_AIML")
   name: string;           // Full department name with program detail
   headPhoneNumber: string; // Contact number of department head
+  email?: string;         // Add email field for department head login
   createdBy: string;      // Name of admin/faculty who created the entry
   isActive: boolean;      // Whether the department is active or disabled
   createdAt: any;         // Timestamp when the department was created
@@ -168,9 +177,10 @@ export interface AnonymousComplaint {
   severity: 'Low' | 'Medium' | 'High' | 'Critical';
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed';
-  isResolved: boolean;
-  createdAt: any;
+  status: 'Open' | 'Under Review' | 'Resolved' | 'Closed';  // Fix status values
+  resolved?: boolean;  // Add resolved field
+  timestamp: any;      // Change from createdAt to timestamp for consistency
+  createdAt?: any;     // Keep for backward compatibility
   updatedAt: any;
   resolvedAt?: any;
   resolvedBy?: string;
@@ -198,48 +208,136 @@ export const checkUserRole = async (userId: string): Promise<{ isAdmin: boolean;
   }
 };
 
+// Check if user is department head by email
+export const checkDepartmentHeadStatus = async (email: string): Promise<{ isDepartmentHead: boolean; department?: Department }> => {
+  try {
+    const deptQuery = query(
+      collection(db, 'departments'),
+      where('email', '==', email),
+      where('isActive', '==', true)
+    );
+    const querySnapshot = await getDocs(deptQuery);
+    
+    if (!querySnapshot.empty) {
+      const departmentDoc = querySnapshot.docs[0];
+      const department: Department = {
+        id: departmentDoc.id,
+        ...departmentDoc.data()
+      } as Department;
+      
+      return {
+        isDepartmentHead: true,
+        department
+      };
+    }
+    
+    return { isDepartmentHead: false };
+  } catch (error) {
+    console.error('Error checking department head status:', error);
+    return { isDepartmentHead: false };
+  }
+};
+
 // ============================================================================
 // VOTING SYSTEM
 // ============================================================================
 
-export const upvotePost = async (postId: string, userId: string): Promise<void> => {
+export const upvotePost = async (postId: string, userId: string): Promise<boolean> => {
   try {
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
-    if (postDoc.exists()) {
-      const postData = postDoc.data();
-      const votedUsers = postData.votedUsers || [];
+    if (!postDoc.exists()) {
+      throw new Error('Post not found');
+    }
+    
+    const postData = postDoc.data();
+    const upvotedBy = postData.upvotedBy || [];
+    const downvotedBy = postData.downvotedBy || [];
+    const hasUpvoted = upvotedBy.includes(userId);
+    const hasDownvoted = downvotedBy.includes(userId);
+    
+    let newUpvotedBy = [...upvotedBy];
+    let newDownvotedBy = [...downvotedBy];
+    let upvoteCount = postData.upvotes || 0;
+    let downvoteCount = postData.downvotes || 0;
+    
+    if (hasUpvoted) {
+      // Remove upvote
+      newUpvotedBy = upvotedBy.filter((id: string) => id !== userId);
+      upvoteCount = Math.max(0, upvoteCount - 1);
+    } else {
+      // Add upvote
+      newUpvotedBy.push(userId);
+      upvoteCount += 1;
       
-      if (!votedUsers.includes(userId)) {
-        await updateDoc(postRef, {
-          upvotes: (postData.upvotes || 0) + 1,
-          votedUsers: [...votedUsers, userId]
-        });
+      // Remove downvote if exists
+      if (hasDownvoted) {
+        newDownvotedBy = downvotedBy.filter((id: string) => id !== userId);
+        downvoteCount = Math.max(0, downvoteCount - 1);
       }
     }
+    
+    await updateDoc(postRef, {
+      upvotes: upvoteCount,
+      downvotes: downvoteCount,
+      upvotedBy: newUpvotedBy,
+      downvotedBy: newDownvotedBy,
+      votedUsers: [...new Set([...newUpvotedBy, ...newDownvotedBy])] // Update legacy field
+    });
+    
+    return !hasUpvoted; // Return true if user upvoted, false if removed upvote
   } catch (error) {
     console.error('Error upvoting post:', error);
     throw error;
   }
 };
 
-export const downvotePost = async (postId: string, userId: string): Promise<void> => {
+export const downvotePost = async (postId: string, userId: string): Promise<boolean> => {
   try {
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
-    if (postDoc.exists()) {
-      const postData = postDoc.data();
-      const votedUsers = postData.votedUsers || [];
+    if (!postDoc.exists()) {
+      throw new Error('Post not found');
+    }
+    
+    const postData = postDoc.data();
+    const upvotedBy = postData.upvotedBy || [];
+    const downvotedBy = postData.downvotedBy || [];
+    const hasUpvoted = upvotedBy.includes(userId);
+    const hasDownvoted = downvotedBy.includes(userId);
+    
+    let newUpvotedBy = [...upvotedBy];
+    let newDownvotedBy = [...downvotedBy];
+    let upvoteCount = postData.upvotes || 0;
+    let downvoteCount = postData.downvotes || 0;
+    
+    if (hasDownvoted) {
+      // Remove downvote
+      newDownvotedBy = downvotedBy.filter((id: string) => id !== userId);
+      downvoteCount = Math.max(0, downvoteCount - 1);
+    } else {
+      // Add downvote
+      newDownvotedBy.push(userId);
+      downvoteCount += 1;
       
-      if (!votedUsers.includes(userId)) {
-        await updateDoc(postRef, {
-          downvotes: (postData.downvotes || 0) + 1,
-          votedUsers: [...votedUsers, userId]
-        });
+      // Remove upvote if exists
+      if (hasUpvoted) {
+        newUpvotedBy = upvotedBy.filter((id: string) => id !== userId);
+        upvoteCount = Math.max(0, upvoteCount - 1);
       }
     }
+    
+    await updateDoc(postRef, {
+      upvotes: upvoteCount,
+      downvotes: downvoteCount,
+      upvotedBy: newUpvotedBy,
+      downvotedBy: newDownvotedBy,
+      votedUsers: [...new Set([...newUpvotedBy, ...newDownvotedBy])] // Update legacy field
+    });
+    
+    return !hasDownvoted; // Return true if user downvoted, false if removed downvote
   } catch (error) {
     console.error('Error downvoting post:', error);
     throw error;
@@ -269,12 +367,29 @@ export const getPosts = async (): Promise<Post[]> => {
 
 export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
   try {
+    // Get user data to set authorName
+    let authorName = 'Unknown User';
+    if (postData.authorId && !postData.isAnonymous) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', postData.authorId));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          authorName = userData.displayName || userData.email?.split('@')[0] || 'Unknown User';
+        }
+      } catch (error) {
+        console.error('Error fetching user data for post:', error);
+      }
+    }
+
     const docRef = await addDoc(collection(db, 'posts'), {
       ...postData,
+      authorName: postData.isAnonymous ? 'Anonymous' : authorName,
       timestamp: serverTimestamp(),
       upvotes: 0,
       downvotes: 0,
       votedUsers: [],
+      upvotedBy: [],  // Initialize new voting arrays
+      downvotedBy: [], // Initialize new voting arrays
       comments: []
     });
     return docRef.id;
@@ -406,7 +521,7 @@ export const getMindWallIssues = async (): Promise<MindWallIssue[]> => {
   try {
     const issuesQuery = query(
       collection(db, 'mindWallIssues'), 
-      orderBy('createdAt', 'desc')
+      orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(issuesQuery);
     return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
@@ -419,51 +534,72 @@ export const getMindWallIssues = async (): Promise<MindWallIssue[]> => {
   }
 };
 
-export const addMindWallIssue = async (issueData: Omit<MindWallIssue, 'id'>): Promise<string> => {
+export const addMindWallIssue = async (issueData: Omit<MindWallIssue, 'id'>): Promise<MindWallIssue> => {
   try {
-    const docRef = await addDoc(collection(db, 'mindWallIssues'), {
+    const newIssue = {
       ...issueData,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      upvotes: 0,
-      downvotes: 0,
-      votedUsers: []
-    });
-    return docRef.id;
+      timestamp: serverTimestamp(),
+      count: 0,
+      votedBy: [],
+      authorId: auth.currentUser?.uid || '',
+      isAnonymous: true
+    };
+    
+    const docRef = await addDoc(collection(db, 'mindWallIssues'), newIssue);
+    
+    return {
+      id: docRef.id,
+      ...newIssue,
+      timestamp: new Date()  // Return current date for immediate UI update
+    } as MindWallIssue;
   } catch (error) {
     console.error('Error adding mind wall issue:', error);
     throw error;
   }
 };
 
-// Vote on mind wall issue
-export const voteMindWallIssue = async (
-  issueId: string, 
-  userId: string, 
-  voteType: 'upvote' | 'downvote'
-): Promise<void> => {
+// Fix voteMindWallIssue to return proper result and match expected signature
+export const voteMindWallIssue = async (issueId: string): Promise<boolean | null> => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return null;
+
+  // Simple debouncing - return null if called too frequently
+  const now = Date.now();
+  const lastVoteKey = `lastVote_${issueId}_${userId}`;
+  const lastVoteTime = localStorage.getItem(lastVoteKey);
+  
+  if (lastVoteTime && (now - parseInt(lastVoteTime)) < 1000) {
+    return null; // Debounce votes within 1 second
+  }
+  
+  localStorage.setItem(lastVoteKey, now.toString());
+
   try {
     const issueRef = doc(db, 'mindWallIssues', issueId);
     const issueDoc = await getDoc(issueRef);
     
     if (issueDoc.exists()) {
       const issueData = issueDoc.data();
-      const votedUsers = issueData.votedUsers || [];
+      const votedBy = issueData.votedBy || [];
+      const hasVoted = votedBy.includes(userId);
       
-      if (!votedUsers.includes(userId)) {
-        const updateData: any = {
-          votedUsers: [...votedUsers, userId]
-        };
-        
-        if (voteType === 'upvote') {
-          updateData.upvotes = (issueData.upvotes || 0) + 1;
-        } else {
-          updateData.downvotes = (issueData.downvotes || 0) + 1;
-        }
-        
-        await updateDoc(issueRef, updateData);
+      if (hasVoted) {
+        // Remove vote
+        await updateDoc(issueRef, {
+          count: Math.max(0, (issueData.count || 0) - 1),
+          votedBy: votedBy.filter((id: string) => id !== userId)
+        });
+        return false;
+      } else {
+        // Add vote
+        await updateDoc(issueRef, {
+          count: (issueData.count || 0) + 1,
+          votedBy: [...votedBy, userId]
+        });
+        return true;
       }
     }
+    return null;
   } catch (error) {
     console.error('Error voting on mind wall issue:', error);
     throw error;
@@ -676,6 +812,25 @@ export const updateDepartmentComplaintStatus = async (
   }
 };
 
+// Get department complaints for specific department (for department heads)
+export const getDepartmentComplaintsByDepartment = async (departmentId: string): Promise<DepartmentComplaint[]> => {
+  try {
+    const complaintsQuery = query(
+      collection(db, 'departmentComplaints'),
+      where('departmentId', '==', departmentId),
+      orderBy('createdAt', 'desc')
+    );
+    const querySnapshot = await getDocs(complaintsQuery);
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+      id: doc.id,
+      ...doc.data()
+    } as DepartmentComplaint));
+  } catch (error) {
+    console.error('Error getting department complaints by department:', error);
+    return [];
+  }
+};
+
 // ============================================================================
 // ANONYMOUS COMPLAINT MANAGEMENT
 // ============================================================================
@@ -684,7 +839,7 @@ export const getAnonymousComplaints = async (): Promise<AnonymousComplaint[]> =>
   try {
     const complaintsQuery = query(
       collection(db, 'anonymousComplaints'), 
-      orderBy('createdAt', 'desc')
+      orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
     return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
@@ -701,10 +856,11 @@ export const addAnonymousComplaint = async (complaintData: Omit<AnonymousComplai
   try {
     const docRef = await addDoc(collection(db, 'anonymousComplaints'), {
       ...complaintData,
-      createdAt: serverTimestamp(),
+      timestamp: serverTimestamp(),
+      createdAt: serverTimestamp(),  // Keep for backward compatibility
       updatedAt: serverTimestamp(),
-      status: 'Pending',
-      isResolved: false
+      status: 'Open',  // Use correct status value
+      resolved: false
     });
     return docRef.id;
   } catch (error) {
@@ -719,13 +875,8 @@ export const updateComplaintStatus = async (
   adminNotes?: string
 ): Promise<void> => {
   try {
-    // Get the current complaint data for notification
-    const complaintDoc = await getDoc(doc(db, 'anonymousComplaints', complaintId));
-    const complaintData = complaintDoc.data();
-    
     const updateData: any = {
       status,
-      isResolved: status === 'Resolved',
       updatedAt: serverTimestamp()
     };
     
@@ -734,28 +885,12 @@ export const updateComplaintStatus = async (
     }
     
     if (status === 'Resolved') {
+      updateData.resolved = true;
       updateData.resolvedAt = serverTimestamp();
+      updateData.resolvedBy = auth.currentUser?.uid || '';
     }
     
     await updateDoc(doc(db, 'anonymousComplaints', complaintId), updateData);
-
-    // Send WhatsApp notification for anonymous complaints if phone is available
-    if (sendWhatsAppNotification && complaintData?.studentPhone) {
-      try {
-        await sendWhatsAppNotification(
-          complaintData.studentPhone,
-          {
-            department: 'Anonymous',
-            category: complaintData.category,
-            title: complaintData.title
-          },
-          status,
-          adminNotes
-        );
-      } catch (notificationError) {
-        console.log('WhatsApp notification failed, but status update succeeded:', notificationError);
-      }
-    }
   } catch (error) {
     console.error('Error updating complaint status:', error);
     throw error;

@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { User, startActivityCleanup, stopActivityCleanup } from '@/lib/firebase-utils';
+import { User, startActivityCleanup, stopActivityCleanup, checkDepartmentHeadStatus } from '@/lib/firebase-utils';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -83,20 +83,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // User exists - update their data with latest info from Firebase Auth
             const existingUserData = userSnap.data() as User;
             
+            // Check if user is department head
+            let isDeptHead = false;
+            let departmentInfo = null;
+            if (firebaseUser.email) {
+              const deptHeadCheck = await checkDepartmentHeadStatus(firebaseUser.email);
+              isDeptHead = deptHeadCheck.isDepartmentHead;
+              departmentInfo = deptHeadCheck.department;
+            }
+            
             // Prepare updated data
             const updatedData = {
               ...existingUserData,
+              uid: firebaseUser.uid,
               email: firebaseUser.email || existingUserData.email,
               displayName: firebaseUser.displayName || existingUserData.displayName,
               photoURL: firebaseUser.photoURL || existingUserData.photoURL,
-              lastLogin: serverTimestamp()
+              lastLogin: serverTimestamp(),
+              // Update role if user is department head
+              role: isDeptHead ? 'department_head' : (existingUserData.role || 'user'),
+              department: departmentInfo?.id || existingUserData.department
             };
             
             // Only update if there are actual changes
             const hasChanges = 
               existingUserData.email !== updatedData.email ||
               existingUserData.displayName !== updatedData.displayName ||
-              existingUserData.photoURL !== updatedData.photoURL;
+              existingUserData.photoURL !== updatedData.photoURL ||
+              existingUserData.role !== updatedData.role ||
+              existingUserData.department !== updatedData.department;
             
             if (hasChanges) {
               await updateDoc(userRef, updatedData);
@@ -111,6 +126,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // New user - create user document
             const email = firebaseUser.email || '';
             const displayName = firebaseUser.displayName || email.split('@')[0] || 'Anonymous';
+            
+            // Check if user is department head
+            let isDeptHead = false;
+            let departmentInfo = null;
+            if (email) {
+              const deptHeadCheck = await checkDepartmentHeadStatus(email);
+              isDeptHead = deptHeadCheck.isDepartmentHead;
+              departmentInfo = deptHeadCheck.department;
+            }
             
             // Try to extract first and last name from display name or email
             let firstName = '', lastName = '';
@@ -142,8 +166,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               displayName,
               firstName,
               lastName,
-              photoURL: firebaseUser.photoURL || null,
-              role: 'user' // Default role
+              photoURL: firebaseUser.photoURL || undefined,
+              role: isDeptHead ? 'department_head' : 'user', // Set role based on department head status
+              department: departmentInfo?.id || undefined,
+              createdAt: serverTimestamp()
             };
             
             // Save user data to Firestore
@@ -171,11 +197,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Start activity cleanup service when the provider mounts
   useEffect(() => {
-    const cleanupInterval = startActivityCleanup();
+    startActivityCleanup();
     
-    // Cleanup when component unmounts
+    // Note: stopActivityCleanup doesn't need to be called as startActivityCleanup() 
+    // handles cleanup automatically and returns void
     return () => {
-      stopActivityCleanup(cleanupInterval);
+      // No cleanup needed as the function manages its own intervals
     };
   }, []);
 

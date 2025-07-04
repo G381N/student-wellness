@@ -75,13 +75,15 @@ export interface Comment {
   content: string;
   author: string;
   authorId: string;
+  authorName?: string;  // Add authorName field for backward compatibility
   timestamp: any;
   isAnonymous: boolean;
 }
 
 export interface ActivityParticipant {
-  userId: string;
-  userName: string;
+  uid: string;  // Change from userId
+  displayName: string;  // Change from userName
+  email?: string;
   joinedAt: any;
 }
 
@@ -102,10 +104,13 @@ export interface Post {
   isAnonymous: boolean;
   participants?: ActivityParticipant[];
   maxParticipants?: number;
-  activityDate?: any;
+  date?: any;  // Add date field
+  time?: string;  // Add time field
   location?: string;
+  imageURL?: string;  // Add imageURL field
   eventType?: 'activity' | 'post';
   type?: 'activity' | 'concern' | 'post';  // Add type field
+  status?: 'Open' | 'Under Review' | 'Resolved' | 'Closed';  // Add status field for concerns
 }
 
 export interface MindWallIssue {
@@ -167,7 +172,6 @@ export interface DepartmentComplaint {
   resolvedAt?: any;
   resolvedBy?: string;
   adminNotes?: string;
-  hodNotes?: string;
 }
 
 export interface AnonymousComplaint {
@@ -242,8 +246,11 @@ export const checkDepartmentHeadStatus = async (email: string): Promise<{ isDepa
 // VOTING SYSTEM
 // ============================================================================
 
-export const upvotePost = async (postId: string, userId: string): Promise<boolean> => {
+export const upvotePost = async (postId: string): Promise<boolean> => {
   try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
@@ -254,8 +261,8 @@ export const upvotePost = async (postId: string, userId: string): Promise<boolea
     const postData = postDoc.data();
     const upvotedBy = postData.upvotedBy || [];
     const downvotedBy = postData.downvotedBy || [];
-    const hasUpvoted = upvotedBy.includes(userId);
-    const hasDownvoted = downvotedBy.includes(userId);
+    const hasUpvoted = upvotedBy.includes(user.uid);
+    const hasDownvoted = downvotedBy.includes(user.uid);
     
     let newUpvotedBy = [...upvotedBy];
     let newDownvotedBy = [...downvotedBy];
@@ -264,16 +271,16 @@ export const upvotePost = async (postId: string, userId: string): Promise<boolea
     
     if (hasUpvoted) {
       // Remove upvote
-      newUpvotedBy = upvotedBy.filter((id: string) => id !== userId);
+      newUpvotedBy = upvotedBy.filter((id: string) => id !== user.uid);
       upvoteCount = Math.max(0, upvoteCount - 1);
     } else {
       // Add upvote
-      newUpvotedBy.push(userId);
+      newUpvotedBy.push(user.uid);
       upvoteCount += 1;
       
       // Remove downvote if exists
       if (hasDownvoted) {
-        newDownvotedBy = downvotedBy.filter((id: string) => id !== userId);
+        newDownvotedBy = downvotedBy.filter((id: string) => id !== user.uid);
         downvoteCount = Math.max(0, downvoteCount - 1);
       }
     }
@@ -293,8 +300,11 @@ export const upvotePost = async (postId: string, userId: string): Promise<boolea
   }
 };
 
-export const downvotePost = async (postId: string, userId: string): Promise<boolean> => {
+export const downvotePost = async (postId: string): Promise<boolean> => {
   try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
@@ -305,8 +315,8 @@ export const downvotePost = async (postId: string, userId: string): Promise<bool
     const postData = postDoc.data();
     const upvotedBy = postData.upvotedBy || [];
     const downvotedBy = postData.downvotedBy || [];
-    const hasUpvoted = upvotedBy.includes(userId);
-    const hasDownvoted = downvotedBy.includes(userId);
+    const hasUpvoted = upvotedBy.includes(user.uid);
+    const hasDownvoted = downvotedBy.includes(user.uid);
     
     let newUpvotedBy = [...upvotedBy];
     let newDownvotedBy = [...downvotedBy];
@@ -315,16 +325,16 @@ export const downvotePost = async (postId: string, userId: string): Promise<bool
     
     if (hasDownvoted) {
       // Remove downvote
-      newDownvotedBy = downvotedBy.filter((id: string) => id !== userId);
+      newDownvotedBy = downvotedBy.filter((id: string) => id !== user.uid);
       downvoteCount = Math.max(0, downvoteCount - 1);
     } else {
       // Add downvote
-      newDownvotedBy.push(userId);
+      newDownvotedBy.push(user.uid);
       downvoteCount += 1;
       
       // Remove upvote if exists
       if (hasUpvoted) {
-        newUpvotedBy = upvotedBy.filter((id: string) => id !== userId);
+        newUpvotedBy = upvotedBy.filter((id: string) => id !== user.uid);
         upvoteCount = Math.max(0, upvoteCount - 1);
       }
     }
@@ -367,29 +377,30 @@ export const getPosts = async (): Promise<Post[]> => {
 
 export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
   try {
-    // Get user data to set authorName
-    let authorName = 'Unknown User';
-    if (postData.authorId && !postData.isAnonymous) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', postData.authorId));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          authorName = userData.displayName || userData.email?.split('@')[0] || 'Unknown User';
-        }
-      } catch (error) {
-        console.error('Error fetching user data for post:', error);
-      }
-    }
+    // Get current user
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
+    // Get user's display name from Firestore
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userData = userDoc.exists() ? userDoc.data() : null;
+    
+    // Use the first available name option
+    const displayName = postData.isAnonymous 
+      ? 'Anonymous' 
+      : userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
 
     const docRef = await addDoc(collection(db, 'posts'), {
       ...postData,
-      authorName: postData.isAnonymous ? 'Anonymous' : authorName,
+      author: displayName,  // Set author field
+      authorName: displayName,  // Set authorName field for backward compatibility
+      authorId: user.uid,
       timestamp: serverTimestamp(),
       upvotes: 0,
       downvotes: 0,
+      upvotedBy: [],
+      downvotedBy: [],
       votedUsers: [],
-      upvotedBy: [],  // Initialize new voting arrays
-      downvotedBy: [], // Initialize new voting arrays
       comments: []
     });
     return docRef.id;
@@ -409,8 +420,11 @@ export const deletePost = async (postId: string): Promise<void> => {
 };
 
 // Join activity
-export const joinActivity = async (postId: string, userId: string, userName: string): Promise<void> => {
+export const joinActivity = async (postId: string): Promise<void> => {
   try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
@@ -419,12 +433,13 @@ export const joinActivity = async (postId: string, userId: string, userName: str
       const participants = postData.participants || [];
       
       // Check if user is already participating
-      const isAlreadyParticipating = participants.some((p: any) => p.userId === userId);
+      const isAlreadyParticipating = participants.some((p: ActivityParticipant) => p.uid === user.uid);
       
       if (!isAlreadyParticipating && participants.length < (postData.maxParticipants || 10)) {
-        const newParticipant = {
-          userId,
-          userName,
+        const newParticipant: ActivityParticipant = {
+          uid: user.uid,
+          displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+          email: user.email || undefined,
           joinedAt: serverTimestamp()
         };
         
@@ -440,8 +455,11 @@ export const joinActivity = async (postId: string, userId: string, userName: str
 };
 
 // Leave activity
-export const leaveActivity = async (postId: string, userId: string): Promise<void> => {
+export const leaveActivity = async (postId: string): Promise<void> => {
   try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
@@ -449,7 +467,7 @@ export const leaveActivity = async (postId: string, userId: string): Promise<voi
       const postData = postDoc.data();
       const participants = postData.participants || [];
       
-      const updatedParticipants = participants.filter((p: any) => p.userId !== userId);
+      const updatedParticipants = participants.filter((p: ActivityParticipant) => p.uid !== user.uid);
       
       await updateDoc(postRef, {
         participants: updatedParticipants
@@ -464,9 +482,13 @@ export const leaveActivity = async (postId: string, userId: string): Promise<voi
 // Add comment to post
 export const addComment = async (
   postId: string, 
-  comment: Omit<Comment, 'id'>
-): Promise<void> => {
+  content: string,
+  isAnonymous: boolean = false
+): Promise<Comment> => {
   try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
@@ -474,16 +496,25 @@ export const addComment = async (
       const postData = postDoc.data();
       const comments = postData.comments || [];
       
-      const newComment = {
-        ...comment,
+      const newComment: Comment = {
         id: Date.now().toString(),
-        timestamp: serverTimestamp()
+        content,
+        author: isAnonymous ? 'Anonymous' : (user.displayName || user.email?.split('@')[0] || 'Unknown User'),
+        authorId: user.uid,
+        timestamp: serverTimestamp(),
+        isAnonymous
       };
       
       await updateDoc(postRef, {
         comments: [...comments, newComment]
       });
+
+      return {
+        ...newComment,
+        timestamp: new Date() // Return current date for immediate UI update
+      };
     }
+    throw new Error('Post not found');
   } catch (error) {
     console.error('Error adding comment:', error);
     throw error;

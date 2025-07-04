@@ -30,21 +30,21 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
 
   const handleUpvote = async () => {
     if (!user || isVoting) return;
+    setIsVoting(true);
     
     try {
-      setIsVoting(true);
-      const upvoted = await upvotePost(tweet.id, user.uid);
+      const result = await upvotePost(tweet.id);
       
       // Update local state
       const updatedTweet = {
         ...tweet,
-        upvotes: upvoted ? tweet.upvotes + 1 : Math.max(0, tweet.upvotes - 1),
-        upvotedBy: upvoted 
+        upvotes: result ? tweet.upvotes + 1 : Math.max(0, tweet.upvotes - 1),
+        upvotedBy: result 
           ? [...tweet.upvotedBy, user.uid]
           : tweet.upvotedBy.filter(uid => uid !== user.uid),
         // Remove from downvotes if switching
-        downvotes: hasDownvoted && upvoted ? Math.max(0, tweet.downvotes - 1) : tweet.downvotes,
-        downvotedBy: hasDownvoted && upvoted 
+        downvotes: hasDownvoted && result ? Math.max(0, tweet.downvotes - 1) : tweet.downvotes,
+        downvotedBy: hasDownvoted && result 
           ? tweet.downvotedBy.filter(uid => uid !== user.uid)
           : tweet.downvotedBy
       };
@@ -67,21 +67,21 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
 
   const handleDownvote = async () => {
     if (!user || isVoting) return;
+    setIsVoting(true);
     
     try {
-      setIsVoting(true);
-      const downvoted = await downvotePost(tweet.id, user.uid);
+      const result = await downvotePost(tweet.id);
       
       // Update local state
       const updatedTweet = {
         ...tweet,
-        downvotes: downvoted ? tweet.downvotes + 1 : Math.max(0, tweet.downvotes - 1),
-        downvotedBy: downvoted 
+        downvotes: result ? tweet.downvotes + 1 : Math.max(0, tweet.downvotes - 1),
+        downvotedBy: result 
           ? [...tweet.downvotedBy, user.uid]
           : tweet.downvotedBy.filter(uid => uid !== user.uid),
         // Remove from upvotes if switching
-        upvotes: hasUpvoted && downvoted ? Math.max(0, tweet.upvotes - 1) : tweet.upvotes,
-        upvotedBy: hasUpvoted && downvoted 
+        upvotes: hasUpvoted && result ? Math.max(0, tweet.upvotes - 1) : tweet.upvotes,
+        upvotedBy: hasUpvoted && result 
           ? tweet.upvotedBy.filter(uid => uid !== user.uid)
           : tweet.upvotedBy
       };
@@ -104,31 +104,15 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
 
   const handleAddComment = async () => {
     if (!user || !newComment.trim() || isCommenting) return;
-
+    setIsCommenting(true);
+    
     try {
-      setIsCommenting(true);
+      const comment = await addComment(tweet.id, newComment.trim(), tweet.isAnonymous);
       
-      // Create comment object with proper structure
-      const commentData = {
-        content: newComment,
-        author: user.displayName || user.email?.split('@')[0] || 'Anonymous',
-        authorId: user.uid,
-        timestamp: new Date(),
-        isAnonymous: false
-      };
-      
-      await addComment(tweet.id, commentData);
-      
-      // Create the comment with ID for local state update
-      const newCommentWithId = {
-        ...commentData,
-        id: Date.now().toString(),
-        timestamp: new Date()
-      };
-      
+      // Update local state
       const updatedTweet = {
         ...tweet,
-        comments: [...tweet.comments, newCommentWithId]
+        comments: [...(tweet.comments || []), comment]
       };
       
       onUpdate(updatedTweet);
@@ -204,9 +188,9 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
               ) : (
                 <>
                   <span className="font-bold text-white text-lg">
-                    {authorInfo?.displayName || tweet.authorName || 'Unknown User'}
+                    {tweet.isAnonymous ? 'Anonymous' : tweet.author || 'Unknown User'}
                   </span>
-                  {authorInfo?.realName && (
+                  {!tweet.isAnonymous && authorInfo?.realName && (
                     <span className="text-gray-400 text-base">
                       @{authorInfo.realName}
                     </span>

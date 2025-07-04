@@ -86,8 +86,8 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         ...activity,
         participants: [...(activity.participants || []), {
           uid: user.uid,
-          displayName: user.displayName || user.email?.split('@')[0] || 'User',
-          email: user.email || '',
+          displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+          email: user.email || undefined,
           joinedAt: Timestamp.now()
         }]
       };
@@ -126,10 +126,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
     setLoading({ ...loading, comment: true });
 
     try {
-      const newComment = await addComment(activity.id, comment);
-      if (newComment.timestamp) {
-        newComment.timestamp = processTimestamp(newComment.timestamp);
-      }
+      const newComment = await addComment(activity.id, comment.trim());
 
       const updatedActivity = {
         ...activity,
@@ -203,9 +200,9 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
                 ) : (
                   <>
                     <span className="font-bold text-white text-base">
-                      {authorInfo?.displayName || activity.authorName || 'Unknown User'}
+                      {activity.isAnonymous ? 'Anonymous' : activity.author || 'Unknown User'}
                     </span>
-                    {authorInfo?.realName && (
+                    {!activity.isAnonymous && authorInfo?.realName && (
                       <span className="text-gray-500 text-sm">
                         @{authorInfo.realName}
                       </span>

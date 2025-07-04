@@ -61,7 +61,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
   const canDelete = isAuthor || isModerator || isAdmin;
   
   const handleEscalate = async () => {
-    if (!user) return;
+    if (!user || loading.upvote) return;
     setLoading({ ...loading, upvote: true });
     
     try {
@@ -70,10 +70,10 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
       // Update the local state
       const updatedConcern = { 
         ...concern,
-        upvotes: hasUpvoted ? concern.upvotes - 1 : concern.upvotes + 1,
-        upvotedBy: hasUpvoted 
-          ? concern.upvotedBy?.filter(id => id !== user.uid) || []
-          : [...(concern.upvotedBy || []), user.uid]
+        upvotes: result ? concern.upvotes + 1 : concern.upvotes - 1,
+        upvotedBy: result 
+          ? [...(concern.upvotedBy || []), user.uid]
+          : concern.upvotedBy?.filter(id => id !== user.uid) || []
       };
       
       onUpdate(updatedConcern);
@@ -85,23 +85,17 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
   };
   
   const handleAddComment = async () => {
-    if (!user || !comment.trim()) return;
+    if (!user || !comment.trim() || loading.comment) return;
     setLoading({ ...loading, comment: true });
-    
+
     try {
-      const newComment = await addComment(concern.id, comment);
-      
-      // Process timestamp for consistency
-      if (newComment.timestamp) {
-        newComment.timestamp = processTimestamp(newComment.timestamp);
-      }
-      
-      // Update the local state
+      const newComment = await addComment(concern.id, comment.trim(), concern.isAnonymous);
+
       const updatedConcern = {
         ...concern,
         comments: [...(concern.comments || []), newComment]
       };
-      
+
       onUpdate(updatedConcern);
       setComment('');
       setIsCommenting(false);
@@ -169,7 +163,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
               ) : (
                 <>
                   <span className="font-bold text-white text-base">
-                    {concern.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || concern.authorName || 'Unknown User')}
+                    {concern.isAnonymous ? 'Anonymous' : concern.author || 'Unknown User'}
                   </span>
                   {!concern.isAnonymous && authorInfo?.realName && (
                     <span className="text-gray-500 text-sm">

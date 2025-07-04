@@ -130,7 +130,7 @@ const DepartmentHeadManagement: React.FC = () => {
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-4">
             <FiUser className="text-2xl text-blue-400" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Department Head Management</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Department Head Management</h1>
           </div>
           <p className="text-sm sm:text-base text-gray-400">
             Manage department head contact information for the complaints system.
@@ -201,7 +201,7 @@ const DepartmentHeadManagement: React.FC = () => {
                     <div className="space-y-2 mb-4">
                       {editingDepartment?.id === department.id ? (
                         <form onSubmit={handleUpdatePhone} className="space-y-3">
-                          <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
                             <FiPhone className="text-blue-400" />
                             <input
                               type="tel"
@@ -227,7 +227,7 @@ const DepartmentHeadManagement: React.FC = () => {
                             >
                               Cancel
                             </button>
-                          </div>
+                      </div>
                         </form>
                       ) : (
                         <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -253,12 +253,12 @@ const DepartmentHeadManagement: React.FC = () => {
                   
                   {editingDepartment?.id !== department.id && (
                     <div className="flex gap-2">
-                      <button
+                    <button
                         onClick={() => handleEditPhone(department)}
                         className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                      >
+                    >
                         <FiEdit className="text-sm" />
-                      </button>
+                    </button>
                     </div>
                   )}
                 </div>

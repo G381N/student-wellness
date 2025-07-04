@@ -29,7 +29,7 @@ try {
   if (typeof window === 'undefined') {
     // Only require in Node.js environment
     const whatsappNotifications = eval('require')('../../WhatsapWellness/config/firebase');
-    sendWhatsAppNotification = whatsappNotifications.sendComplaintStatusNotification;
+  sendWhatsAppNotification = whatsappNotifications.sendComplaintStatusNotification;
   }
 } catch (error) {
   console.log('WhatsApp notifications not available in this environment');

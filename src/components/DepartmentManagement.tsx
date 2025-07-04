@@ -85,14 +85,14 @@ const DepartmentManagement: React.FC = () => {
         await updateDepartment(editingDepartment.id, updateData);
         setSuccess('Department updated successfully');
       } else {
-        const departmentData = {
+      const departmentData = {
           code: formData.code.trim(),
           name: formData.name.trim(),
           headPhoneNumber: formData.headPhoneNumber.trim(),
           createdBy: formData.createdBy,
-          isActive: formData.isActive,
+        isActive: formData.isActive,
           createdAt: serverTimestamp()
-        };
+      };
         
         await addDepartment(departmentData);
         setSuccess('Department added successfully');
@@ -153,7 +153,7 @@ const DepartmentManagement: React.FC = () => {
         ? timestamp.toDate() 
         : new Date(timestamp);
       return date.toLocaleDateString();
-    } catch (error) {
+      } catch (error) {
       return 'Invalid date';
     }
   };
@@ -190,7 +190,7 @@ const DepartmentManagement: React.FC = () => {
               <FiBriefcase className="text-2xl text-blue-400" />
               <h1 className="text-2xl sm:text-3xl font-bold text-white">Department Management</h1>
             </div>
-            <button
+          <button
               onClick={() => {
                 setShowAddForm(true);
                 setEditingDepartment(null);
@@ -203,15 +203,15 @@ const DepartmentManagement: React.FC = () => {
                 });
               }}
               className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm sm:text-base"
-            >
+          >
               <FiPlus className="text-sm" />
-              Add Department
-            </button>
-          </div>
+            Add Department
+          </button>
+        </div>
           <p className="text-sm sm:text-base text-gray-400">
             Manage departments and their information for the complaints system.
           </p>
-        </div>
+      </div>
 
         {/* Success/Error Messages */}
         <AnimatePresence>
@@ -267,13 +267,13 @@ const DepartmentManagement: React.FC = () => {
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+              <div>
                     <label className="block text-sm font-medium text-white mb-2">
                       <FiCode className="inline mr-2" />
                       Department Code *
-                    </label>
-                    <input
-                      type="text"
+                </label>
+                <input
+                  type="text"
                       value={formData.code}
                       onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
                       className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
@@ -297,40 +297,40 @@ const DepartmentManagement: React.FC = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, headPhoneNumber: e.target.value }))}
                       className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
                       placeholder="+91XXXXXXXXXX"
-                      required
-                    />
+                  required
+                />
                   </div>
-                </div>
+              </div>
 
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-white mb-2">
                     <FiBriefcase className="inline mr-2" />
                     Department Name *
-                  </label>
-                  <input
+                </label>
+                <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
                     placeholder="Full department name with program detail"
-                    required
-                  />
-                </div>
+                  required
+                />
+              </div>
 
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-white mb-2">
                     <FiUser className="inline mr-2" />
                     Created By
-                  </label>
-                  <input
+                </label>
+                <input
                     type="text"
                     value={formData.createdBy}
                     onChange={(e) => setFormData(prev => ({ ...prev, createdBy: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white"
                     placeholder="Admin or faculty name"
                     required
-                  />
-                </div>
+                />
+              </div>
 
                 <div className="flex items-center gap-2">
                   <input
@@ -340,34 +340,34 @@ const DepartmentManagement: React.FC = () => {
                     className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
                   />
                   <label className="text-sm text-white">Active Department</label>
-                </div>
+              </div>
 
                 <div className="flex gap-2">
-                  <button
-                    type="submit"
+                <button
+                  type="submit"
                     disabled={isSubmitting}
                     className="flex-1 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                >
                     {isSubmitting ? 'Saving...' : editingDepartment ? 'Update Department' : 'Add Department'}
-                  </button>
-                  <button
-                    type="button"
+                </button>
+                <button
+                  type="button"
                     onClick={() => {
                       setShowAddForm(false);
                       setEditingDepartment(null);
                       setError('');
                     }}
                     className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
             </motion.div>
-          )}
+      )}
         </AnimatePresence>
 
-        {/* Departments List */}
+      {/* Departments List */}
         {departments.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <FiBriefcase className="mx-auto text-4xl sm:text-6xl text-gray-600 mb-4" />
@@ -375,10 +375,10 @@ const DepartmentManagement: React.FC = () => {
             <p className="text-sm sm:text-base text-gray-400">
               Start by adding your first department to the system.
             </p>
-          </div>
+        </div>
         ) : (
           <div className="grid gap-4 sm:gap-6">
-            {departments.map((department) => (
+              {departments.map((department) => (
               <motion.div
                 key={department.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -393,12 +393,12 @@ const DepartmentManagement: React.FC = () => {
                         {department.code}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        department.isActive 
+                      department.isActive 
                           ? 'bg-green-900 text-green-300' 
                           : 'bg-red-900 text-red-300'
-                      }`}>
-                        {department.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                    }`}>
+                      {department.isActive ? 'Active' : 'Inactive'}
+                    </span>
                     </div>
                     
                     <div className="space-y-2 mb-4">
@@ -413,9 +413,9 @@ const DepartmentManagement: React.FC = () => {
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <span>Created: {formatTimestamp(department.createdAt)}</span>
                       </div>
-                    </div>
-                  </div>
-                  
+        </div>
+      </div>
+
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(department)}
@@ -423,18 +423,18 @@ const DepartmentManagement: React.FC = () => {
                     >
                       <FiEdit className="text-sm" />
                     </button>
-                    <button
+                      <button
                       onClick={() => handleToggleActive(department.id, department.isActive)}
                       className={`px-3 py-1 rounded-lg transition-colors text-sm ${
                         department.isActive 
                           ? 'bg-red-600 text-white hover:bg-red-700' 
                           : 'bg-green-600 text-white hover:bg-green-700'
                       }`}
-                    >
+                      >
                       {department.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                  </div>
-                </div>
+                      </button>
+        </div>
+      </div>
               </motion.div>
             ))}
           </div>
@@ -449,7 +449,7 @@ const DepartmentManagement: React.FC = () => {
           <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-green-400">
               {departments.filter((d: Department) => d.isActive).length}
-            </div>
+        </div>
             <div className="text-sm text-gray-400">Active Departments</div>
           </div>
           <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 text-center">
@@ -457,7 +457,7 @@ const DepartmentManagement: React.FC = () => {
               {departments.filter((d: Department) => !d.isActive).length}
             </div>
             <div className="text-sm text-gray-400">Inactive Departments</div>
-          </div>
+        </div>
         </div>
       </div>
     </div>

@@ -15,7 +15,8 @@ import {
   DocumentReference,
   QuerySnapshot,
   Timestamp,
-  FieldValue
+  FieldValue,
+  QueryDocumentSnapshot
 } from 'firebase/firestore';
 import { db, auth, storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -25,8 +26,11 @@ let sendWhatsAppNotification: Function | null = null;
 
 try {
   // Dynamically import the notification function from WhatsApp bot
-  const whatsappNotifications = require('../../WhatsapWellness/config/firebase');
-  sendWhatsAppNotification = whatsappNotifications.sendComplaintStatusNotification;
+  if (typeof window === 'undefined') {
+    // Only require in Node.js environment
+    const whatsappNotifications = eval('require')('../../WhatsapWellness/config/firebase');
+    sendWhatsAppNotification = whatsappNotifications.sendComplaintStatusNotification;
+  }
 } catch (error) {
   console.log('WhatsApp notifications not available in this environment');
   sendWhatsAppNotification = null;
@@ -126,21 +130,12 @@ export interface Moderator {
 
 export interface Department {
   id: string;
-  name: string;
-  description: string;
-  isActive: boolean;
-  createdAt: any;
-  updatedAt?: any;
-}
-
-export interface DepartmentHead {
-  id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  departmentId: string;
-  isActive: boolean;
-  createdAt: any;
+  code: string;           // Unique department code (e.g., "MSC_AIML")
+  name: string;           // Full department name with program detail
+  headPhoneNumber: string; // Contact number of department head
+  createdBy: string;      // Name of admin/faculty who created the entry
+  isActive: boolean;      // Whether the department is active or disabled
+  createdAt: any;         // Timestamp when the department was created
   updatedAt?: any;
 }
 
@@ -151,9 +146,9 @@ export interface DepartmentComplaint {
   studentEmail: string;
   studentPhone?: string;
   departmentId: string;
-  department?: string;
+  departmentCode?: string;  // Added for new schema
   category: string;
-  severity: 'Low' | 'Medium' | 'High' | 'Critical';
+  priority: 'Low' | 'Medium' | 'High' | 'Critical';  // Changed from severity to priority
   title: string;
   description: string;
   status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed';
@@ -262,7 +257,7 @@ export const getPosts = async (): Promise<Post[]> => {
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(postsQuery);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as Post));
@@ -414,7 +409,7 @@ export const getMindWallIssues = async (): Promise<MindWallIssue[]> => {
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(issuesQuery);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as MindWallIssue));
@@ -496,7 +491,7 @@ export const getModerators = async (): Promise<Moderator[]> => {
       orderBy('assignedAt', 'desc')
     );
     const querySnapshot = await getDocs(moderatorsQuery);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as Moderator));
@@ -541,7 +536,7 @@ export const getDepartments = async (): Promise<Department[]> => {
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(deptQuery);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as Department));
@@ -579,49 +574,16 @@ export const updateDepartment = async (departmentId: string, updateData: Partial
 
 // Save department (alias for addDepartment)
 export const saveDepartment = async (departmentData: Omit<Department, 'id'>): Promise<string> => {
-  return await addDepartment(departmentData);
-};
-
-// ============================================================================
-// DEPARTMENT HEAD MANAGEMENT
-// ============================================================================
-
-export const getDepartmentHeads = async (): Promise<DepartmentHead[]> => {
   try {
-    const headsQuery = query(
-      collection(db, 'departmentHeads'), 
-      orderBy('createdAt', 'desc')
-    );
-    const querySnapshot = await getDocs(headsQuery);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as DepartmentHead));
-  } catch (error) {
-    console.error('Error getting department heads:', error);
-    return [];
-  }
-};
-
-export const addDepartmentHead = async (headData: Omit<DepartmentHead, 'id'>): Promise<string> => {
-  try {
-    const docRef = await addDoc(collection(db, 'departmentHeads'), {
-      ...headData,
+    const docRef = await addDoc(collection(db, 'departments'), {
+      ...departmentData,
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
       isActive: true
     });
     return docRef.id;
   } catch (error) {
-    console.error('Error adding department head:', error);
-    throw error;
-  }
-};
-
-export const removeDepartmentHead = async (headId: string): Promise<void> => {
-  try {
-    await deleteDoc(doc(db, 'departmentHeads', headId));
-  } catch (error) {
-    console.error('Error removing department head:', error);
+    console.error('Error saving department:', error);
     throw error;
   }
 };
@@ -637,7 +599,7 @@ export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> 
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as DepartmentComplaint));
@@ -725,7 +687,7 @@ export const getAnonymousComplaints = async (): Promise<AnonymousComplaint[]> =>
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as AnonymousComplaint));
@@ -804,7 +766,7 @@ export const updateComplaintStatus = async (
 // ACTIVITY MANAGEMENT
 // ============================================================================
 
-let cleanupInterval: NodeJS.Timeout | null = null;
+let cleanupInterval: ReturnType<typeof setInterval> | null = null;
 
 export const deleteExpiredActivities = async (): Promise<void> => {
   try {
@@ -817,7 +779,7 @@ export const deleteExpiredActivities = async (): Promise<void> => {
     const querySnapshot = await getDocs(activitiesQuery);
     const expiredActivities: string[] = [];
     
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
       const data = doc.data();
       if (data.activityDate) {
         const activityDate = processTimestamp(data.activityDate);

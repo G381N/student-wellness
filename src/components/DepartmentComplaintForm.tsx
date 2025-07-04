@@ -1,26 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiSend, FiCheck, FiBriefcase, FiUser, FiPhone, FiMail, FiFileText, FiAlertTriangle } from 'react-icons/fi';
-import { addDepartmentComplaint } from '@/lib/firebase-utils';
-
-const DEPARTMENTS = [
-  'Computer Science & Engineering',
-  'Electronics & Communication',
-  'Mechanical Engineering', 
-  'Civil Engineering',
-  'Business Administration',
-  'Commerce',
-  'Psychology',
-  'Social Work',
-  'Arts & Humanities',
-  'Law',
-  'Medicine',
-  'Nursing',
-  'Physiotherapy',
-  'Pharmacy'
-];
+import { addDepartmentComplaint, getDepartments, Department } from '@/lib/firebase-utils';
 
 const CATEGORIES = [
   'Academic Issues',
@@ -46,10 +29,12 @@ const SEVERITY_LEVELS = [
 ];
 
 export default function DepartmentComplaintForm() {
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    department: '',
+    departmentId: '',
     category: '',
     severity: 'Medium',
     studentName: '',
@@ -61,6 +46,25 @@ export default function DepartmentComplaintForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      setLoadingDepartments(true);
+      const departmentData = await getDepartments();
+      // Filter only active departments
+      const activeDepartments = departmentData.filter(dept => dept.isActive);
+      setDepartments(activeDepartments);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      setError('Failed to load departments. Please refresh the page.');
+    } finally {
+      setLoadingDepartments(false);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -70,13 +74,19 @@ export default function DepartmentComplaintForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title.trim() || !formData.description.trim() || !formData.department || !formData.category) {
+    if (!formData.title.trim() || !formData.description.trim() || !formData.departmentId || !formData.category) {
       setError('Please fill in all required fields');
       return;
     }
 
     if (!formData.studentName.trim() || !formData.studentPhone.trim()) {
       setError('Student name and phone number are required for department complaints');
+      return;
+    }
+
+    const selectedDepartment = departments.find(dept => dept.id === formData.departmentId);
+    if (!selectedDepartment) {
+      setError('Please select a valid department');
       return;
     }
 
@@ -87,19 +97,25 @@ export default function DepartmentComplaintForm() {
       await addDepartmentComplaint({
         title: formData.title.trim(),
         description: formData.description.trim(),
-        department: formData.department,
+        departmentId: formData.departmentId,
+        department: selectedDepartment.name,
         category: formData.category,
         severity: formData.severity as 'Low' | 'Medium' | 'High' | 'Critical',
         studentName: formData.studentName.trim(),
         studentPhone: formData.studentPhone.trim(),
-        source: 'Website'
+        studentEmail: formData.studentEmail.trim() || undefined,
+        studentId: '', // Will be populated by the backend
+        status: 'Pending',
+        isResolved: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
       setIsSubmitted(true);
       setFormData({
         title: '',
         description: '',
-        department: '',
+        departmentId: '',
         category: '',
         severity: 'Medium',
         studentName: '',
@@ -242,18 +258,27 @@ export default function DepartmentComplaintForm() {
               <FiBriefcase className="inline mr-2" />
               Department *
             </label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-white"
-              required
-            >
-              <option value="">Select Department</option>
-              {DEPARTMENTS.map((dept) => (
-                <option key={dept} value={dept}>{dept}</option>
-              ))}
-            </select>
+            {loadingDepartments ? (
+              <div className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-400 flex items-center">
+                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                Loading departments...
+              </div>
+            ) : (
+              <select
+                name="departmentId"
+                value={formData.departmentId}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-white"
+                required
+              >
+                <option value="">Select Department</option>
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name} ({dept.code})
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div>
@@ -338,7 +363,7 @@ export default function DepartmentComplaintForm() {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || loadingDepartments}
             className="w-full px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting ? (

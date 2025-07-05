@@ -14,7 +14,7 @@ interface TweetCardProps {
   onDelete?: () => void;
 }
 
-export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
+export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
   const { user, isAdmin, isModerator } = useAuth();
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');

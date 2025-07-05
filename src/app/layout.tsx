@@ -2,7 +2,7 @@ import '../lib/firebase'; // Initialize firebase
 import './globals.css';
 import AppProvider from './providers';
 import { Metadata } from 'next';
-import ConditionalNavbar from '@/components/ConditionalNavbar';
+import LayoutShell from '@/components/LayoutShell';
 
 export const metadata: Metadata = {
   title: 'CampusWell - Student Mental Health & Community Support',
@@ -21,10 +21,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-black text-white">
         <AppProvider>
-          <ConditionalNavbar />
-          <main>
+          <LayoutShell>
             {children}
-          </main>
+          </LayoutShell>
         </AppProvider>
       </body>
     </html>

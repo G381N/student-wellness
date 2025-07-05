@@ -476,7 +476,12 @@ export default function DashboardPage() {
     }
     
     if (activeSection === 'feed') {
-      filteredPosts = filteredPosts;
+      // Show all posts except activities and concerns
+      filteredPosts = filteredPosts.filter(post => 
+        (post as any).type !== 'activity' && 
+        (post as any).type !== 'concern' &&
+        (post as any).type !== 'moderator-announcement'
+      );
     } else if (activeSection === 'activities') {
       filteredPosts = filteredPosts.filter(post => (post as any).type === 'activity');
     } else if (activeSection === 'concerns') {

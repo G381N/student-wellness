@@ -9,7 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useUserInfo } from '@/hooks/useUserInfo';
 
 interface TweetCardProps {
-  tweet: Post;
+  tweet: Post & { type?: 'post' | 'tweet' };  // Added type to handle both 'post' and 'tweet'
   onUpdate: (updatedTweet: Post) => void;
   onDelete: (tweetId: string) => void;
 }

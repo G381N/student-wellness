@@ -179,7 +179,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
       }
 
       const postData: any = {
-        type: postType === 'general' ? 'tweet' : postType,
+        type: postType === 'general' ? 'post' : postType,  // Changed 'tweet' to 'post'
         content: formData.content,
         category: formData.category,
         isAnonymous: postType === 'concern' ? formData.isAnonymous : false

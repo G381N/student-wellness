@@ -479,18 +479,18 @@ export default function DashboardPage() {
     
     // Filter out moderators-only posts for regular users
     if (!userData?.role || (userData.role !== 'moderator' && userData.role !== 'admin')) {
-      filteredPosts = filteredPosts.filter(post => post.visibility !== 'moderators');
+      filteredPosts = filteredPosts.filter(post => (post as any).visibility !== 'moderators');
     }
     
     if (activeSection === 'feed') {
-      // Show all posts except activities, concerns, and moderator announcements
+      // Show all posts except moderator announcements
       filteredPosts = filteredPosts.filter(post => 
-        !post.type || post.type === 'post' || post.type === 'tweet'
+        (post as any).type !== 'moderator-announcement'
       );
     } else if (activeSection === 'activities') {
-      filteredPosts = filteredPosts.filter(post => post.type === 'activity');
+      filteredPosts = filteredPosts.filter(post => (post as any).type === 'activity');
     } else if (activeSection === 'concerns') {
-      filteredPosts = filteredPosts.filter(post => post.type === 'concern');
+      filteredPosts = filteredPosts.filter(post => (post as any).type === 'concern');
     } else {
       filteredPosts = [];
     }
@@ -498,9 +498,9 @@ export default function DashboardPage() {
     if (searchQuery.trim()) {
       filteredPosts = filteredPosts.filter(post => 
         post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (post.category && post.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (post.location && post.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (post.author && post.author.toLowerCase().includes(searchQuery.toLowerCase()))
+        ((post as any).category && (post as any).category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        ((post as any).location && (post as any).location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        ((post as any).author && (post as any).author.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
     

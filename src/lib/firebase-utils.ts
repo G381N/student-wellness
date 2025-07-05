@@ -417,6 +417,19 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
   }
 };
 
+export const updatePost = async (postId: string, updateData: Partial<Post>): Promise<void> => {
+  try {
+    const postRef = doc(db, 'posts', postId);
+    await updateDoc(postRef, {
+      ...updateData,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error updating post:', error);
+    throw error;
+  }
+};
+
 export const deletePost = async (postId: string): Promise<void> => {
   try {
     await deleteDoc(doc(db, 'posts', postId));

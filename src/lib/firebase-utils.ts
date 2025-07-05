@@ -413,7 +413,7 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       comments: [],
       isAnonymous: postData.isAnonymous || false,
       type: postData.type || 'general',
-      status: 'Open' // Add status field as it appears in working posts
+      status: 'Open'
     };
 
     let finalPostData: any = { ...basePostData };
@@ -439,18 +439,24 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
         throw new Error('Unauthorized to create moderator announcement');
       }
       finalPostData.visibility = 'moderators';
-    }
-
-    // Remove the imageURL handling since it's causing issues
-    delete finalPostData.imageURL;
-
-    // Ensure arrays are properly initialized
-    finalPostData.upvotedBy = finalPostData.upvotedBy || [];
-    finalPostData.downvotedBy = finalPostData.downvotedBy || [];
-    finalPostData.votedUsers = finalPostData.votedUsers || [];
-    finalPostData.comments = finalPostData.comments || [];
-    if (finalPostData.participants) {
-      finalPostData.participants = [];
+    } else if (postData.type === 'general') {
+      // For general posts, ensure we have the minimal required fields
+      finalPostData = {
+        content: postData.content?.trim() || '',
+        category: postData.category?.trim() || '',
+        author: displayName,
+        authorName: displayName,
+        authorId: user.uid,
+        timestamp: serverTimestamp(),
+        type: 'general',
+        upvotes: 0,
+        downvotes: 0,
+        upvotedBy: [],
+        downvotedBy: [],
+        votedUsers: [],
+        comments: [],
+        isAnonymous: false
+      };
     }
 
     // Remove any undefined or null values
@@ -570,23 +576,23 @@ export const addComment = async (
       const postData = postDoc.data();
       const comments = postData.comments || [];
       
+      // Create new comment with ISO string timestamp
       const newComment: Comment = {
         id: Date.now().toString(),
-        content,
+        content: content.trim(),
         author: isAnonymous ? 'Anonymous' : (user.displayName || user.email?.split('@')[0] || 'Unknown User'),
         authorId: user.uid,
-        timestamp: new Date().toISOString(), // Use ISO string instead of serverTimestamp
+        authorName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+        timestamp: new Date().toISOString(),
         isAnonymous
       };
       
+      // Update the post with the new comment
       await updateDoc(postRef, {
         comments: [...comments, newComment]
       });
 
-      return {
-        ...newComment,
-        timestamp: new Date().toISOString() // Return ISO string for consistency
-      };
+      return newComment;
     }
     throw new Error('Post not found');
   } catch (error) {

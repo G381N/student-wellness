@@ -192,27 +192,25 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         return;
       }
 
+      // For all other post types
       const postData: any = {
         type: postType,
-        content: formData.content,
+        content: formData.content.trim(),
         category: formData.category,
         isAnonymous: postType === 'concern' ? formData.isAnonymous : false
       };
 
-      if (formData.imageURL) postData.imageURL = formData.imageURL;
-
       // Activity-specific fields
       if (postType === 'activity') {
-        if (formData.title) postData.title = formData.title;
-        if (formData.location) postData.location = formData.location;
+        if (formData.title) postData.title = formData.title.trim();
+        if (formData.location) postData.location = formData.location.trim();
         if (formData.date) postData.date = formData.date;
         if (formData.time) postData.time = formData.time;
         if (formData.maxParticipants) {
           const max = parseInt(formData.maxParticipants);
           if (!isNaN(max) && max > 0) postData.maxParticipants = max;
-        } else {
-          postData.maxParticipants = null;
         }
+        postData.participants = [];
       } 
       // Concern-specific fields
       else if (postType === 'concern') {

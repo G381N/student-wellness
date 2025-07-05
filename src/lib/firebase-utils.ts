@@ -411,53 +411,34 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       downvotedBy: [],
       votedUsers: [],
       comments: [],
-      isAnonymous: false
+      isAnonymous: postData.isAnonymous || false,
+      type: postData.type || 'general'
     };
 
-    let finalPostData: any;
+    let finalPostData: any = { ...basePostData };
 
-    // Handle different post types
-    switch (postData.type) {
-      case 'activity':
-        finalPostData = {
-          ...basePostData,
-          type: 'activity',
-          title: postData.title?.trim(),
-          location: postData.location?.trim(),
-          date: postData.date,
-          time: postData.time?.trim(),
-          maxParticipants: postData.maxParticipants ? parseInt(String(postData.maxParticipants)) : null,
-          participants: []
-        };
-        break;
-
-      case 'concern':
-        finalPostData = {
-          ...basePostData,
-          type: 'concern',
-          isAnonymous: postData.isAnonymous ?? true,
-          status: 'Open',
-          priority: postData.priority
-        };
-        break;
-
-      case 'moderator-announcement':
-        if (!(userData?.isAdmin || userData?.isModerator)) {
-          throw new Error('Unauthorized to create moderator announcement');
-        }
-        finalPostData = {
-          ...basePostData,
-          type: 'moderator-announcement',
-          visibility: 'moderators'
-        };
-        break;
-
-      default: // Handle general posts
-        finalPostData = {
-          ...basePostData,
-          type: 'general'
-        };
-        break;
+    // Add specific fields based on post type
+    if (postData.type === 'activity') {
+      finalPostData = {
+        ...finalPostData,
+        title: postData.title?.trim(),
+        location: postData.location?.trim(),
+        date: postData.date,
+        time: postData.time?.trim(),
+        maxParticipants: postData.maxParticipants ? parseInt(String(postData.maxParticipants)) : null,
+        participants: []
+      };
+    } else if (postData.type === 'concern') {
+      finalPostData = {
+        ...finalPostData,
+        status: 'Open',
+        priority: postData.priority
+      };
+    } else if (postData.type === 'moderator-announcement') {
+      if (!(userData?.isAdmin || userData?.isModerator)) {
+        throw new Error('Unauthorized to create moderator announcement');
+      }
+      finalPostData.visibility = 'moderators';
     }
 
     // Add image URL if it exists and is valid

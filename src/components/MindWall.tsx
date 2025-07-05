@@ -187,7 +187,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   {/* Title and Category */}
                   <div className="flex items-center space-x-2 mb-2">
                     <h2 className="text-lg font-bold">{issue.title}</h2>
-                  </div>
+              </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-400 mb-3">
                     <span className="px-2 py-1 bg-gray-800 rounded-full">{issue.category}</span>
                     <span>•</span>
@@ -198,10 +198,10 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   <p className="text-gray-300 mb-4">{issue.description}</p>
                   
                   {/* Actions */}
-                  <div className="flex items-center space-x-4">
-                    <button
+                    <div className="flex items-center space-x-4">
+                      <button
                       onClick={() => handleVote(issue.id)}
-                      disabled={votingStates[issue.id]}
+                        disabled={votingStates[issue.id]}
                       className={`flex items-center space-x-2 transition-colors ${
                         issue.votedBy.includes(user?.uid || '') 
                           ? 'text-green-400' 

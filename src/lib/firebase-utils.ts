@@ -198,6 +198,22 @@ export interface AnonymousComplaint {
   adminNotes?: string;
 }
 
+// Add new interface for general posts
+export interface GeneralPost {
+  id: string;
+  content: string;
+  author: string;
+  authorId: string;
+  authorName?: string;
+  timestamp: any;
+  category: string;
+  upvotes: number;
+  downvotes: number;
+  upvotedBy: string[];
+  downvotedBy: string[];
+  comments: Comment[];
+}
+
 // ============================================================================
 // USER MANAGEMENT
 // ============================================================================
@@ -1048,5 +1064,106 @@ export const stopActivityCleanup = (): void => {
   if (cleanupInterval) {
     clearInterval(cleanupInterval);
     cleanupInterval = null;
+  }
+}; 
+
+// Add new functions for general posts
+export const addGeneralPost = async (postData: Omit<GeneralPost, 'id'>): Promise<GeneralPost> => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userData = userDoc.exists() ? userDoc.data() : null;
+    
+    const displayName = userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
+
+    const generalPostData = {
+      content: postData.content.trim(),
+      category: postData.category.trim(),
+      author: displayName,
+      authorName: displayName,
+      authorId: user.uid,
+      timestamp: new Date().toISOString(),
+      upvotes: 0,
+      downvotes: 0,
+      upvotedBy: [],
+      downvotedBy: [],
+      comments: []
+    };
+
+    const docRef = await addDoc(collection(db, 'general-posts'), generalPostData);
+    
+    return {
+      id: docRef.id,
+      ...generalPostData
+    } as GeneralPost;
+  } catch (error) {
+    console.error('Error adding general post:', error);
+    throw error;
+  }
+};
+
+export const getGeneralPosts = async (): Promise<GeneralPost[]> => {
+  try {
+    const postsQuery = query(
+      collection(db, 'general-posts'), 
+      orderBy('timestamp', 'desc')
+    );
+    const querySnapshot = await getDocs(postsQuery);
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    } as GeneralPost));
+  } catch (error) {
+    console.error('Error getting general posts:', error);
+    return [];
+  }
+};
+
+export const deleteGeneralPost = async (postId: string): Promise<void> => {
+  try {
+    await deleteDoc(doc(db, 'general-posts', postId));
+  } catch (error) {
+    console.error('Error deleting general post:', error);
+    throw error;
+  }
+};
+
+export const addCommentToGeneralPost = async (
+  postId: string, 
+  content: string
+): Promise<Comment> => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
+    const postRef = doc(db, 'general-posts', postId);
+    const postDoc = await getDoc(postRef);
+    
+    if (postDoc.exists()) {
+      const postData = postDoc.data();
+      const comments = postData.comments || [];
+      
+      const newComment: Comment = {
+        id: Date.now().toString(),
+        content: content.trim(),
+        author: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+        authorId: user.uid,
+        authorName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+        timestamp: new Date().toISOString(),
+        isAnonymous: false
+      };
+      
+      await updateDoc(postRef, {
+        comments: [...comments, newComment]
+      });
+
+      return newComment;
+    }
+    throw new Error('Post not found');
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    throw error;
   }
 }; 

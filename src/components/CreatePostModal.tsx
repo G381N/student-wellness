@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiX, FiImage, FiMapPin, FiCalendar, FiClock, FiUsers, FiEyeOff, 
-  FiAlertTriangle, FiSend, FiShield 
+  FiSmile, FiAlertTriangle, FiLock, FiGlobe, FiShield, FiSend 
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { addPost, uploadImage, addAnonymousComplaint } from '@/lib/firebase-utils';
@@ -293,6 +293,17 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
     return (filledFields / totalFields) * 100;
   };
 
+  // Get visibility options based on user role
+  const getVisibilityOptions = () => {
+    if (isModerator || isAdmin) {
+      return [
+        { value: 'public', label: 'Public', icon: FiGlobe, desc: 'Everyone can see' },
+        { value: 'mods', label: 'Moderators Only', icon: FiLock, desc: 'Only moderators can see' }
+      ];
+    }
+    return []; // Regular users don't see visibility options (auto-public)
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -570,32 +581,34 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                 </>
               )}
 
-              {/* Visibility options for general posts (removed) */}
-              {postType === 'general' && (
-                <div className="px-4 space-y-4">
-                  <div>
-                    <textarea
-                      ref={textareaRef}
-                      value={formData.content}
-                      onChange={handleContentChange}
-                      rows={3}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-white transition-all resize-none leading-relaxed"
-                      placeholder="What's on your mind?"
-                    />
-                    <div className="mt-2">
-                      <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-white transition-all"
+              {/* Visibility options for general posts (moderators only) */}
+              {postType === 'general' && (isModerator || isAdmin) && (
+                <div>
+                  <label className="block text-white text-xs font-medium mb-1.5">Visibility</label>
+                  <div className="space-y-1.5">
+                    {getVisibilityOptions().map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setFormData({ ...formData, visibility: option.value })}
+                        className={`w-full flex items-center space-x-2 p-2.5 rounded-lg border transition-all ${
+                          formData.visibility === option.value
+                            ? 'border-white bg-gray-700'
+                            : 'border-gray-700 bg-gray-800 hover:border-gray-600 hover:bg-gray-700'
+                        }`}
                       >
-                        <option value="" className="bg-gray-900 text-gray-500">Choose category...</option>
-                        {GENERAL_CATEGORIES.map(category => (
-                          <option key={category} value={category} className="bg-gray-900 text-white">
-                            {category}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                        <option.icon className={`text-sm ${
+                          formData.visibility === option.value ? 'text-white' : 'text-gray-400'
+                        }`} />
+                        <div className="flex-1 text-left">
+                          <div className={`font-medium text-sm ${
+                            formData.visibility === option.value ? 'text-white' : 'text-gray-300'
+                          }`}>
+                            {option.label}
+                          </div>
+                          <div className="text-gray-400 text-xs">{option.desc}</div>
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
@@ -652,9 +665,9 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
             </div>
 
             <div className="flex items-center justify-between">
-              {/* Left: Media Upload (only show for activity posts) */}
+              {/* Left: Media Upload (not for complaints) */}
               <div className="flex items-center space-x-2">
-                {postType === 'activity' && (
+                {postType !== 'anonymous-complaint' && (
                   <>
                     <button
                       onClick={() => fileInputRef.current?.click()}
@@ -669,6 +682,15 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                       )}
                     </button>
                     
+                    {postType === 'general' && (
+                      <button
+                        className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors border border-gray-600"
+                        title="Add emoji"
+                      >
+                        <FiSmile className="text-gray-400 text-sm" />
+                      </button>
+                    )}
+
                     <input 
                       ref={fileInputRef}
                       type="file" 
@@ -687,6 +709,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                 className={`font-semibold py-2 px-6 rounded-full transition-all text-sm flex items-center ${
                   !isFormValid() || loading || submitted
                     ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    : postType === 'anonymous-complaint'
+                    ? 'bg-white text-black hover:bg-gray-200'
                     : 'bg-white text-black hover:bg-gray-200'
                 }`}
               >

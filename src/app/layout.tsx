@@ -16,9 +16,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="stylesheet" href="/styles/globals.css" />
-      </head>
       <body className="antialiased bg-black text-white">
         <AppProvider>
           <ConditionalLayoutShell>

@@ -7,7 +7,7 @@ import {
   FiSmile, FiAlertTriangle, FiLock, FiGlobe, FiShield, FiSend 
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
-import { addPost, uploadImage, addAnonymousComplaint } from '@/lib/firebase-utils';
+import { addPost, uploadImage, addAnonymousComplaint, addGeneralPost } from '@/lib/firebase-utils';
 import Image from 'next/image';
 
 interface CreatePostModalProps {
@@ -182,7 +182,6 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         
         if (mountedRef.current) {
           setSubmitted(true);
-          // Close modal after a short delay
           setTimeout(() => {
             if (mountedRef.current) {
               onClose();
@@ -192,7 +191,33 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         return;
       }
 
-      // For all other post types
+      // Handle general posts separately
+      if (postType === 'general') {
+        const generalPost = await addGeneralPost({
+          content: formData.content.trim(),
+          category: formData.category,
+          author: '',  // Will be set by addGeneralPost
+          authorId: '', // Will be set by addGeneralPost
+          timestamp: null, // Will be set by addGeneralPost
+          upvotes: 0,
+          downvotes: 0,
+          upvotedBy: [],
+          downvotedBy: [],
+          comments: []
+        });
+        
+        if (mountedRef.current) {
+          onPostCreated(generalPost);
+          setTimeout(() => {
+            if (mountedRef.current) {
+              onClose();
+            }
+          }, 100);
+        }
+        return;
+      }
+
+      // For activity and concern posts
       const postData: any = {
         type: postType,
         content: formData.content.trim(),
@@ -215,20 +240,11 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
       else if (postType === 'concern') {
         if (formData.isUrgent) postData.priority = 'urgent';
       }
-      // General post fields - handle visibility
-      else if (postType === 'general') {
-        if ((isModerator || isAdmin) && formData.visibility === 'mods') {
-          postData.type = 'moderator-announcement';
-          postData.visibility = 'moderators';
-        }
-      }
 
       const createdPost = await addPost(postData);
       
-      // Only update state if component is still mounted
       if (mountedRef.current) {
         onPostCreated(createdPost);
-        // Add a small delay before closing to ensure state updates are processed
         setTimeout(() => {
           if (mountedRef.current) {
             onClose();

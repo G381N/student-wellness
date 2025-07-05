@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX, FiHome, FiInfo, FiUser, FiHeart, FiUserPlus } from 'react-icons/fi';
+import { FiSearch, FiX, FiHome, FiActivity, FiClock, FiUser, FiHeart, FiMessageSquare, FiShield } from 'react-icons/fi';
 import ProfileMenu from './ProfileMenu';
 
 interface User {
@@ -21,16 +21,10 @@ interface NavItem {
 }
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
-  // Public navigation items
-  const publicNavItems: NavItem[] = [
-    { name: 'Home', href: '/', icon: FiHome },
-    { name: 'About', href: '/about', icon: FiInfo },
-  ];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -49,144 +43,83 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-md">
-              <FiHeart className="text-white text-xl" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">
-              Christ Wellness
-            </span>
+    <div className="flex flex-col h-screen bg-black">
+      {/* Left Sidebar */}
+      <div className="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-800 p-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2 mb-8">
+          <FiHeart className="text-white text-2xl" />
+          <span className="text-xl font-bold text-white">CampusWell</span>
+        </Link>
+
+        {/* Navigation Items */}
+        <nav className="space-y-2">
+          <Link href="/" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiHome className="text-xl" />
+            <span>Home</span>
           </Link>
+          <Link href="/activities" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiActivity className="text-xl" />
+            <span>Activities</span>
+          </Link>
+          <Link href="/concerns" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiClock className="text-xl" />
+            <span>Concerns</span>
+          </Link>
+          <Link href="/mind-wall" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiUser className="text-xl" />
+            <span>Mind Wall</span>
+          </Link>
+          <Link href="/wellness" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiHeart className="text-xl" />
+            <span>Wellness</span>
+          </Link>
+          <Link href="/breathing" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiActivity className="text-xl" />
+            <span>Breathing</span>
+          </Link>
+          <Link href="/complaints" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiMessageSquare className="text-xl" />
+            <span>Anonymous Complaints</span>
+          </Link>
+          <Link href="/announcements" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiShield className="text-xl" />
+            <span>Announcements</span>
+          </Link>
+        </nav>
+      </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {/* Public Navigation Items */}
-            {publicNavItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
-              >
-                <item.icon className="text-lg" />
-                <span>{item.name}</span>
-              </Link>
-            ))}
+      {/* Main Content Area */}
+      <div className="ml-64 flex-1">
+        {/* Top Navigation Bar */}
+        <div className="sticky top-0 z-50 bg-black border-b border-gray-800 px-4 py-2">
+          <div className="flex items-center justify-between">
+            {/* Search Bar */}
+            <div className="flex-1 max-w-2xl relative">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search everything..."
+                className="w-full bg-white bg-opacity-10 text-white placeholder-gray-400 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-            {/* Authentication Links */}
-            {loading ? (
-              <div className="w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
-            ) : user ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
-                >
-                  <FiUser className="text-lg" />
-                  <span>Dashboard</span>
-                </Link>
+            {/* Profile Menu */}
+            {!loading && user && (
+              <div className="ml-4">
                 <ProfileMenu />
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/login"
-                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
-                >
-                  <FiUser className="text-lg" />
-                  <span>Login</span>
-                </Link>
-                <Link
-                  href="/signup"
-                  className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-800 text-white px-4 py-2 rounded-xl hover:from-blue-700 hover:to-blue-900 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
-                >
-                  <FiUserPlus className="text-lg" />
-                  <span>Sign Up</span>
-                </Link>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors duration-200"
-            >
-              {isOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
-            </button>
-          </div>
+        {/* Page Content */}
+        <div className="p-4">
+          {/* Content will be rendered here */}
         </div>
       </div>
-
-      {/* Mobile Navigation Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-100 shadow-lg"
-          >
-            <div className="px-4 pt-2 pb-4 space-y-1">
-              {/* Public Navigation Items */}
-              {publicNavItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all duration-200 font-medium"
-                >
-                  <item.icon className="text-lg" />
-                  <span>{item.name}</span>
-                </Link>
-              ))}
-
-              {/* Authentication Links */}
-              {loading ? (
-                <div className="w-full h-10 bg-gray-200 rounded animate-pulse"></div>
-              ) : user ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all duration-200 font-medium"
-                  >
-                    <FiUser className="text-lg" />
-                    <span>Dashboard</span>
-                  </Link>
-                  <div className="px-3 py-2">
-                    <ProfileMenu />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all duration-200 font-medium"
-                  >
-                    <FiUser className="text-lg" />
-                    <span>Login</span>
-                  </Link>
-                  <Link
-                    href="/signup"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white px-3 py-2 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-all duration-200 font-medium shadow-md"
-                  >
-                    <FiUserPlus className="text-lg" />
-                    <span>Sign Up</span>
-                  </Link>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+    </div>
   );
 } 

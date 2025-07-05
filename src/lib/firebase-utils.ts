@@ -397,13 +397,10 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       ? 'Anonymous' 
       : userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
 
-    // Clean up and validate post data
-    const cleanPostData: Partial<Post> = {
-      ...postData,
+    // Base post data that's common to all post types
+    const basePostData = {
       content: postData.content?.trim() || '',
       category: postData.category?.trim() || '',
-      imageURL: postData.imageURL && postData.imageURL.startsWith('http') ? postData.imageURL : null,
-      type: (postData.type || 'general') as Post['type'],
       author: displayName,
       authorName: displayName,
       authorId: user.uid,
@@ -414,20 +411,68 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       downvotedBy: [],
       votedUsers: [],
       comments: [],
-      participants: []
+      isAnonymous: false
     };
 
-    // Remove any undefined or invalid fields
-    Object.entries(cleanPostData).forEach(([key, value]) => {
+    let finalPostData: any;
+
+    // Handle different post types
+    switch (postData.type) {
+      case 'activity':
+        finalPostData = {
+          ...basePostData,
+          type: 'activity',
+          title: postData.title?.trim(),
+          location: postData.location?.trim(),
+          date: postData.date,
+          time: postData.time?.trim(),
+          maxParticipants: postData.maxParticipants ? parseInt(String(postData.maxParticipants)) : null,
+          participants: []
+        };
+        break;
+
+      case 'concern':
+        finalPostData = {
+          ...basePostData,
+          type: 'concern',
+          isAnonymous: postData.isAnonymous ?? true,
+          status: 'Open',
+          priority: postData.priority
+        };
+        break;
+
+      case 'moderator-announcement':
+        if (!(userData?.isAdmin || userData?.isModerator)) {
+          throw new Error('Unauthorized to create moderator announcement');
+        }
+        finalPostData = {
+          ...basePostData,
+          type: 'moderator-announcement',
+          visibility: 'moderators'
+        };
+        break;
+
+      default: // Handle general posts
+        finalPostData = {
+          ...basePostData,
+          type: 'general'
+        };
+        break;
+    }
+
+    // Add image URL if it exists and is valid
+    if (postData.imageURL && postData.imageURL.startsWith('http')) {
+      finalPostData.imageURL = postData.imageURL;
+    }
+
+    // Remove any undefined or empty string values
+    Object.entries(finalPostData).forEach(([key, value]) => {
       if (value === undefined || value === '') {
-        delete cleanPostData[key as keyof Post];
+        delete finalPostData[key];
       }
     });
 
-    // Remove eventType field if it exists
-    delete (cleanPostData as any).eventType;
-
-    const docRef = await addDoc(collection(db, 'posts'), cleanPostData);
+    const docRef = await addDoc(collection(db, 'posts'), finalPostData);
     return docRef.id;
   } catch (error) {
     console.error('Error adding post:', error);

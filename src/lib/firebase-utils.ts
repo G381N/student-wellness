@@ -442,7 +442,8 @@ export const joinActivity = async (postId: string): Promise<void> => {
       // Check if user is already participating
       const isAlreadyParticipating = participants.some((p: ActivityParticipant) => p.uid === user.uid);
       
-      if (!isAlreadyParticipating && participants.length < (postData.maxParticipants || 10)) {
+      // Allow joining if maxParticipants is null (unlimited) or if limit not reached
+      if (!isAlreadyParticipating && (postData.maxParticipants === null || participants.length < postData.maxParticipants)) {
         const newParticipant: ActivityParticipant = {
           uid: user.uid,
           displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
@@ -453,6 +454,8 @@ export const joinActivity = async (postId: string): Promise<void> => {
         await updateDoc(postRef, {
           participants: [...participants, newParticipant]
         });
+      } else if (!isAlreadyParticipating) {
+        throw new Error('Activity has reached maximum participants limit');
       }
     }
   } catch (error) {
@@ -558,7 +561,7 @@ export const uploadImage = async (file: File, path: string): Promise<string> => 
 export const getMindWallIssues = async (): Promise<MindWallIssue[]> => {
   try {
     const issuesQuery = query(
-      collection(db, 'Mindwall-issues'), 
+      collection(db, 'mindwall-issues'), 
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(issuesQuery);
@@ -583,7 +586,7 @@ export const addMindWallIssue = async (issueData: Omit<MindWallIssue, 'id'>): Pr
       isAnonymous: true
     };
     
-    const docRef = await addDoc(collection(db, 'Mindwall-issues'), newIssue);
+    const docRef = await addDoc(collection(db, 'mindwall-issues'), newIssue);
     
     return {
       id: docRef.id,
@@ -613,7 +616,7 @@ export const voteMindWallIssue = async (issueId: string): Promise<boolean | null
   localStorage.setItem(lastVoteKey, now.toString());
 
   try {
-    const issueRef = doc(db, 'Mindwall-issues', issueId);
+    const issueRef = doc(db, 'mindwall-issues', issueId);
     const issueDoc = await getDoc(issueRef);
     
     if (issueDoc.exists()) {
@@ -647,7 +650,7 @@ export const voteMindWallIssue = async (issueId: string): Promise<boolean | null
 // Delete mind wall issue
 export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
   try {
-    await deleteDoc(doc(db, 'Mindwall-issues', issueId));
+    await deleteDoc(doc(db, 'mindwall-issues', issueId));
   } catch (error) {
     console.error('Error deleting mind wall issue:', error);
     throw error;

@@ -196,6 +196,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         if (formData.maxParticipants) {
           const max = parseInt(formData.maxParticipants);
           if (!isNaN(max) && max > 0) postData.maxParticipants = max;
+        } else {
+          postData.maxParticipants = null; // Set to null for unlimited participants
         }
         postData.type = 'activity';
         postData.eventType = 'activity';

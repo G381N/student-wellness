@@ -405,7 +405,10 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       upvotedBy: [],
       downvotedBy: [],
       votedUsers: [],
-      comments: []
+      comments: [],
+      participants: [],
+      type: postData.type || 'post',
+      eventType: postData.type === 'activity' ? 'activity' : undefined
     });
     return docRef.id;
   } catch (error) {
@@ -555,7 +558,7 @@ export const uploadImage = async (file: File, path: string): Promise<string> => 
 export const getMindWallIssues = async (): Promise<MindWallIssue[]> => {
   try {
     const issuesQuery = query(
-      collection(db, 'mindWallIssues'), 
+      collection(db, 'Mindwall-issues'), 
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(issuesQuery);
@@ -580,7 +583,7 @@ export const addMindWallIssue = async (issueData: Omit<MindWallIssue, 'id'>): Pr
       isAnonymous: true
     };
     
-    const docRef = await addDoc(collection(db, 'mindWallIssues'), newIssue);
+    const docRef = await addDoc(collection(db, 'Mindwall-issues'), newIssue);
     
     return {
       id: docRef.id,
@@ -610,7 +613,7 @@ export const voteMindWallIssue = async (issueId: string): Promise<boolean | null
   localStorage.setItem(lastVoteKey, now.toString());
 
   try {
-    const issueRef = doc(db, 'mindWallIssues', issueId);
+    const issueRef = doc(db, 'Mindwall-issues', issueId);
     const issueDoc = await getDoc(issueRef);
     
     if (issueDoc.exists()) {
@@ -644,7 +647,7 @@ export const voteMindWallIssue = async (issueId: string): Promise<boolean | null
 // Delete mind wall issue
 export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
   try {
-    await deleteDoc(doc(db, 'mindWallIssues', issueId));
+    await deleteDoc(doc(db, 'Mindwall-issues', issueId));
   } catch (error) {
     console.error('Error deleting mind wall issue:', error);
     throw error;

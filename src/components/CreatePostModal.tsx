@@ -197,11 +197,14 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           const max = parseInt(formData.maxParticipants);
           if (!isNaN(max) && max > 0) postData.maxParticipants = max;
         }
+        postData.type = 'activity';
+        postData.eventType = 'activity';
       } 
       // Concern-specific fields
       else if (postType === 'concern') {
         postData.status = 'new';
         if (formData.isUrgent) postData.priority = 'urgent';
+        postData.type = 'concern';
       }
       // General post fields - handle visibility
       else if (postType === 'general') {
@@ -210,6 +213,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           postData.type = 'moderator-announcement';
           postData.visibility = 'moderators';
         } else {
+          postData.type = 'post';
           postData.visibility = 'public'; // Regular users always post as public
         }
       }

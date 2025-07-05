@@ -219,6 +219,7 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
           )}
 
           <div className="flex items-center space-x-4 mt-4">
+            {/* Comment button - always visible */}
             <button
               onClick={() => setShowComments(!showComments)}
               className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 transition-all duration-200 group custom-cursor"
@@ -229,6 +230,7 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
               <span className="text-sm font-medium">{tweet.comments?.length || 0}</span>
             </button>
 
+            {/* Voting buttons */}
             <div className="flex items-center space-x-2">
               <button
                 onClick={handleUpvote}
@@ -276,35 +278,42 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
             </div>
           </div>
 
+          {/* Comments section */}
           {showComments && (
             <div className="mt-4 space-y-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="w-full bg-gray-900 border border-gray-700 rounded-full py-3 px-5 text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 focus:bg-gray-800 transition-all duration-200"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleAddComment();
-                    }
-                  }}
-                />
-                <button
-                  onClick={handleAddComment}
-                  disabled={!newComment.trim() || isCommenting}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 disabled:text-gray-600 transition-colors duration-200 px-2 py-1 rounded"
-                >
-                  {isCommenting ? (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <span className="font-semibold">Post</span>
-                  )}
-                </button>
-              </div>
+              {/* Comment input */}
+              {user ? (
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    className="w-full bg-gray-900 border border-gray-700 rounded-full py-3 px-5 text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 focus:bg-gray-800 transition-all duration-200"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleAddComment();
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={handleAddComment}
+                    disabled={!newComment.trim() || isCommenting}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 disabled:text-gray-600 transition-colors duration-200 px-2 py-1 rounded"
+                  >
+                    {isCommenting ? (
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <span className="font-semibold">Post</span>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-gray-400 text-sm">Please sign in to comment.</p>
+              )}
 
+              {/* Comments list */}
               <div className="space-y-3">
                 {tweet.comments?.map((comment, index) => (
                   <div key={index} className="flex items-start space-x-3 bg-gray-800 bg-opacity-50 p-4 rounded-xl">

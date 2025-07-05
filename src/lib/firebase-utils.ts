@@ -531,7 +531,7 @@ export const addComment = async (
         content,
         author: isAnonymous ? 'Anonymous' : (user.displayName || user.email?.split('@')[0] || 'Unknown User'),
         authorId: user.uid,
-        timestamp: serverTimestamp(),
+        timestamp: new Date().toISOString(), // Use ISO string instead of serverTimestamp
         isAnonymous
       };
       
@@ -541,7 +541,7 @@ export const addComment = async (
 
       return {
         ...newComment,
-        timestamp: new Date() // Return current date for immediate UI update
+        timestamp: new Date().toISOString() // Return ISO string for consistency
       };
     }
     throw new Error('Post not found');

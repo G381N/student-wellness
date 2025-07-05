@@ -169,20 +169,20 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           category: formData.category,
           severity: formData.severity,
           status: 'Open',
-          timestamp: null,  // Will be set by serverTimestamp() in the function
-          updatedAt: null   // Will be set by serverTimestamp() in the function
+          timestamp: null,
+          updatedAt: null
         });
         
         setSubmitted(true);
+        // Close modal after a short delay
         setTimeout(() => {
-          setSubmitted(false);
           onClose();
         }, 2000);
         return;
       }
 
       const postData: any = {
-        type: postType,  // Set type directly from postType
+        type: postType,
         content: formData.content,
         category: formData.category,
         isAnonymous: postType === 'concern' ? formData.isAnonymous : false
@@ -200,17 +200,16 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           const max = parseInt(formData.maxParticipants);
           if (!isNaN(max) && max > 0) postData.maxParticipants = max;
         } else {
-          postData.maxParticipants = null; // Set to null for unlimited participants
+          postData.maxParticipants = null;
         }
       } 
       // Concern-specific fields
       else if (postType === 'concern') {
-        postData.status = 'Open';  // Changed from 'new' to match the Post interface
+        postData.status = 'Open';
         if (formData.isUrgent) postData.priority = 'urgent';
       }
       // General post fields - handle visibility
       else if (postType === 'general') {
-        // For moderators posting to "mods" visibility, create moderator announcement
         if ((isModerator || isAdmin) && formData.visibility === 'mods') {
           postData.type = 'moderator-announcement';
           postData.visibility = 'moderators';
@@ -218,8 +217,12 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
       }
 
       const createdPost = await addPost(postData);
-      onPostCreated(createdPost);
-      onClose();
+      
+      // Only update state if the post was created successfully
+      if (createdPost) {
+        onPostCreated(createdPost);
+        onClose();
+      }
     } catch (error) {
       console.error('Error creating post:', error);
       alert('Failed to create post. Please try again.');

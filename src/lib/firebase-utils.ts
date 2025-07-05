@@ -382,7 +382,7 @@ export const getPosts = async (): Promise<Post[]> => {
   }
 };
 
-export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
+export const addPost = async (postData: Omit<Post, 'id'>): Promise<Post> => {
   try {
     // Get current user
     const user = auth.currentUser;
@@ -404,7 +404,7 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       author: displayName,
       authorName: displayName,
       authorId: user.uid,
-      timestamp: serverTimestamp(),
+      timestamp: new Date().toISOString(), // Use ISO string instead of serverTimestamp
       upvotes: 0,
       downvotes: 0,
       upvotedBy: [],
@@ -439,24 +439,6 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
         throw new Error('Unauthorized to create moderator announcement');
       }
       finalPostData.visibility = 'moderators';
-    } else if (postData.type === 'general') {
-      // For general posts, ensure we have the minimal required fields
-      finalPostData = {
-        content: postData.content?.trim() || '',
-        category: postData.category?.trim() || '',
-        author: displayName,
-        authorName: displayName,
-        authorId: user.uid,
-        timestamp: serverTimestamp(),
-        type: 'general',
-        upvotes: 0,
-        downvotes: 0,
-        upvotedBy: [],
-        downvotedBy: [],
-        votedUsers: [],
-        comments: [],
-        isAnonymous: false
-      };
     }
 
     // Remove any undefined or null values
@@ -467,7 +449,12 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
     });
 
     const docRef = await addDoc(collection(db, 'posts'), finalPostData);
-    return docRef.id;
+    
+    // Return the complete post object with the new ID
+    return {
+      id: docRef.id,
+      ...finalPostData
+    } as Post;
   } catch (error) {
     console.error('Error adding post:', error);
     throw error;

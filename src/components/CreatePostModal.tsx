@@ -210,11 +210,9 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           const max = parseInt(formData.maxParticipants);
           if (!isNaN(max) && max > 0) postData.maxParticipants = max;
         }
-        postData.participants = [];
       } 
       // Concern-specific fields
       else if (postType === 'concern') {
-        postData.status = 'Open';
         if (formData.isUrgent) postData.priority = 'urgent';
       }
       // General post fields - handle visibility
@@ -228,9 +226,14 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
       const createdPost = await addPost(postData);
       
       // Only update state if component is still mounted
-      if (mountedRef.current && createdPost) {
+      if (mountedRef.current) {
         onPostCreated(createdPost);
-        onClose();
+        // Add a small delay before closing to ensure state updates are processed
+        setTimeout(() => {
+          if (mountedRef.current) {
+            onClose();
+          }
+        }, 100);
       }
     } catch (error) {
       console.error('Error creating post:', error);

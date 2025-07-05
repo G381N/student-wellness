@@ -51,7 +51,8 @@ export const useUserInfo = (userId: string) => {
           const fallbackInfo: UserInfo = {
             displayName: 'Unknown User',
             realName: '',
-            email: ''
+            email: '',
+            photoURL: undefined
           };
           userCache.set(userId, fallbackInfo);
           setUserInfo(fallbackInfo);
@@ -61,7 +62,8 @@ export const useUserInfo = (userId: string) => {
         const errorInfo: UserInfo = {
           displayName: 'Unknown User',
           realName: '',
-          email: ''
+          email: '',
+          photoURL: undefined
         };
         setUserInfo(errorInfo);
       } finally {

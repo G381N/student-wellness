@@ -188,9 +188,9 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
               ) : (
                 <>
                   <span className="font-bold text-white text-lg">
-                    {tweet.isAnonymous ? 'Anonymous' : tweet.author || 'Unknown User'}
+                    {tweet.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || 'Unknown User')}
                   </span>
-                  {!tweet.isAnonymous && authorInfo?.realName && (
+                  {!tweet.isAnonymous && authorInfo?.realName && authorInfo.realName !== authorInfo.displayName && (
                     <span className="text-gray-400 text-base">
                       @{authorInfo.realName}
                     </span>

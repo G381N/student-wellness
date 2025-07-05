@@ -163,9 +163,9 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
               ) : (
                 <>
                   <span className="font-bold text-white text-base">
-                    {concern.isAnonymous ? 'Anonymous' : concern.author || 'Unknown User'}
+                    {concern.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || 'Unknown User')}
                   </span>
-                  {!concern.isAnonymous && authorInfo?.realName && (
+                  {!concern.isAnonymous && authorInfo?.realName && authorInfo.realName !== authorInfo.displayName && (
                     <span className="text-gray-500 text-sm">
                       @{authorInfo.realName}
                     </span>

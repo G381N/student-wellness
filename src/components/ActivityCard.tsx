@@ -200,9 +200,9 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
                 ) : (
                   <>
                     <span className="font-bold text-white text-base">
-                      {activity.isAnonymous ? 'Anonymous' : activity.author || 'Unknown User'}
+                      {activity.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || 'Unknown User')}
                     </span>
-                    {!activity.isAnonymous && authorInfo?.realName && (
+                    {!activity.isAnonymous && authorInfo?.realName && authorInfo.realName !== authorInfo.displayName && (
                       <span className="text-gray-500 text-sm">
                         @{authorInfo.realName}
                       </span>

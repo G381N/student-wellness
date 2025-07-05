@@ -45,9 +45,13 @@ export const processTimestamp = (timestamp: any): Date => {
 };
 
 // Helper function to get user display info
-export const getUserDisplayInfo = (email: string | undefined): string => {
-  if (!email) return 'Unknown User';
-  return email.split('@')[0];
+export const getUserDisplayInfo = (userData: any): { displayName: string; realName: string } => {
+  if (!userData) return { displayName: 'Unknown User', realName: '' };
+  
+  const displayName = userData.displayName || userData.email?.split('@')[0] || 'Unknown User';
+  const realName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || displayName;
+  
+  return { displayName, realName };
 };
 
 // ============================================================================

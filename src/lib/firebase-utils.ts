@@ -255,7 +255,7 @@ export const upvotePost = async (postId: string): Promise<boolean> => {
     const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const postRef = doc(db, 'post', postId);
+    const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
     if (!postDoc.exists()) {
@@ -309,7 +309,7 @@ export const downvotePost = async (postId: string): Promise<boolean> => {
     const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const postRef = doc(db, 'post', postId);
+    const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
     if (!postDoc.exists()) {
@@ -365,7 +365,7 @@ export const downvotePost = async (postId: string): Promise<boolean> => {
 export const getPosts = async (): Promise<Post[]> => {
   try {
     const postsQuery = query(
-      collection(db, 'post'), 
+      collection(db, 'posts'), 
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(postsQuery);
@@ -394,7 +394,7 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       ? 'Anonymous' 
       : userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
 
-    const docRef = await addDoc(collection(db, 'post'), {
+    const docRef = await addDoc(collection(db, 'posts'), {
       ...postData,
       author: displayName,  // Set author field
       authorName: displayName,  // Set authorName field for backward compatibility
@@ -419,7 +419,7 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
 
 export const deletePost = async (postId: string): Promise<void> => {
   try {
-    await deleteDoc(doc(db, 'post', postId));
+    await deleteDoc(doc(db, 'posts', postId));
   } catch (error) {
     console.error('Error deleting post:', error);
     throw error;
@@ -432,7 +432,7 @@ export const joinActivity = async (postId: string): Promise<void> => {
     const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const postRef = doc(db, 'post', postId);
+    const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
     if (postDoc.exists()) {
@@ -470,7 +470,7 @@ export const leaveActivity = async (postId: string): Promise<void> => {
     const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const postRef = doc(db, 'post', postId);
+    const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
     if (postDoc.exists()) {
@@ -499,7 +499,7 @@ export const addComment = async (
     const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const postRef = doc(db, 'post', postId);
+    const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     
     if (postDoc.exists()) {
@@ -534,7 +534,7 @@ export const addComment = async (
 // Delete post as moderator or admin
 export const deletePostAsModeratorOrAdmin = async (postId: string): Promise<void> => {
   try {
-    await deleteDoc(doc(db, 'post', postId));
+    await deleteDoc(doc(db, 'posts', postId));
   } catch (error) {
     console.error('Error deleting post as moderator/admin:', error);
     throw error;
@@ -948,7 +948,7 @@ export const deleteExpiredActivities = async (): Promise<void> => {
   try {
     const now = new Date();
     const activitiesQuery = query(
-      collection(db, 'post'),
+      collection(db, 'posts'),
       where('eventType', '==', 'activity')
     );
     
@@ -966,7 +966,7 @@ export const deleteExpiredActivities = async (): Promise<void> => {
     });
     
     for (const activityId of expiredActivities) {
-      await deleteDoc(doc(db, 'post', activityId));
+      await deleteDoc(doc(db, 'posts', activityId));
     }
     
     if (expiredActivities.length > 0) {

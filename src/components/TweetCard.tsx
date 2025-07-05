@@ -1,11 +1,11 @@
 'use client';
 
-import { FiMessageCircle, FiChevronUp, FiChevronDown, FiTrash2, FiUser } from 'react-icons/fi';
+import { FiMessageCircle, FiChevronUp, FiChevronDown, FiTrash2, FiUser, FiUserPlus, FiUserMinus } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Post, addComment, upvotePost, downvotePost, deletePost, deletePostAsModeratorOrAdmin } from '@/lib/firebase-utils';
+import { Post, addComment, upvotePost, downvotePost, deletePost, deletePostAsModeratorOrAdmin, joinActivity, leaveActivity } from '@/lib/firebase-utils';
 import { formatDistanceToNow } from 'date-fns';
 
 interface TweetCardProps {
@@ -21,10 +21,13 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
   const [isCommenting, setIsCommenting] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const hasUpvoted = tweet.upvotedBy?.includes(user?.uid || '');
   const hasDownvoted = tweet.downvotedBy?.includes(user?.uid || '');
   const canDelete = user?.uid === tweet.authorId || isAdmin || isModerator;
+  const isParticipating = tweet.participants?.some(p => p.uid === user?.uid);
+  const isFull = tweet.maxParticipants !== undefined && tweet.participants && tweet.participants.length >= tweet.maxParticipants;
 
   const handleUpvote = async () => {
     if (!user || isVoting) return;
@@ -88,6 +91,45 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
     }
   };
 
+  const handleJoinActivity = async () => {
+    if (!user) {
+      toast.error('Please sign in to join activities');
+      return;
+    }
+
+    if (isJoining) return;
+
+    try {
+      setIsJoining(true);
+      if (isParticipating) {
+        await leaveActivity(tweet.id);
+        const updatedParticipants = tweet.participants?.filter(p => p.uid !== user.uid) || [];
+        onUpdate({ ...tweet, participants: updatedParticipants });
+        toast.success('Left the activity successfully');
+      } else {
+        if (isFull) {
+          toast.error('This activity is full');
+          return;
+        }
+        await joinActivity(tweet.id);
+        const newParticipant = {
+          uid: user.uid,
+          displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+          email: user.email || undefined,
+          joinedAt: new Date()
+        };
+        const updatedParticipants = [...(tweet.participants || []), newParticipant];
+        onUpdate({ ...tweet, participants: updatedParticipants });
+        toast.success('Joined the activity successfully');
+      }
+    } catch (error: any) {
+      console.error('Error joining/leaving activity:', error);
+      toast.error(error.message || 'Failed to join/leave activity');
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
   const handleDeleteTweet = async () => {
     try {
       if (tweet.authorId === user?.uid) {
@@ -136,6 +178,45 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
             )}
           </div>
           <p className="text-white mt-2">{tweet.content}</p>
+
+          {/* Activity Details */}
+          {tweet.type === 'activity' && (
+            <div className="mt-4 bg-gray-800 bg-opacity-50 rounded-xl p-4">
+              <h3 className="font-semibold text-white mb-2">{tweet.content}</h3>
+              <div className="space-y-2 text-sm text-gray-300">
+                <p>📅 Date: {tweet.date}</p>
+                <p>⏰ Time: {tweet.time}</p>
+                <p>📍 Location: {tweet.location}</p>
+                <p>👥 Participants: {tweet.participants?.length || 0}/{tweet.maxParticipants || '∞'}</p>
+              </div>
+              <button
+                onClick={handleJoinActivity}
+                disabled={isJoining || (isFull && !isParticipating)}
+                className={`mt-4 w-full py-2 px-4 rounded-full flex items-center justify-center space-x-2 transition-all duration-200 ${
+                  isParticipating
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : isFull
+                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+              >
+                {isJoining ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    {isParticipating ? (
+                      <FiUserMinus className="w-5 h-5" />
+                    ) : (
+                      <FiUserPlus className="w-5 h-5" />
+                    )}
+                    <span>
+                      {isParticipating ? 'Leave Activity' : isFull ? 'Activity Full' : 'Join Activity'}
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
 
           <div className="flex items-center space-x-4 mt-4">
             <button

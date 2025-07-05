@@ -397,7 +397,7 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       ? 'Anonymous' 
       : userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
 
-    // Base post data that's common to all post types
+    // Base post data that matches the working structure exactly
     const basePostData = {
       content: postData.content?.trim() || '',
       category: postData.category?.trim() || '',
@@ -412,7 +412,8 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       votedUsers: [],
       comments: [],
       isAnonymous: postData.isAnonymous || false,
-      type: postData.type || 'general'
+      type: postData.type || 'general',
+      status: 'Open' // Add status field as it appears in working posts
     };
 
     let finalPostData: any = { ...basePostData };
@@ -431,7 +432,6 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
     } else if (postData.type === 'concern') {
       finalPostData = {
         ...finalPostData,
-        status: 'Open',
         priority: postData.priority
       };
     } else if (postData.type === 'moderator-announcement') {
@@ -441,14 +441,21 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       finalPostData.visibility = 'moderators';
     }
 
-    // Add image URL if it exists and is valid
-    if (postData.imageURL && postData.imageURL.startsWith('http')) {
-      finalPostData.imageURL = postData.imageURL;
+    // Remove the imageURL handling since it's causing issues
+    delete finalPostData.imageURL;
+
+    // Ensure arrays are properly initialized
+    finalPostData.upvotedBy = finalPostData.upvotedBy || [];
+    finalPostData.downvotedBy = finalPostData.downvotedBy || [];
+    finalPostData.votedUsers = finalPostData.votedUsers || [];
+    finalPostData.comments = finalPostData.comments || [];
+    if (finalPostData.participants) {
+      finalPostData.participants = [];
     }
 
-    // Remove any undefined or empty string values
+    // Remove any undefined or null values
     Object.entries(finalPostData).forEach(([key, value]) => {
-      if (value === undefined || value === '') {
+      if (value === undefined || value === null) {
         delete finalPostData[key];
       }
     });

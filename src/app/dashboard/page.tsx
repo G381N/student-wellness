@@ -192,11 +192,18 @@ export default function DashboardPage() {
           getPosts(),
           getMindWallIssues()
         ]);
-        setPosts(fetchedPosts);
+
+        // Process posts to ensure they have the correct type
+        const processedPosts = fetchedPosts.map(post => ({
+          ...post,
+          type: post.type || 'post' // Default to 'post' if type is not set
+        }));
+
+        setPosts(processedPosts);
         setMindWallIssues(fetchedIssues);
         
         // Get what's happening data
-        const whatsHappeningData = await getWhatsHappening(fetchedPosts, fetchedIssues);
+        const whatsHappeningData = await getWhatsHappening(processedPosts, fetchedIssues);
         setWhatsHappening(whatsHappeningData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -208,7 +215,7 @@ export default function DashboardPage() {
     if (user) {
       fetchData();
     }
-  }, [user, activeSection]); // Added activeSection to trigger refresh on navigation
+  }, [user, forceRefresh]); // Added forceRefresh to dependencies
 
   const handleRefresh = async () => {
     try {
@@ -472,30 +479,28 @@ export default function DashboardPage() {
     
     // Filter out moderators-only posts for regular users
     if (!userData?.role || (userData.role !== 'moderator' && userData.role !== 'admin')) {
-      filteredPosts = filteredPosts.filter(post => (post as any).visibility !== 'moderators');
+      filteredPosts = filteredPosts.filter(post => post.visibility !== 'moderators');
     }
     
     if (activeSection === 'feed') {
-      // Show all posts except activities and concerns
+      // Show all posts except activities, concerns, and moderator announcements
       filteredPosts = filteredPosts.filter(post => 
-        (post as any).type !== 'activity' && 
-        (post as any).type !== 'concern' &&
-        (post as any).type !== 'moderator-announcement'
+        !post.type || post.type === 'post' || post.type === 'tweet'
       );
     } else if (activeSection === 'activities') {
-      filteredPosts = filteredPosts.filter(post => (post as any).type === 'activity');
+      filteredPosts = filteredPosts.filter(post => post.type === 'activity');
     } else if (activeSection === 'concerns') {
-      filteredPosts = filteredPosts.filter(post => (post as any).type === 'concern');
+      filteredPosts = filteredPosts.filter(post => post.type === 'concern');
     } else {
       filteredPosts = [];
     }
     
-    if (searchQuery.trim() && (activeSection === 'feed' || activeSection === 'activities' || activeSection === 'concerns')) {
+    if (searchQuery.trim()) {
       filteredPosts = filteredPosts.filter(post => 
         post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ((post as any).category && (post as any).category.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        ((post as any).location && (post as any).location.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        ((post as any).authorName && (post as any).authorName.toLowerCase().includes(searchQuery.toLowerCase()))
+        (post.category && post.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (post.location && post.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (post.author && post.author.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
     

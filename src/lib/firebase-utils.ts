@@ -96,28 +96,28 @@ export interface Post {
   content: string;
   author: string;
   authorId: string;
-  authorName?: string;  // Add this field for display names
+  authorName?: string;
   timestamp: any;
   category: string;
   upvotes: number;
   downvotes: number;
-  votedUsers: string[]; // Keep this for backward compatibility
-  upvotedBy: string[];  // Add this for upvote tracking
-  downvotedBy: string[]; // Add this for downvote tracking
+  votedUsers: string[];
+  upvotedBy: string[];
+  downvotedBy: string[];
   comments: Comment[];
   isAnonymous: boolean;
   participants?: ActivityParticipant[];
   maxParticipants?: number;
-  date?: any;  // Add date field
-  time?: string;  // Add time field
+  date?: any;
+  time?: string;
   location?: string;
-  imageURL?: string;  // Add imageURL field
+  imageURL?: string | null;
   eventType?: 'activity' | 'post';
-  type?: 'activity' | 'concern' | 'post' | 'moderator-announcement';  // Add moderator-announcement type
-  status?: 'Open' | 'Under Review' | 'Resolved' | 'Closed';  // Add status field for concerns
-  title?: string;  // Add title field for activities
-  priority?: 'urgent';  // Add priority field for concerns
-  visibility?: 'public' | 'moderators';  // Add visibility field for moderator announcements
+  type: 'activity' | 'concern' | 'post' | 'moderator-announcement' | 'general';
+  status?: 'Open' | 'Under Review' | 'Resolved' | 'Closed';
+  title?: string;
+  priority?: 'urgent';
+  visibility?: 'public' | 'moderators';
 }
 
 export interface MindWallIssue {
@@ -397,9 +397,13 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       ? 'Anonymous' 
       : userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
 
-    // Prepare post data without eventType field
-    const postToSave = {
+    // Clean up and validate post data
+    const cleanPostData: Partial<Post> = {
       ...postData,
+      content: postData.content?.trim() || '',
+      category: postData.category?.trim() || '',
+      imageURL: postData.imageURL && postData.imageURL.startsWith('http') ? postData.imageURL : null,
+      type: (postData.type || 'general') as Post['type'],
       author: displayName,
       authorName: displayName,
       authorId: user.uid,
@@ -413,10 +417,17 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       participants: []
     };
 
-    // Remove eventType field if it exists
-    delete (postToSave as any).eventType;
+    // Remove any undefined or invalid fields
+    Object.entries(cleanPostData).forEach(([key, value]) => {
+      if (value === undefined || value === '') {
+        delete cleanPostData[key as keyof Post];
+      }
+    });
 
-    const docRef = await addDoc(collection(db, 'posts'), postToSave);
+    // Remove eventType field if it exists
+    delete (cleanPostData as any).eventType;
+
+    const docRef = await addDoc(collection(db, 'posts'), cleanPostData);
     return docRef.id;
   } catch (error) {
     console.error('Error adding post:', error);

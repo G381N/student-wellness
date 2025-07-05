@@ -2,7 +2,7 @@
 
 import { FiMessageCircle, FiChevronUp, FiChevronDown, FiTrash2, FiUser, FiUserPlus, FiUserMinus } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Post, addComment, upvotePost, downvotePost, deletePost, deletePostAsModeratorOrAdmin, joinActivity, leaveActivity } from '@/lib/firebase-utils';
@@ -22,6 +22,13 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const hasUpvoted = tweet.upvotedBy?.includes(user?.uid || '');
   const hasDownvoted = tweet.downvotedBy?.includes(user?.uid || '');
@@ -34,17 +41,23 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
     setIsVoting(true);
     try {
       const hasUpvoted = await upvotePost(tweet.id);
-      const updatedPost = {
-        ...tweet,
-        upvotes: hasUpvoted ? (tweet.upvotes || 0) + 1 : Math.max(0, (tweet.upvotes || 0) - 1),
-        upvotedBy: hasUpvoted ? [...(tweet.upvotedBy || []), user.uid] : (tweet.upvotedBy || []).filter(id => id !== user.uid),
-      };
-      onUpdate(updatedPost);
+      if (mountedRef.current) {
+        const updatedPost = {
+          ...tweet,
+          upvotes: hasUpvoted ? (tweet.upvotes || 0) + 1 : Math.max(0, (tweet.upvotes || 0) - 1),
+          upvotedBy: hasUpvoted ? [...(tweet.upvotedBy || []), user.uid] : (tweet.upvotedBy || []).filter(id => id !== user.uid),
+        };
+        onUpdate(updatedPost);
+      }
     } catch (error) {
       console.error('Error upvoting post:', error);
-      toast.error('Failed to upvote. Please try again.');
+      if (mountedRef.current) {
+        toast.error('Failed to upvote. Please try again.');
+      }
     } finally {
-      setIsVoting(false);
+      if (mountedRef.current) {
+        setIsVoting(false);
+      }
     }
   };
 
@@ -53,17 +66,23 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
     setIsVoting(true);
     try {
       const hasDownvoted = await downvotePost(tweet.id);
-      const updatedPost = {
-        ...tweet,
-        downvotes: hasDownvoted ? (tweet.downvotes || 0) + 1 : Math.max(0, (tweet.downvotes || 0) - 1),
-        downvotedBy: hasDownvoted ? [...(tweet.downvotedBy || []), user.uid] : (tweet.downvotedBy || []).filter(id => id !== user.uid),
-      };
-      onUpdate(updatedPost);
+      if (mountedRef.current) {
+        const updatedPost = {
+          ...tweet,
+          downvotes: hasDownvoted ? (tweet.downvotes || 0) + 1 : Math.max(0, (tweet.downvotes || 0) - 1),
+          downvotedBy: hasDownvoted ? [...(tweet.downvotedBy || []), user.uid] : (tweet.downvotedBy || []).filter(id => id !== user.uid),
+        };
+        onUpdate(updatedPost);
+      }
     } catch (error) {
       console.error('Error downvoting post:', error);
-      toast.error('Failed to downvote. Please try again.');
+      if (mountedRef.current) {
+        toast.error('Failed to downvote. Please try again.');
+      }
     } finally {
-      setIsVoting(false);
+      if (mountedRef.current) {
+        setIsVoting(false);
+      }
     }
   };
 
@@ -74,20 +93,26 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
     try {
       const comment = await addComment(tweet.id, newComment.trim());
       
-      // Update local state
-      const updatedPost = {
-        ...tweet,
-        comments: [...(tweet.comments || []), comment],
-      };
-      
-      onUpdate(updatedPost);
-      setNewComment('');
-      setShowComments(true);
+      if (mountedRef.current) {
+        // Update local state
+        const updatedPost = {
+          ...tweet,
+          comments: [...(tweet.comments || []), comment],
+        };
+        
+        onUpdate(updatedPost);
+        setNewComment('');
+        setShowComments(true);
+      }
     } catch (error) {
       console.error('Error adding comment:', error);
-      toast.error('Failed to add comment. Please try again.');
+      if (mountedRef.current) {
+        toast.error('Failed to add comment. Please try again.');
+      }
     } finally {
-      setIsCommenting(false);
+      if (mountedRef.current) {
+        setIsCommenting(false);
+      }
     }
   };
 
@@ -103,30 +128,38 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
       setIsJoining(true);
       if (isParticipating) {
         await leaveActivity(tweet.id);
-        const updatedParticipants = tweet.participants?.filter(p => p.uid !== user.uid) || [];
-        onUpdate({ ...tweet, participants: updatedParticipants });
-        toast.success('Left the activity successfully');
+        if (mountedRef.current) {
+          const updatedParticipants = tweet.participants?.filter(p => p.uid !== user.uid) || [];
+          onUpdate({ ...tweet, participants: updatedParticipants });
+          toast.success('Left the activity successfully');
+        }
       } else {
         if (isFull) {
           toast.error('This activity is full');
           return;
         }
         await joinActivity(tweet.id);
-        const newParticipant = {
-          uid: user.uid,
-          displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
-          email: user.email || undefined,
-          joinedAt: new Date()
-        };
-        const updatedParticipants = [...(tweet.participants || []), newParticipant];
-        onUpdate({ ...tweet, participants: updatedParticipants });
-        toast.success('Joined the activity successfully');
+        if (mountedRef.current) {
+          const newParticipant = {
+            uid: user.uid,
+            displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+            email: user.email || undefined,
+            joinedAt: new Date()
+          };
+          const updatedParticipants = [...(tweet.participants || []), newParticipant];
+          onUpdate({ ...tweet, participants: updatedParticipants });
+          toast.success('Joined the activity successfully');
+        }
       }
     } catch (error: any) {
       console.error('Error joining/leaving activity:', error);
-      toast.error(error.message || 'Failed to join/leave activity');
+      if (mountedRef.current) {
+        toast.error(error.message || 'Failed to join/leave activity');
+      }
     } finally {
-      setIsJoining(false);
+      if (mountedRef.current) {
+        setIsJoining(false);
+      }
     }
   };
 
@@ -140,12 +173,16 @@ export function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
         await deletePostAsModeratorOrAdmin(tweet.id);
       }
       
-      onDelete?.();
-      setShowDeleteConfirm(false);
-      toast.success('Post deleted successfully');
+      if (mountedRef.current) {
+        onDelete?.();
+        setShowDeleteConfirm(false);
+        toast.success('Post deleted successfully');
+      }
     } catch (error) {
       console.error('Error deleting post:', error);
-      toast.error('Failed to delete post. Please try again.');
+      if (mountedRef.current) {
+        toast.error('Failed to delete post. Please try again.');
+      }
     }
   };
 

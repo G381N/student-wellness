@@ -51,7 +51,14 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   // Form state
   const [formData, setFormData] = useState({
     content: '',
@@ -173,11 +180,15 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           updatedAt: null
         });
         
-        setSubmitted(true);
-        // Close modal after a short delay
-        setTimeout(() => {
-          onClose();
-        }, 2000);
+        if (mountedRef.current) {
+          setSubmitted(true);
+          // Close modal after a short delay
+          setTimeout(() => {
+            if (mountedRef.current) {
+              onClose();
+            }
+          }, 2000);
+        }
         return;
       }
 
@@ -218,16 +229,20 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
 
       const createdPost = await addPost(postData);
       
-      // Only update state if the post was created successfully
-      if (createdPost) {
+      // Only update state if component is still mounted
+      if (mountedRef.current && createdPost) {
         onPostCreated(createdPost);
         onClose();
       }
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Failed to create post. Please try again.');
+      if (mountedRef.current) {
+        alert('Failed to create post. Please try again.');
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 

@@ -140,7 +140,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
     // Upload to Firebase
     try {
       setUploadingImage(true);
-      const imageURL = await uploadImage(file);
+      const imageURL = await uploadImage(file, `posts/${Date.now()}_${file.name}`);
       setFormData({ ...formData, imageURL });
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -167,7 +167,10 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           title: formData.title || 'Anonymous Complaint',
           description: formData.content,
           category: formData.category,
-          severity: formData.severity
+          severity: formData.severity,
+          status: 'Open',
+          timestamp: null,  // Will be set by serverTimestamp() in the function
+          updatedAt: null   // Will be set by serverTimestamp() in the function
         });
         
         setSubmitted(true);
@@ -179,7 +182,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
       }
 
       const postData: any = {
-        type: postType === 'general' ? 'post' : postType,  // Changed 'tweet' to 'post'
+        type: postType,  // Set type directly from postType
         content: formData.content,
         category: formData.category,
         isAnonymous: postType === 'concern' ? formData.isAnonymous : false
@@ -199,14 +202,11 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         } else {
           postData.maxParticipants = null; // Set to null for unlimited participants
         }
-        postData.type = 'activity';
-        postData.eventType = 'activity';
       } 
       // Concern-specific fields
       else if (postType === 'concern') {
-        postData.status = 'new';
+        postData.status = 'Open';  // Changed from 'new' to match the Post interface
         if (formData.isUrgent) postData.priority = 'urgent';
-        postData.type = 'concern';
       }
       // General post fields - handle visibility
       else if (postType === 'general') {
@@ -214,9 +214,6 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         if ((isModerator || isAdmin) && formData.visibility === 'mods') {
           postData.type = 'moderator-announcement';
           postData.visibility = 'moderators';
-        } else {
-          postData.type = 'post';
-          postData.visibility = 'public'; // Regular users always post as public
         }
       }
 

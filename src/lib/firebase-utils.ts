@@ -113,8 +113,11 @@ export interface Post {
   location?: string;
   imageURL?: string;  // Add imageURL field
   eventType?: 'activity' | 'post';
-  type?: 'activity' | 'concern' | 'post';  // Add type field
+  type?: 'activity' | 'concern' | 'post' | 'moderator-announcement';  // Add moderator-announcement type
   status?: 'Open' | 'Under Review' | 'Resolved' | 'Closed';  // Add status field for concerns
+  title?: string;  // Add title field for activities
+  priority?: 'urgent';  // Add priority field for concerns
+  visibility?: 'public' | 'moderators';  // Add visibility field for moderator announcements
 }
 
 export interface MindWallIssue {

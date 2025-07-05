@@ -397,10 +397,11 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       ? 'Anonymous' 
       : userData?.displayName || user.displayName || user.email?.split('@')[0] || 'Unknown User';
 
-    const docRef = await addDoc(collection(db, 'posts'), {
+    // Prepare post data without eventType field
+    const postToSave = {
       ...postData,
-      author: displayName,  // Set author field
-      authorName: displayName,  // Set authorName field for backward compatibility
+      author: displayName,
+      authorName: displayName,
       authorId: user.uid,
       timestamp: serverTimestamp(),
       upvotes: 0,
@@ -409,10 +410,13 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<string> => {
       downvotedBy: [],
       votedUsers: [],
       comments: [],
-      participants: [],
-      type: postData.type || 'post',
-      eventType: postData.type === 'activity' ? 'activity' : undefined
-    });
+      participants: []
+    };
+
+    // Remove eventType field if it exists
+    delete (postToSave as any).eventType;
+
+    const docRef = await addDoc(collection(db, 'posts'), postToSave);
     return docRef.id;
   } catch (error) {
     console.error('Error adding post:', error);
@@ -464,7 +468,7 @@ export const joinActivity = async (postId: string): Promise<void> => {
           uid: user.uid,
           displayName: user.displayName || user.email?.split('@')[0] || 'Unknown User',
           email: user.email || undefined,
-          joinedAt: serverTimestamp()
+          joinedAt: new Date().toISOString() // Use ISO string instead of serverTimestamp
         };
         
         await updateDoc(postRef, {

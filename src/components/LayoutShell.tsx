@@ -34,17 +34,19 @@ export default function LayoutShell({ children }: LayoutShellProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const getMainContentMargins = () => {
+  const getMainContentStyles = () => {
     if (isMobile) {
       return {
-        marginLeft: '0px',
-        marginRight: '0px',
+        paddingLeft: '0px',
+        paddingRight: '0px',
+        paddingTop: '64px', // Space for top bar
       };
     }
     
     return {
-      marginLeft: leftSidebarCollapsed ? '0px' : '256px',
-      marginRight: rightSidebarCollapsed ? '0px' : '320px',
+      paddingLeft: leftSidebarCollapsed ? '80px' : '272px', // 64px/256px for sidebar + 16px padding
+      paddingRight: rightSidebarCollapsed ? '16px' : '336px', // 320px for sidebar + 16px padding
+      paddingTop: '80px', // Space for top bar + padding
     };
   };
 
@@ -70,18 +72,17 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
       {/* Top Bar */}
       <TopBar 
-        onLeftSidebarToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
         leftSidebarCollapsed={leftSidebarCollapsed}
         rightSidebarCollapsed={rightSidebarCollapsed}
       />
 
       {/* Main Content */}
       <motion.main
-        className="transition-all duration-300 pt-20 min-h-screen"
-        style={getMainContentMargins()}
+        className="min-h-screen transition-all duration-300"
+        style={getMainContentStyles()}
         layout
       >
-        <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="max-w-3xl mx-auto">
           {children}
         </div>
       </motion.main>

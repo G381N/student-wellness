@@ -1,42 +1,34 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FiHome, 
-  FiActivity, 
-  FiClock, 
-  FiUser, 
-  FiHeart, 
-  FiMessageSquare, 
-  FiShield,
-  FiMenu,
-  FiX,
-  FiWind
-} from 'react-icons/fi';
+import { FiHome, FiActivity, FiAlertCircle, FiHeart, FiWind, FiMessageSquare, FiBell, FiUser, FiChevronRight } from 'react-icons/fi';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LeftSidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
 }
 
+// Navigation links configuration
 const navLinks = [
-  { name: 'Home', href: '/dashboard', icon: FiHome },
-  { name: 'Activities', href: '/dashboard/activities', icon: FiActivity },
-  { name: 'Concerns', href: '/dashboard/concerns', icon: FiClock },
-  { name: 'Mind Wall', href: '/dashboard/mind-wall', icon: FiUser },
-  { name: 'Wellness', href: '/dashboard/wellness', icon: FiHeart },
-  { name: 'Breathing', href: '/dashboard/breathing', icon: FiWind },
-  { name: 'Complaints', href: '/dashboard/complaints', icon: FiMessageSquare },
-  { name: 'Announcements', href: '/dashboard/announcements', icon: FiShield },
+  { href: '/dashboard', icon: FiHome, label: 'Home' },
+  { href: '/dashboard/activities', icon: FiActivity, label: 'Activities' },
+  { href: '/dashboard/concerns', icon: FiAlertCircle, label: 'Concerns' },
+  { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
+  { href: '/dashboard/wellness', icon: FiWind, label: 'Wellness' },
+  { href: '/dashboard/breathing', icon: FiWind, label: 'Breathing' },
+  { href: '/dashboard/complaints', icon: FiMessageSquare, label: 'Complaints' },
+  { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
 ];
 
 export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps) {
+  const { user } = useAuth();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
-
+  
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -47,108 +39,87 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const sidebarVariants = {
-    open: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40
-      }
-    },
-    closed: {
-      x: isMobile ? -280 : -200,
-      opacity: isMobile ? 0 : 1,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40
-      }
-    }
-  };
-
   return (
     <>
-      {/* Mobile Backdrop */}
-      <AnimatePresence>
-        {isMobile && !isCollapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={onToggle}
-          />
-        )}
-      </AnimatePresence>
-
+      {/* Mobile overlay */}
+      {isMobile && !isCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={onToggle}
+        />
+      )}
+    
       {/* Sidebar */}
       <motion.div
-        variants={sidebarVariants}
-        animate={isCollapsed ? "closed" : "open"}
-        className="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-800 z-50 flex flex-col"
+        className={`fixed top-0 left-0 h-full z-40 ${
+          isCollapsed ? 'w-16' : 'w-64'
+        } bg-gray-900 border-r border-gray-800 transition-all duration-300`}
+        initial={false}
+        animate={{ width: isCollapsed ? 64 : 256 }}
       >
-        {/* Header */}
-        <div className="p-4 border-b border-gray-800">
-          <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <FiHeart className="text-blue-500 text-2xl" />
-              <span className="text-xl font-bold text-white">CampusWell</span>
-            </Link>
-            <button
-              onClick={onToggle}
-              className="p-2 rounded-lg hover:bg-gray-800 transition-colors md:hidden"
-            >
-              <FiX className="text-white text-xl" />
-            </button>
-          </div>
+        {/* Logo */}
+        <div className="flex items-center px-4 h-16 border-b border-gray-800">
+          <Link href="/dashboard" className="flex items-center">
+            <div className="text-blue-500 text-2xl mr-2">💙</div>
+            {!isCollapsed && <span className="text-white font-bold text-xl">CampusWell</span>}
+          </Link>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            const Icon = link.icon;
-            
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => isMobile && onToggle()}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <Icon className={`text-xl ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
-                <span className="font-medium">{link.name}</span>
-              </Link>
-            );
-          })}
+        
+        {/* Navigation Links */}
+        <nav className="mt-6">
+          <ul className="space-y-2 px-2">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
+                      isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                    }`}
+                  >
+                    <link.icon className={`${isCollapsed ? 'mx-auto' : 'mr-3'} text-xl`} />
+                    {!isCollapsed && <span>{link.label}</span>}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="text-center text-gray-400 text-sm">
-            <p>© 2024 CampusWell</p>
-            <p>Mental Health & Community</p>
-          </div>
+        
+        {/* Profile Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+          {user && (
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <FiUser className="text-white" />
+              </div>
+              {!isCollapsed && (
+                <div className="ml-3 overflow-hidden">
+                  <p className="text-sm font-medium text-white truncate">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {user.email}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {/* Collapse/Expand Handle */}
+        <div 
+          className="absolute top-1/2 -right-3 w-6 h-24 flex items-center justify-center cursor-pointer bg-gray-800 rounded-r-md border-r border-t border-b border-gray-700 opacity-60 hover:opacity-100 transition-opacity"
+          onClick={onToggle}
+        >
+          <FiChevronRight 
+            className={`text-gray-400 transition-transform ${isCollapsed ? '' : 'transform rotate-180'}`} 
+          />
         </div>
       </motion.div>
-
-      {/* Toggle Button for Desktop */}
-      {!isMobile && (
-        <button
-          onClick={onToggle}
-          className={`fixed top-4 z-50 p-2 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition-all duration-200 ${
-            isCollapsed ? 'left-4' : 'left-72'
-          }`}
-        >
-          <FiMenu className="text-white text-xl" />
-        </button>
-      )}
     </>
   );
 } 

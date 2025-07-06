@@ -21,7 +21,9 @@ import {
   FiChevronDown,
   FiBell,
   FiBriefcase,
-  FiFileText
+  FiFileText,
+  FiCalendar,
+  FiMessageSquare
 } from 'react-icons/fi';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -110,12 +112,11 @@ export default function SideNav({
   };
 
   const navItems = [
-    { id: 'feed', icon: FiHome, label: 'Home' },
-    { id: 'activities', icon: FiActivity, label: 'Activities' },
-    { id: 'concerns', icon: FiAlertCircle, label: 'Concerns' },
-    { id: 'mindwall', icon: FiUsers, label: 'Mind Wall' },
-    { id: 'wellness', icon: FiHeart, label: 'Wellness' },
-    { id: 'breathing', icon: FiWind, label: 'Breathing' },
+    { id: 'overview', icon: FiHome, label: 'Overview' },
+    { id: 'activities', icon: FiCalendar, label: 'Activities' },
+    { id: 'concerns', icon: FiMessageSquare, label: 'Concerns' },
+    { id: 'mindwall', icon: FiHeart, label: 'Mind Wall' },
+    { id: 'wellness', icon: FiActivity, label: 'Wellness' },
   ];
 
   const moderatorItems = [

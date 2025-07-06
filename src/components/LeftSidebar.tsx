@@ -1,22 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  FiHome, 
-  FiActivity, 
-  FiAlertCircle, 
-  FiHeart, 
-  FiWind, 
-  FiMessageSquare, 
-  FiBell, 
-  FiUser, 
-  FiChevronRight,
+import {
+  FiHome,
+  FiMessageSquare,
+  FiHeart,
+  FiActivity,
+  FiAlertCircle,
+  FiWind,
+  FiBell,
   FiUsers,
   FiShield,
-  FiPhone
+  FiPhone,
+  FiCalendar,
+  FiSpeaker,
+  FiBriefcase,
+  FiChevronRight,
+  FiUser
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -25,46 +28,10 @@ interface LeftSidebarProps {
   onToggle: () => void;
 }
 
-// Navigation links configuration based on role
-const getNavLinks = (isAdmin: boolean, isModerator: boolean, isDepartmentHead: boolean) => {
-  // Base links for all users
-  const baseLinks = [
-    { href: '/dashboard', icon: FiHome, label: 'Home' },
-    { href: '/dashboard/activities', icon: FiActivity, label: 'Activities' },
-    { href: '/dashboard/concerns', icon: FiAlertCircle, label: 'Concerns' },
-    { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
-    { href: '/dashboard/wellness', icon: FiWind, label: 'Wellness' },
-    { href: '/dashboard/breathing', icon: FiWind, label: 'Breathing' },
-  ];
-
-  // Additional links for moderators and admins
-  if (isAdmin || isModerator) {
-    baseLinks.push({ href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' });
-  }
-
-  // Additional links for department heads
-  if (isDepartmentHead) {
-    baseLinks.push({ href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' });
-    baseLinks.push({ href: '/dashboard/department-complaints', icon: FiMessageSquare, label: 'Department Complaints' });
-  }
-
-  // Additional links for admins only
-  if (isAdmin) {
-    baseLinks.push({ href: '/dashboard/anonymous-complaints', icon: FiMessageSquare, label: 'Anonymous Complaints' });
-    baseLinks.push({ href: '/dashboard/department-complaints', icon: FiMessageSquare, label: 'Department Complaints' });
-    baseLinks.push({ href: '/dashboard/manage-departments', icon: FiUsers, label: 'Manage Departments' });
-    baseLinks.push({ href: '/dashboard/manage-moderators', icon: FiShield, label: 'Manage Mods' });
-    baseLinks.push({ href: '/dashboard/manage-counselors', icon: FiPhone, label: 'Manage Counselors' });
-  }
-
-  return baseLinks;
-};
-
-export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps) {
-  const { user, isAdmin, isModerator } = useAuth();
+const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
+  const { user, isAdmin, isDepartmentHead } = useAuth();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
-  const [isDepartmentHead, setIsDepartmentHead] = useState(false);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -84,7 +51,7 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
       // Example implementation:
       // const departmentData = await getDepartmentByUserEmail(user?.email);
       // setIsDepartmentHead(departmentData?.headEmail === user?.email);
-      setIsDepartmentHead(false); // Default to false for now
+      // setIsDepartmentHead(false); // Default to false for now
     };
     
     if (user) {
@@ -93,7 +60,29 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
   }, [user]);
 
   // Get navigation links based on user role
-  const navLinks = getNavLinks(isAdmin, isModerator, isDepartmentHead);
+  const baseLinks = [
+    { href: '/dashboard', icon: FiHome, label: 'Home' },
+    { href: '/dashboard/activities', icon: FiCalendar, label: 'Activities' },
+    { href: '/dashboard/concerns', icon: FiMessageSquare, label: 'Concerns' },
+    { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
+    { href: '/dashboard/wellness', icon: FiActivity, label: 'Wellness' },
+  ];
+
+  // Add department head specific links
+  if (isDepartmentHead) {
+    baseLinks.push(
+      { href: '/dashboard/announcements', icon: FiSpeaker, label: 'Announcements' },
+      { href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' }
+    );
+  }
+
+  // Add admin-only links
+  if (isAdmin) {
+    baseLinks.push({ href: '/dashboard/announcements', icon: FiSpeaker, label: 'Announcements' });
+    baseLinks.push({ href: '/dashboard/anonymous-complaints', icon: FiShield, label: 'Anonymous Complaints' });
+    baseLinks.push({ href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' });
+    baseLinks.push({ href: '/dashboard/manage-departments', icon: FiUsers, label: 'Manage Departments' });
+  }
 
   return (
     <>
@@ -125,18 +114,16 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
           {/* Collapse/Expand Toggle Button */}
           <button
             onClick={onToggle}
-            className={`absolute ${isCollapsed ? 'right-1' : 'right-2'} top-1/2 transform -translate-y-1/2 p-2 rounded-full hover:bg-gray-800 transition-colors ${isMobile ? 'bg-gray-800' : ''}`}
+            className={`absolute ${isCollapsed ? 'right-1' : 'right-2'} top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors z-10`}
           >
-            <FiChevronRight 
-              className={`text-gray-400 transition-transform ${isCollapsed ? '' : 'transform rotate-180'}`} 
-            />
+            <FiChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} />
           </button>
         </div>
         
         {/* Navigation Links with Scrolling */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide">
           <ul className="space-y-1 px-2 py-4">
-            {navLinks.map((link) => {
+            {baseLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <li key={link.href}>
@@ -167,16 +154,20 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
               }}
               className="flex items-center w-full px-4 py-2 rounded-xl hover:bg-gray-800 transition-colors"
             >
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <FiUser className="text-white" />
+              <div className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FiUser className="w-5 h-5 text-white" />
+                </div>
+                {!isCollapsed && (
+                  <span className="ml-3 text-gray-300">Profile</span>
+                )}
               </div>
-              {!isCollapsed && (
-                <span className="ml-3 text-gray-300">Profile</span>
-              )}
             </button>
           </div>
         )}
       </motion.div>
     </>
   );
-} 
+};
+
+export default LeftSidebar; 

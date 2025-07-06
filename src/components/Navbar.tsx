@@ -70,13 +70,9 @@ export default function Navbar() {
             <FiUser className="text-xl" />
             <span>Mind Wall</span>
           </Link>
-          <Link href="/wellness" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
-            <FiHeart className="text-xl" />
+          <Link href="/dashboard/wellness" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
+            <FiActivity className="text-lg" />
             <span>Wellness</span>
-          </Link>
-          <Link href="/breathing" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
-            <FiActivity className="text-xl" />
-            <span>Breathing</span>
           </Link>
           <Link href="/complaints" className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-3 rounded-xl transition-colors">
             <FiMessageSquare className="text-xl" />

@@ -19,7 +19,9 @@ import {
   FiSpeaker,
   FiBriefcase,
   FiChevronRight,
-  FiUser
+  FiUser,
+  FiHardDrive,
+  FiUserCheck
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -77,11 +79,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
   }
 
   // Add admin-only links
+  const adminLinks = [];
   if (isAdmin) {
-    baseLinks.push({ href: '/dashboard/announcements', icon: FiSpeaker, label: 'Announcements' });
-    baseLinks.push({ href: '/dashboard/anonymous-complaints', icon: FiShield, label: 'Anonymous Complaints' });
-    baseLinks.push({ href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' });
-    baseLinks.push({ href: '/dashboard/manage-departments', icon: FiUsers, label: 'Manage Departments' });
+    adminLinks.push(
+      { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
+      { href: '/dashboard/manage-departments', icon: FiHardDrive, label: 'Manage Departments' },
+      { href: '/dashboard/manage-moderators', icon: FiUserCheck, label: 'Manage Moderators' }
+    );
   }
 
   return (

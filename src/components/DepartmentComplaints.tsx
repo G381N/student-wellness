@@ -49,12 +49,14 @@ export default function DepartmentComplaints() {
         userDepartment
       });
       
-      if (isDepartmentHead && userDepartment) {
-        console.log('✅ Valid department head, fetching department complaints for department ID:', userDepartment);
-        fetchedData = await getDepartmentComplaintsByDepartment(userDepartment);
+      if (isDepartmentHead && departmentInfo?.code) { // Check for departmentInfo.code
+        console.log('✅ Valid department head, fetching department complaints for department code:', departmentInfo.code);
+        fetchedData = await getDepartmentComplaintsByDepartment(departmentInfo.code);
       } else if (isAdmin) {
         console.log('👑 Admin - fetching all complaints');
         fetchedData = await getDepartmentComplaints();
+      } else {
+        console.log('❌ Not authorized to view complaints.');
       }
       
       console.log('📊 Final complaints to display:', fetchedData.length, fetchedData);

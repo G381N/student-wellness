@@ -35,23 +35,9 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Don't render on mobile
-  if (isMobile) {
+  // Don't render on mobile or when collapsed
+  if (isMobile || isCollapsed) {
     return null;
-  }
-
-  // When collapsed, show only the profile button
-  if (isCollapsed) {
-    return (
-      <div className="fixed top-24 right-4 z-40">
-        <button 
-          onClick={onToggle}
-          className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors"
-        >
-          <FiUser className="text-white text-xl" />
-        </button>
-      </div>
-    );
   }
 
   return (
@@ -61,6 +47,19 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
       animate={{ x: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
+      {/* Header with Toggle Button */}
+      <div className="flex items-center justify-between p-4 h-16 border-b border-gray-800 relative">
+        {/* Collapse/Expand Toggle Button */}
+        <button
+          onClick={onToggle}
+          className="p-1 rounded-md hover:bg-gray-800 transition-colors"
+        >
+          <FiChevronLeft className="text-gray-400" />
+        </button>
+        
+        <h2 className="text-white font-semibold">Profile & Updates</h2>
+      </div>
+      
       {/* Profile Section */}
       <div className="p-6 border-b border-gray-800">
         {user ? (
@@ -141,14 +140,6 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
           <FiPlus className="text-lg" />
           <span>Create Post</span>
         </button>
-      </div>
-      
-      {/* Collapse/Expand Handle */}
-      <div 
-        className="absolute top-1/2 -left-3 w-6 h-24 flex items-center justify-center cursor-pointer bg-gray-800 rounded-l-md border-l border-t border-b border-gray-700 opacity-60 hover:opacity-100 transition-opacity"
-        onClick={onToggle}
-      >
-        <FiChevronLeft className="text-gray-400" />
       </div>
     </motion.div>
   );

@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import TopBar from './TopBar';
+import ProfileModal from './ProfileModal';
 import CreatePostModal from './CreatePostModal';
+import { FiUser } from 'react-icons/fi';
 
 interface LayoutShellProps {
   children: React.ReactNode;
@@ -13,8 +15,9 @@ interface LayoutShellProps {
 
 export default function LayoutShell({ children }: LayoutShellProps) {
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false);
-  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(true); // Start collapsed
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -31,7 +34,15 @@ export default function LayoutShell({ children }: LayoutShellProps) {
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    
+    // Listen for profile modal open event from LeftSidebar
+    const handleOpenProfileModal = () => setShowProfileModal(true);
+    window.addEventListener('openProfileModal', handleOpenProfileModal);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('openProfileModal', handleOpenProfileModal);
+    };
   }, []);
 
   const getMainContentStyles = () => {
@@ -74,6 +85,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       <TopBar 
         leftSidebarCollapsed={leftSidebarCollapsed}
         rightSidebarCollapsed={rightSidebarCollapsed}
+        onRightSidebarToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
       />
 
       {/* Main Content */}
@@ -86,6 +98,16 @@ export default function LayoutShell({ children }: LayoutShellProps) {
           {children}
         </div>
       </motion.main>
+
+      {/* Desktop Profile FAB (only shown when right sidebar is collapsed) */}
+      {!isMobile && rightSidebarCollapsed && (
+        <button
+          onClick={() => setRightSidebarCollapsed(false)}
+          className="fixed top-4 right-4 z-40 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors"
+        >
+          <FiUser className="text-white" />
+        </button>
+      )}
 
       {/* Mobile Create Post Button */}
       {isMobile && (
@@ -104,6 +126,12 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onPostCreated={handlePostCreated}
+      />
+
+      {/* Mobile Profile Modal */}
+      <ProfileModal 
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
       />
     </div>
   );

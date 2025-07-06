@@ -5,15 +5,15 @@ import { motion } from 'framer-motion';
 import { FiSearch, FiX } from 'react-icons/fi';
 
 interface TopBarProps {
-  onLeftSidebarToggle?: () => void;
   leftSidebarCollapsed: boolean;
   rightSidebarCollapsed: boolean;
+  onRightSidebarToggle?: () => void;
 }
 
 export default function TopBar({ 
-  onLeftSidebarToggle,
   leftSidebarCollapsed,
-  rightSidebarCollapsed
+  rightSidebarCollapsed,
+  onRightSidebarToggle
 }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);

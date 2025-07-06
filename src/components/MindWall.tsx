@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiPlus, FiX, FiChevronUp, FiTrash2, FiShare } from 'react-icons/fi';
+import { FiPlus, FiX, FiChevronUp, FiTrash2, FiShare, FiBarChart, FiTrendingUp, FiUsers, FiMessageSquare } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { MindWallIssue, addMindWallIssue, getMindWallIssues, voteMindWallIssue, deleteMindWallIssue } from '@/lib/firebase-utils';
 
@@ -15,6 +15,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
   const [issues, setIssues] = useState<MindWallIssue[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [votingStates, setVotingStates] = useState<{[key: string]: boolean}>({});
@@ -44,6 +45,24 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
       fetchIssues();
     }
   }, [user]);
+
+  // Calculate analytics
+  const analytics = {
+    totalPosts: issues.length,
+    totalVotes: issues.reduce((sum, issue) => sum + issue.count, 0),
+    totalUsers: new Set(issues.map(issue => issue.authorId)).size,
+    categoryStats: categories.map(category => ({
+      category,
+      count: issues.filter(issue => issue.category === category).length,
+      votes: issues.filter(issue => issue.category === category).reduce((sum, issue) => sum + issue.count, 0)
+    })).filter(stat => stat.count > 0).sort((a, b) => b.votes - a.votes),
+    topIssues: [...issues].sort((a, b) => b.count - a.count).slice(0, 5),
+    recentActivity: issues.filter(issue => {
+      const dayAgo = new Date();
+      dayAgo.setDate(dayAgo.getDate() - 1);
+      return new Date(issue.timestamp) > dayAgo;
+    }).length
+  };
 
   const handleVote = async (issueId: string) => {
     if (!user || votingStates[issueId]) return;
@@ -168,13 +187,22 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
         <div className="sticky top-0 z-10 bg-black bg-opacity-90 backdrop-blur-sm border-b border-gray-800">
           <div className="flex items-center justify-between p-4">
             <h1 className="text-xl font-bold">Mind Wall</h1>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors flex items-center space-x-2"
-            >
-              <FiPlus className="text-lg" />
-              <span>Share Thought</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowAnalytics(true)}
+                className="px-3 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors flex items-center space-x-2"
+              >
+                <FiBarChart className="text-lg" />
+                <span className="hidden sm:inline">Analytics</span>
+              </button>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="px-4 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors flex items-center space-x-2"
+              >
+                <FiPlus className="text-lg" />
+                <span>Share Thought</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -187,7 +215,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   {/* Title and Category */}
                   <div className="flex items-center space-x-2 mb-2">
                     <h2 className="text-lg font-bold">{issue.title}</h2>
-              </div>
+                  </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-400 mb-3">
                     <span className="px-2 py-1 bg-gray-800 rounded-full">{issue.category}</span>
                     <span>•</span>
@@ -198,10 +226,10 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   <p className="text-gray-300 mb-4">{issue.description}</p>
                   
                   {/* Actions */}
-                    <div className="flex items-center space-x-4">
-                      <button
+                  <div className="flex items-center space-x-4">
+                    <button
                       onClick={() => handleVote(issue.id)}
-                        disabled={votingStates[issue.id]}
+                      disabled={votingStates[issue.id]}
                       className={`flex items-center space-x-2 transition-colors ${
                         issue.votedBy.includes(user?.uid || '') 
                           ? 'text-green-400' 
@@ -250,6 +278,111 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
             </div>
           ))}
         </div>
+
+        {/* Analytics Modal */}
+        <AnimatePresence>
+          {showAnalytics && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-gray-900 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold flex items-center space-x-2">
+                    <FiBarChart className="text-blue-400" />
+                    <span>Mind Wall Analytics</span>
+                  </h2>
+                  <button
+                    onClick={() => setShowAnalytics(false)}
+                    className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                  >
+                    <FiX />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Overview Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                      <FiMessageSquare className="text-blue-400 text-2xl mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{analytics.totalPosts}</div>
+                      <div className="text-sm text-gray-400">Total Posts</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                      <FiTrendingUp className="text-green-400 text-2xl mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{analytics.totalVotes}</div>
+                      <div className="text-sm text-gray-400">Total Votes</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                      <FiUsers className="text-purple-400 text-2xl mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{analytics.totalUsers}</div>
+                      <div className="text-sm text-gray-400">Contributors</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                      <FiChevronUp className="text-yellow-400 text-2xl mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{analytics.recentActivity}</div>
+                      <div className="text-sm text-gray-400">Recent (24h)</div>
+                    </div>
+                  </div>
+
+                  {/* Category Breakdown */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Category Breakdown</h3>
+                    <div className="space-y-3">
+                      {analytics.categoryStats.map((stat, index) => (
+                        <div key={stat.category} className="flex items-center justify-between bg-gray-800 rounded-lg p-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              {index + 1}
+                            </div>
+                            <span className="text-white font-medium">{stat.category}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-bold">{stat.votes} votes</div>
+                            <div className="text-sm text-gray-400">{stat.count} posts</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Top Issues */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Top Issues</h3>
+                    <div className="space-y-3">
+                      {analytics.topIssues.map((issue, index) => (
+                        <div key={issue.id} className="bg-gray-800 rounded-lg p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                  {index + 1}
+                                </div>
+                                <h4 className="font-medium text-white">{issue.title}</h4>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-gray-400">
+                                <span className="px-2 py-1 bg-gray-700 rounded-full">{issue.category}</span>
+                                <span>•</span>
+                                <span>{issue.count} votes</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Add Issue Modal */}
         <AnimatePresence>

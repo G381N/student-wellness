@@ -71,7 +71,7 @@ export default function DashboardPage() {
       }
     };
 
-    fetchData();
+      fetchData();
   }, [forceRefresh]);
 
   const handleRefresh = async () => {
@@ -81,7 +81,7 @@ export default function DashboardPage() {
   const handleUpdatePost = (updatedPost: Post) => {
     setPosts(prevPosts => 
       prevPosts.map(post => 
-        post.id === updatedPost.id ? updatedPost : post
+      post.id === updatedPost.id ? updatedPost : post
       )
     );
   };
@@ -151,7 +151,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-black text-white">
       {/* Welcome Header */}
       <div className="mb-8">
-        <motion.div
+                <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -163,8 +163,8 @@ export default function DashboardPage() {
           <p className="text-gray-400 text-lg">
             Your mental wellness dashboard
           </p>
-        </motion.div>
-      </div>
+                </motion.div>
+        </div>
 
       {/* Search Results */}
       {searchQuery && (
@@ -184,28 +184,28 @@ export default function DashboardPage() {
                   {results.posts.map((post) => (
                     <div key={post.id}>
                       {post.type === 'activity' && (
-                        <ActivityCard
+                          <ActivityCard 
                           activity={post}
                           onUpdate={handleUpdatePost}
-                          onDelete={handleDeletePost}
-                        />
+                            onDelete={handleDeletePost}
+                          />
                       )}
                       {post.type === 'concern' && (
-                        <ConcernCard
+                          <ConcernCard 
                           concern={post}
                           onUpdate={handleUpdatePost}
-                          onDelete={handleDeletePost}
-                        />
+                            onDelete={handleDeletePost}
+                          />
                       )}
                       {(post.type === 'general' || post.type === 'post') && (
-                        <TweetCard
+                          <TweetCard 
                           tweet={post}
                           onUpdate={handleUpdatePost}
                           onDelete={() => handleDeletePost(post.id)}
-                        />
-                      )}
-                    </div>
-                  ))}
+                          />
+                        )}
+                      </div>
+                    ))}
                   {results.issues.map((issue) => (
                     <div key={issue.id} className="bg-gray-800 rounded-xl p-4 border border-gray-600">
                       <h3 className="font-semibold text-white mb-2">{issue.title}</h3>
@@ -213,16 +213,16 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between text-xs text-gray-400">
                         <span>{issue.category}</span>
                         <span>{issue.count} voices</span>
-                      </div>
-                    </div>
+                  </div>
+              </div>
                   ))}
-                </div>
+                    </div>
               ) : (
                 <p className="text-gray-400">No results found for your search.</p>
               );
             })()}
           </motion.div>
-        </div>
+                  </div>
       )}
 
       {/* Main Feed */}
@@ -240,12 +240,12 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center group-hover:bg-blue-700 transition-colors">
                 <FiPlus className="text-white text-xl" />
-              </div>
+                      </div>
               <div className="text-left">
                 <h3 className="text-white font-semibold">Share your thoughts</h3>
                 <p className="text-gray-400 text-sm">What's on your mind today?</p>
-              </div>
-            </div>
+                        </div>
+                        </div>
           </button>
         </motion.div>
 
@@ -259,30 +259,30 @@ export default function DashboardPage() {
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center space-x-3">
               <FiUsers className="text-blue-500 text-xl" />
-              <div>
+                        <div>
                 <p className="text-white font-semibold">{posts.length}</p>
                 <p className="text-gray-400 text-sm">Total Posts</p>
-              </div>
-            </div>
-          </div>
+                        </div>
+                        </div>
+                      </div>
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center space-x-3">
               <FiActivity className="text-green-500 text-xl" />
-              <div>
+                        <div>
                 <p className="text-white font-semibold">{posts.filter(p => p.type === 'activity').length}</p>
                 <p className="text-gray-400 text-sm">Activities</p>
-              </div>
-            </div>
-          </div>
+                        </div>
+                        </div>
+                      </div>
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center space-x-3">
               <FiHeart className="text-red-500 text-xl" />
-              <div>
+                        <div>
                 <p className="text-white font-semibold">{mindWallIssues.length}</p>
                 <p className="text-gray-400 text-sm">Mind Wall Issues</p>
-              </div>
-            </div>
-          </div>
+                        </div>
+                        </div>
+                      </div>
         </motion.div>
 
         {/* Posts Feed */}
@@ -316,34 +316,34 @@ export default function DashboardPage() {
                     onDelete={() => handleDeletePost(post.id)}
                   />
                 )}
-              </div>
-            ))
-          ) : (
+                      </div>
+                    ))
+                  ) : (
             <div className="text-center py-12">
               <FiMessageCircle className="text-gray-600 text-6xl mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-400 mb-2">No posts yet</h3>
               <p className="text-gray-500 mb-4">Be the first to share something with the community!</p>
-              <button
-                onClick={() => setShowCreateModal(true)}
+                  <button
+                    onClick={() => setShowCreateModal(true)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Create First Post
-              </button>
-            </div>
-          )}
+                  </button>
+                        </div>
+                      )}
         </motion.div>
 
         {/* Refresh Button */}
         <div className="text-center pt-8">
-          <button
+                  <button
             onClick={handleRefresh}
             className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"
           >
             <FiRefreshCw className="text-lg" />
             <span>Refresh Feed</span>
-          </button>
-        </div>
-      </div>
+                  </button>
+                </div>
+              </div>
 
       {/* Create Post Modal */}
       <CreatePostModal

@@ -52,7 +52,7 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
         {/* Collapse/Expand Toggle Button */}
         <button
           onClick={onToggle}
-          className="p-1 rounded-md hover:bg-gray-800 transition-colors"
+          className="p-2 rounded-full hover:bg-gray-800 transition-colors bg-gray-800"
         >
           <FiChevronLeft className="text-gray-400" />
         </button>

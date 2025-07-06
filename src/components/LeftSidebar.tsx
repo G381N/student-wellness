@@ -125,7 +125,7 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
           {/* Collapse/Expand Toggle Button */}
           <button
             onClick={onToggle}
-            className={`absolute ${isCollapsed ? 'right-2' : 'right-4'} top-5 p-1 rounded-md hover:bg-gray-800 transition-colors`}
+            className={`absolute ${isCollapsed ? 'right-1' : 'right-2'} top-1/2 transform -translate-y-1/2 p-2 rounded-full hover:bg-gray-800 transition-colors ${isMobile ? 'bg-gray-800' : ''}`}
           >
             <FiChevronRight 
               className={`text-gray-400 transition-transform ${isCollapsed ? '' : 'transform rotate-180'}`} 

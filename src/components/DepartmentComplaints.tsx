@@ -32,20 +32,39 @@ export default function DepartmentComplaints() {
       setLoading(true);
       let fetchedComplaints: DepartmentComplaint[] = [];
       
+      console.log('🔍 Fetching complaints...', {
+        isAdmin,
+        isDepartmentHead,
+        userEmail: user?.email,
+        userRole: user?.email // Add debugging info
+      });
+      
       if (isAdmin) {
         // Admin can see all complaints
+        console.log('👑 Admin - fetching all complaints');
         fetchedComplaints = await getDepartmentComplaints();
+        console.log('📋 All complaints fetched:', fetchedComplaints.length);
       } else if (isDepartmentHead && user?.email) {
         // Department head can only see their department's complaints
+        console.log('🏢 Department head - checking department status');
         const deptHeadCheck = await checkDepartmentHeadStatus(user.email);
+        console.log('🔍 Department head check result:', deptHeadCheck);
+        
         if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
+          console.log('✅ Valid department head, fetching department complaints for:', deptHeadCheck.department.id);
           fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.id);
+          console.log('📋 Department complaints fetched:', fetchedComplaints.length);
+        } else {
+          console.log('❌ Not a valid department head');
         }
+      } else {
+        console.log('❌ No access - not admin or department head');
       }
       
+      console.log('📊 Final complaints to display:', fetchedComplaints);
       setComplaints(fetchedComplaints);
     } catch (error) {
-      console.error('Error fetching department complaints:', error);
+      console.error('❌ Error fetching department complaints:', error);
     } finally {
       setLoading(false);
     }

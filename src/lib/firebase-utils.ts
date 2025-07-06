@@ -238,12 +238,14 @@ export const checkUserRole = async (userId: string): Promise<{ isAdmin: boolean;
 // Check if user is department head by email
 export const checkDepartmentHeadStatus = async (email: string): Promise<{ isDepartmentHead: boolean; department?: Department }> => {
   try {
+    console.log('🔍 checkDepartmentHeadStatus: Checking email:', email);
     const deptQuery = query(
       collection(db, 'departments'),
       where('email', '==', email),
       where('isActive', '==', true)
     );
     const querySnapshot = await getDocs(deptQuery);
+    console.log('📊 checkDepartmentHeadStatus: Found', querySnapshot.size, 'matching departments');
     
     if (!querySnapshot.empty) {
       const departmentDoc = querySnapshot.docs[0];
@@ -252,15 +254,17 @@ export const checkDepartmentHeadStatus = async (email: string): Promise<{ isDepa
         ...departmentDoc.data()
       } as Department;
       
+      console.log('✅ checkDepartmentHeadStatus: Found department:', department);
       return {
         isDepartmentHead: true,
         department
       };
     }
     
+    console.log('❌ checkDepartmentHeadStatus: No matching department found for email:', email);
     return { isDepartmentHead: false };
   } catch (error) {
-    console.error('Error checking department head status:', error);
+    console.error('❌ checkDepartmentHeadStatus: Error checking department head status:', error);
     return { isDepartmentHead: false };
   }
 };
@@ -844,17 +848,23 @@ export const saveDepartment = async (departmentData: Omit<Department, 'id'>): Pr
 
 export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> => {
   try {
+    console.log('🔍 getDepartmentComplaints: Fetching all department complaints...');
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'), 
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    console.log('📊 getDepartmentComplaints: Found', querySnapshot.size, 'complaints');
+    
+    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as DepartmentComplaint));
+    
+    console.log('📋 getDepartmentComplaints: Processed complaints:', complaints);
+    return complaints;
   } catch (error) {
-    console.error('Error getting department complaints:', error);
+    console.error('❌ getDepartmentComplaints: Error getting department complaints:', error);
     return [];
   }
 };
@@ -929,18 +939,24 @@ export const updateDepartmentComplaintStatus = async (
 // Get department complaints for specific department (for department heads)
 export const getDepartmentComplaintsByDepartment = async (departmentId: string): Promise<DepartmentComplaint[]> => {
   try {
+    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department:', departmentId);
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
       where('departmentId', '==', departmentId),
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department:', departmentId);
+    
+    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     } as DepartmentComplaint));
+    
+    console.log('📋 getDepartmentComplaintsByDepartment: Processed complaints:', complaints);
+    return complaints;
   } catch (error) {
-    console.error('Error getting department complaints by department:', error);
+    console.error('❌ getDepartmentComplaintsByDepartment: Error getting department complaints by department:', error);
     return [];
   }
 };

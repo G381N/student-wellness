@@ -971,7 +971,7 @@ export const getDepartmentComplaintsByDepartment = async (departmentName: string
     console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department NAME:', departmentName);
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
-      where('department', '==', departmentName),
+      where('department', '==', departmentName), // Changed to 'department' field
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);

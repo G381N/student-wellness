@@ -47,11 +47,15 @@ export default function DepartmentComplaints() {
         userDepartment
       });
       
+      // ALWAYS fetch all complaints for debugging first
+      console.log('👑 Fetching ALL complaints for debugging...');
+      const allComplaints = await getDepartmentComplaints();
+      console.log('📋 ALL complaints in collection:', allComplaints.length, allComplaints);
+      
       if (isAdmin) {
         // Admin can see all complaints
-        console.log('👑 Admin - fetching all complaints');
-        fetchedComplaints = await getDepartmentComplaints();
-        console.log('📋 All complaints fetched:', fetchedComplaints.length, fetchedComplaints);
+        console.log('👑 Admin - using all complaints');
+        fetchedComplaints = allComplaints;
       } else if (isDepartmentHead && user?.email) {
         // Department head can only see their department's complaints
         console.log('🏢 Department head - checking department status');
@@ -60,8 +64,26 @@ export default function DepartmentComplaints() {
         
         if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
           console.log('✅ Valid department head, fetching department complaints for:', deptHeadCheck.department.id);
+          
+          // Let's also try filtering from all complaints locally to debug
+          const filteredComplaints = allComplaints.filter(complaint => 
+            complaint.departmentId === deptHeadCheck.department!.id
+          );
+          console.log('🔍 Locally filtered complaints:', filteredComplaints);
+          
+          // Use the Firebase query
           fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.id);
-          console.log('📋 Department complaints fetched:', fetchedComplaints.length, fetchedComplaints);
+          console.log('📋 Department complaints from Firebase query:', fetchedComplaints.length, fetchedComplaints);
+          
+          // If no complaints from query but we have all complaints, let's debug the department IDs
+          if (fetchedComplaints.length === 0 && allComplaints.length > 0) {
+            console.log('🚨 DEBUG: No complaints found via query, but collection has data');
+            console.log('🚨 Looking for departmentId:', deptHeadCheck.department.id);
+            console.log('🚨 Available departmentIds in complaints:', allComplaints.map(c => c.departmentId));
+            
+            // Temporarily use filtered complaints for debugging
+            fetchedComplaints = filteredComplaints;
+          }
         } else {
           console.log('❌ Not a valid department head');
         }

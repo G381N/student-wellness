@@ -33,10 +33,10 @@ export default function ModeratorAnnouncements() {
   });
 
   useEffect(() => {
-    if (isModerator || isAdmin) {
+    if (isModerator || isAdmin || isDepartmentHead) {
       fetchAnnouncementsAndPosts();
     }
-  }, [isModerator, isAdmin]);
+  }, [isModerator, isAdmin, isDepartmentHead]);
 
   const fetchAnnouncementsAndPosts = async () => {
     try {

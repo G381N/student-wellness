@@ -3,93 +3,94 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiUser, FiX, FiCheck, FiEye, FiBriefcase } from 'react-icons/fi';
-// Make sure these imports are correct and include 'Department' interface
 import { getDepartmentComplaints, getDepartmentComplaintsByDepartment, updateDepartmentComplaintStatus, DepartmentComplaint, checkDepartmentHeadStatus, Department } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function DepartmentComplaints() {
-  const { user, isAdmin, isDepartmentHead, userDepartment } = useAuth();
+  const { user, isAdmin, isDepartmentHead } = useAuth();
   const [complaints, setComplaints] = useState<DepartmentComplaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedComplaint, setSelectedComplaint] = useState<DepartmentComplaint | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [updating, setUpdating] = useState(false);
-  // Type departmentInfo correctly as Department or null
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('🔍 DepartmentComplaints useEffect triggered:', {
-      user: user?.email,
-      isAdmin,
-      isDepartmentHead,
-      userDepartment // This will be the ID, not the code initially
-    });
-    
-    if (user) {
-      fetchComplaints();
-      if (isDepartmentHead && user.email) {
-        // Get full department info (including code) for department head
-        checkDepartmentHeadStatus(user.email).then(({ department }) => {
-          console.log('🏢 Department info loaded from checkDepartmentHeadStatus:', department);
-          setDepartmentInfo(department || null); // Ensure it's null if department is undefined
-        });
-      }
-    }
-  }, [user, isAdmin, isDepartmentHead, userDepartment]);
+    console.log('--- useEffect Triggered ---');
+    console.log(`User: ${user?.email}, Admin: ${isAdmin}, DeptHead: ${isDepartmentHead}`);
 
-  const fetchComplaints = async () => {
+    if (!user) {
+      console.log('User not authenticated. Stopping.');
+      setLoading(false);
+      return;
+    }
+
+    if (isAdmin) {
+      console.log('User is Admin. Fetching all complaints.');
+      fetchComplaints(null);
+    } else if (isDepartmentHead && user.email) {
+      console.log('User is Department Head. Checking department status...');
+      checkDepartmentHeadStatus(user.email)
+        .then(({ department }) => {
+          if (department && department.name) {
+            console.log(`Department found: ${department.name}. Fetching complaints for this department.`);
+            setDepartmentInfo(department);
+            fetchComplaints(department.name);
+          } else {
+            console.log('Department Head status checked, but no department name found.');
+            setError('You are a department head, but your department could not be identified.');
+            setLoading(false);
+          }
+        })
+        .catch(err => {
+          console.error('Error in checkDepartmentHeadStatus:', err);
+          setError('An error occurred while verifying your department.');
+          setLoading(false);
+        });
+    } else {
+      console.log('User is not an Admin or Department Head. Access denied.');
+      setError('You are not authorized to view this page.');
+      setLoading(false);
+    }
+  }, [user, isAdmin, isDepartmentHead]);
+
+  const fetchComplaints = async (departmentName: string | null) => {
+    console.log(`--- fetchComplaints called with departmentName: ${departmentName} ---`);
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
       let fetchedData: DepartmentComplaint[] = [];
-      
-      console.log('🔍 Fetching complaints...', {
-        isAdmin,
-        isDepartmentHead,
-        userEmail: user?.email,
-        userDepartment
-      });
-      
-      if (isDepartmentHead && departmentInfo?.code) { // Check for departmentInfo.code
-        console.log('✅ Valid department head, fetching department complaints for department code:', departmentInfo.code);
-        fetchedData = await getDepartmentComplaintsByDepartment(departmentInfo.code);
+      if (departmentName) {
+        fetchedData = await getDepartmentComplaintsByDepartment(departmentName);
       } else if (isAdmin) {
-        console.log('👑 Admin - fetching all complaints');
         fetchedData = await getDepartmentComplaints();
-      } else {
-        console.log('❌ Not authorized to view complaints.');
       }
-      
-      console.log('📊 Final complaints to display:', fetchedData.length, fetchedData);
+      console.log(`Fetched ${fetchedData.length} complaints.`);
       setComplaints(fetchedData);
-    } catch (error) {
-      console.error('❌ Error fetching department complaints:', error);
+    } catch (err) {
+      console.error('Error in fetchComplaints:', err);
+      setError('Failed to fetch complaints.');
+      setComplaints([]);
     } finally {
       setLoading(false);
+      console.log('--- fetchComplaints finished ---');
     }
   };
 
-  // Status values now include 'submitted'
+  // ... rest of the component remains the same
   const handleUpdateStatus = async (status: 'submitted' | 'Pending' | 'In Progress' | 'Resolved' | 'Closed') => {
-    if (!selectedComplaint) return;
+    if (!selectedComplaint || !selectedComplaint.id) return;
 
     try {
       setUpdating(true);
       const resolvedBy = user?.displayName || user?.email || 'Unknown';
       await updateDepartmentComplaintStatus(selectedComplaint.id, status, adminNotes, resolvedBy);
       
-      // Update local state
-      setComplaints(complaints.map(complaint => 
-        complaint.id === selectedComplaint.id 
-          ? { 
-              ...complaint, 
-              status, 
-              adminNotes, 
-              isResolved: status === 'Resolved',
-              resolvedBy: status === 'Resolved' ? resolvedBy : complaint.resolvedBy,
-              resolvedAt: status === 'Resolved' ? new Date() : complaint.resolvedAt,
-              updatedAt: new Date(), // Ensure updatedAt is set on status change
-            }
-          : complaint
+      setComplaints(complaints.map(c => 
+        c.id === selectedComplaint.id 
+          ? { ...c, status, adminNotes, updatedAt: new Date() } 
+          : c
       ));
       
       setSelectedComplaint(null);
@@ -101,38 +102,31 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const formatTimestamp = (timestamp: any) => {
-    if (!timestamp) return 'Unknown';
-    
-    try {
-      const date = typeof timestamp.toDate === 'function' 
-        ? timestamp.toDate() 
-        : new Date(timestamp);
-      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-    } catch (error) {
-      return 'Invalid date';
-    }
+  const formatTimestamp = (timestamp: any): string => {
+    if (!timestamp) return 'N/A';
+    const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    return date.toLocaleString();
   };
 
-  // Renamed from getPriorityColor to getUrgencyColor
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'Low': return 'text-green-400 bg-green-900';
-      case 'Medium': return 'text-yellow-400 bg-yellow-900';
-      case 'High': return 'text-orange-400 bg-orange-900';
-      case 'Critical': return 'text-red-400 bg-red-900';
-      default: return 'text-gray-400 bg-gray-900';
+      case 'Low': return 'text-green-400 bg-green-900/50';
+      case 'Medium': return 'text-yellow-400 bg-yellow-900/50';
+      case 'High': return 'text-orange-400 bg-orange-900/50';
+      case 'Critical': return 'text-red-400 bg-red-900/50';
+      default: return 'text-gray-400 bg-gray-900/50';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'submitted': return 'text-purple-400 bg-purple-900'; // New status color for 'submitted'
-      case 'Pending': return 'text-blue-400 bg-blue-900';
-      case 'In Progress': return 'text-yellow-400 bg-yellow-900';
-      case 'Resolved': return 'text-green-400 bg-green-900';
-      case 'Closed': return 'text-gray-400 bg-gray-900';
-      default: return 'text-gray-400 bg-gray-900';
+      case 'submitted': return 'text-purple-400 bg-purple-900/50';
+      case 'Pending': return 'text-blue-400 bg-blue-900/50';
+      case 'In Progress': return 'text-yellow-400 bg-yellow-900/50';
+      case 'Resolved': return 'text-green-400 bg-green-900/50';
+      case 'Closed': return 'text-gray-400 bg-gray-900/50';
+      default: return 'text-gray-400 bg-gray-900/50';
     }
   };
 
@@ -141,20 +135,19 @@ export default function DepartmentComplaints() {
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading department complaints...</p>
+          <p className="text-gray-400">Loading Complaints...</p>
         </div>
       </div>
     );
   }
 
-  // Redirect non-authorized users
-  if (!isAdmin && !isDepartmentHead) {
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="text-center">
+        <div className="text-center bg-gray-900 p-8 rounded-lg">
           <FiAlertTriangle className="mx-auto text-6xl text-red-400 mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
-          <p className="text-gray-400">Only administrators and department heads can access department complaints.</p>
+          <h2 className="text-2xl font-bold text-white mb-2">An Error Occurred</h2>
+          <p className="text-gray-400">{error}</p>
         </div>
       </div>
     );
@@ -170,264 +163,125 @@ export default function DepartmentComplaints() {
           </div>
           <p className="text-sm sm:text-base text-gray-400">
             {isAdmin 
-              ? 'Manage and review complaints from all departments' 
-              : `Manage complaints for ${departmentInfo?.name || 'your'} department`
+              ? 'Reviewing complaints from all departments.' 
+              : `Reviewing complaints for the ${departmentInfo?.name || '...'} department.`
             }
           </p>
-          {isDepartmentHead && departmentInfo && (
-            <div className="mt-3 p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
-              <p className="text-blue-300 text-sm">
-                <FiBriefcase className="inline mr-2" />
-                You can only view and manage complaints for your assigned department: <strong>{departmentInfo.name}</strong>
-              </p>
-            </div>
-          )}
         </div>
 
         {complaints.length === 0 ? (
-          <div className="text-center py-8 sm:py-12">
-            <FiBriefcase className="mx-auto text-4xl sm:text-6xl text-gray-600 mb-4" />
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Department Complaints</h3>
-            <p className="text-sm sm:text-base text-gray-400">
-              {isDepartmentHead 
-                ? `There are currently no complaints for the ${departmentInfo?.name || 'your'} department.`
-                : 'There are currently no department complaints to review.'
-              }
-            </p>
+          <div className="text-center py-12 bg-gray-900/50 rounded-lg">
+            <FiCheck className="mx-auto text-6xl text-green-500 mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">All Clear!</h3>
+            <p className="text-gray-400">There are no complaints to review at this time.</p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6">
+          <div className="grid gap-6">
             {complaints.map((complaint) => (
               <motion.div
                 key={complaint.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gray-900 border border-gray-700 rounded-lg p-4 sm:p-6 hover:border-gray-600 transition-colors"
+                className="bg-gray-900 border border-gray-700 rounded-lg p-6 hover:border-blue-500 transition-colors"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-base sm:text-lg font-semibold text-white">{complaint.title}</h3>
-                      {/* Display department name from complaint */}
-                      {complaint.department && (
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
-                          {complaint.department}
-                        </span>
-                      )}
-                    </div>
-                    
-                    <p className="text-sm sm:text-base text-gray-300 mb-4">{complaint.description}</p>
-                    
-                    {complaint.studentName && (
-                      <div className="mb-4 p-3 bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-4 text-sm text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <FiUser className="text-xs" />
-                            <span><strong>Student:</strong> {complaint.studentName}</span>
-                          </div>
-                          {complaint.studentEmail && (
-                            <div>
-                              <strong>Email:</strong> {complaint.studentEmail}
-                            </div>
-                          )}
-                          {complaint.studentPhone && (
-                            <div>
-                              <strong>Phone:</strong> {complaint.studentPhone}
-                            </div>
-                          )}
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-2">
+                            <h3 className="text-lg font-semibold text-white">{complaint.title}</h3>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(complaint.urgency)}`}>{complaint.urgency}</span>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(complaint.status)}`}>{complaint.status}</span>
                         </div>
-                        {complaint.source && (
-                          <div className="mt-2 text-xs text-gray-500">
-                            <strong>Source:</strong> {complaint.source}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(complaint.urgency)}`}>
-                        {complaint.urgency}
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
-                        {complaint.status}
-                      </span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium text-gray-400 bg-gray-800">
-                        {complaint.category}
-                      </span>
+                         <p className="text-sm text-gray-400 mb-1">
+                            <span className="font-semibold text-gray-300">Department:</span> {complaint.department}
+                        </p>
+                        <p className="text-sm text-gray-400 mb-4">
+                            <span className="font-semibold text-gray-300">Category:</span> {complaint.category}
+                        </p>
+                        <p className="text-gray-300 mb-4">{complaint.description}</p>
+                        <div className="flex items-center text-xs text-gray-500">
+                            <FiClock className="mr-1.5" />
+                            Submitted: {formatTimestamp(complaint.createdAt)}
+                        </div>
                     </div>
-                    
-                    <div className="flex items-center text-xs sm:text-sm text-gray-500">
-                      <FiClock className="mr-1" />
-                      {/* Use createdAt or timestamp, depending on what's available */}
-                      {formatTimestamp(complaint.createdAt || complaint.timestamp)}
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => {
-                      setSelectedComplaint(complaint);
-                      setAdminNotes(complaint.adminNotes || '');
-                    }}
-                    className="w-full sm:w-auto sm:ml-4 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
-                  >
-                    <FiEye className="text-sm" />
-                    Review
-                  </button>
+                     <button
+                        onClick={() => setSelectedComplaint(complaint)}
+                        className="self-start sm:self-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                        <FiEye />
+                        Review
+                    </button>
                 </div>
-                
-                {complaint.adminNotes && (
-                  <div className="mt-4 p-3 bg-gray-800 rounded-lg border-l-4 border-blue-500">
-                    <p className="text-xs sm:text-sm text-gray-300">
-                      <strong className="text-blue-400">{isDepartmentHead ? 'Department Head Notes:' : 'Admin Notes:'}</strong> {complaint.adminNotes}
-                    </p>
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Review Modal */}
       <AnimatePresence>
         {selectedComplaint && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-3 sm:p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-black border border-gray-700 rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-bold text-white">Review Department Complaint</h2>
-                <button
-                  onClick={() => setSelectedComplaint(null)}
-                  className="text-gray-400 hover:text-white transition-colors p-1"
-                >
-                  <FiX className="text-lg sm:text-xl" />
-                </button>
-              </div>
-
-              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-                <div>
-                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Title</h3>
-                  <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.title}</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Description</h3>
-                  <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.description}</p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Department</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.department || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Category</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.category}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Urgency</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(selectedComplaint.urgency)}`}>
-                      {selectedComplaint.urgency}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Current Status</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedComplaint.status)}`}>
-                      {selectedComplaint.status}
-                    </span>
-                  </div>
-                </div>
-
-                {selectedComplaint.studentName && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="flex items-start justify-between mb-6">
                     <div>
-                      <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Name</h3>
-                      <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentName}</p>
+                        <h2 className="text-xl font-bold text-white">{selectedComplaint.title}</h2>
+                        <p className="text-sm text-gray-400">{selectedComplaint.department} / {selectedComplaint.category}</p>
                     </div>
-                    {selectedComplaint.studentEmail && (
-                      <div>
-                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Email</h3>
-                        <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentEmail}</p>
-                      </div>
-                    )}
-                    {selectedComplaint.studentPhone && (
-                      <div>
-                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Phone</h3>
-                        <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentPhone}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                    <button onClick={() => setSelectedComplaint(null)} className="text-gray-400 hover:text-white transition-colors">
+                        <FiX size={24} />
+                    </button>
+                </div>
 
-                {selectedComplaint.source && (
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Source</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.source}</p>
-                  </div>
-                )}
-              </div>
+                <div className="space-y-4">
+                    <div>
+                        <h3 className="font-semibold text-white mb-2">Description</h3>
+                        <p className="text-gray-300 bg-gray-800 p-3 rounded-md">{selectedComplaint.description}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <h3 className="font-semibold text-white mb-2">Student Name</h3>
+                            <p className="text-gray-300">{selectedComplaint.studentName}</p>
+                        </div>
+                         <div>
+                            <h3 className="font-semibold text-white mb-2">Student Email</h3>
+                            <p className="text-gray-300">{selectedComplaint.studentEmail}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-white mb-2">Admin/HOD Notes</label>
+                        <textarea
+                          value={adminNotes}
+                          onChange={(e) => setAdminNotes(e.target.value)}
+                          className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                          rows={4}
+                          placeholder="Add notes here..."
+                        />
+                    </div>
+                </div>
 
-              <div className="mb-4 sm:mb-6">
-                <label className="block text-sm font-medium text-white mb-2">
-                  {isDepartmentHead ? 'Department Head Notes' : 'Admin Notes'}
-                </label>
-                <textarea
-                  value={adminNotes}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base"
-                  rows={3}
-                  placeholder="Add notes about this complaint..."
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
-                <button
-                  onClick={() => handleUpdateStatus('In Progress')}
-                  disabled={updating || selectedComplaint.status === 'In Progress'}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
-                >
-                  In Progress
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus('Resolved')}
-                  disabled={updating || selectedComplaint.status === 'Resolved'}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
-                >
-                  Mark Resolved
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus('Closed')}
-                  disabled={updating || selectedComplaint.status === 'Closed'}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
-                >
-                  Close
-                </button>
-                {selectedComplaint.status === 'submitted' && (
-                  <button
-                    onClick={() => handleUpdateStatus('In Progress')} 
-                    disabled={updating}
-                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
-                  >
-                    Start Review
-                  </button>
-                )}
-              </div>
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex gap-2">
+                        <button onClick={() => handleUpdateStatus('In Progress')} disabled={updating} className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50">In Progress</button>
+                        <button onClick={() => handleUpdateStatus('Resolved')} disabled={updating} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">Mark Resolved</button>
+                        <button onClick={() => handleUpdateStatus('Closed')} disabled={updating} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50">Close</button>
+                    </div>
+                     <p className="text-xs text-gray-500">
+                        Complaint ID: {selectedComplaint.id}
+                    </p>
+                </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-} 
+}

@@ -188,13 +188,13 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
           <div className="flex items-center justify-between p-4">
             <h1 className="text-xl font-bold">Mind Wall</h1>
             <div className="flex items-center space-x-2">
-              <button
+            <button
                 onClick={() => setShowAnalytics(true)}
                 className="px-3 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors flex items-center space-x-2"
               >
                 <FiBarChart className="text-lg" />
                 <span className="hidden sm:inline">Analytics</span>
-              </button>
+                      </button>
               <button
                 onClick={() => setShowAddForm(true)}
                 className="px-4 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors flex items-center space-x-2"
@@ -226,10 +226,10 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   <p className="text-gray-300 mb-4">{issue.description}</p>
                   
                   {/* Actions */}
-                  <div className="flex items-center space-x-4">
-                    <button
+                    <div className="flex items-center space-x-4">
+                      <button
                       onClick={() => handleVote(issue.id)}
-                      disabled={votingStates[issue.id]}
+                        disabled={votingStates[issue.id]}
                       className={`flex items-center space-x-2 transition-colors ${
                         issue.votedBy.includes(user?.uid || '') 
                           ? 'text-green-400' 
@@ -462,7 +462,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                       'Post'
                     )}
                   </button>
-                </div>
+        </div>
               </motion.div>
             </motion.div>
           )}

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DepartmentComplaints from '@/components/DepartmentComplaints';
 
 export default function DepartmentComplaintsPage() {
-  const { user, loading: authLoading, isAdmin } = useAuth();
+  const { user, loading: authLoading, isAdmin, isDepartmentHead } = useAuth();
   const router = useRouter();
 
   // Redirect if not logged in
@@ -18,12 +18,12 @@ export default function DepartmentComplaintsPage() {
     }
   }, [user, authLoading, router]);
 
-  // Redirect if not authorized (admin only for now)
+  // Redirect if not authorized - now includes department heads
   useEffect(() => {
-    if (!authLoading && user && !isAdmin) {
+    if (!authLoading && user && !isAdmin && !isDepartmentHead) {
       router.push('/dashboard');
     }
-  }, [user, authLoading, isAdmin, router]);
+  }, [user, authLoading, isAdmin, isDepartmentHead, router]);
 
   if (authLoading) {
     return (
@@ -36,13 +36,13 @@ export default function DepartmentComplaintsPage() {
     );
   }
 
-  if (!user || !isAdmin) {
+  if (!user || (!isAdmin && !isDepartmentHead)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
           <FiUsers className="text-gray-600 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-400 mb-2">Access Denied</h3>
-          <p className="text-gray-500">You need admin privileges to access this page</p>
+          <p className="text-gray-500">You need admin or department head privileges to access this page</p>
         </div>
       </div>
     );

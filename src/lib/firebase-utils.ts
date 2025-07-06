@@ -169,7 +169,7 @@ export interface DepartmentComplaint {
   departmentId: string;
   departmentCode?: string;  // Added for new schema
   category: string;
-  priority: 'Low' | 'Medium' | 'High' | 'Critical';  // Changed from severity to priority
+  severity: 'Low' | 'Medium' | 'High' | 'Critical';  // Changed from priority to severity to match Firebase
   title: string;
   description: string;
   status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed';
@@ -848,23 +848,44 @@ export const saveDepartment = async (departmentData: Omit<Department, 'id'>): Pr
 
 export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> => {
   try {
-    console.log('🔍 getDepartmentComplaints: Fetching all department complaints...');
+    console.log('🔍 getDepartmentComplaints: Starting to fetch all department complaints...');
+    
+    // First, let's check if the collection exists
+    const collectionRef = collection(db, 'departmentComplaints');
+    console.log('📊 getDepartmentComplaints: Collection reference created');
+    
     const complaintsQuery = query(
-      collection(db, 'departmentComplaints'), 
+      collectionRef, 
       orderBy('createdAt', 'desc')
     );
+    console.log('📊 getDepartmentComplaints: Query created with orderBy createdAt desc');
+    
     const querySnapshot = await getDocs(complaintsQuery);
-    console.log('📊 getDepartmentComplaints: Found', querySnapshot.size, 'complaints');
+    console.log('📊 getDepartmentComplaints: Query executed, found', querySnapshot.size, 'documents');
     
-    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
-      id: doc.id,
-      ...doc.data()
-    } as DepartmentComplaint));
+    if (querySnapshot.empty) {
+      console.log('📊 getDepartmentComplaints: No documents found in departmentComplaints collection');
+      return [];
+    }
     
-    console.log('📋 getDepartmentComplaints: Processed complaints:', complaints);
+    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => {
+      const data = doc.data();
+      console.log('📋 getDepartmentComplaints: Processing document', doc.id, ':', data);
+      return {
+        id: doc.id,
+        ...data
+      } as DepartmentComplaint;
+    });
+    
+    console.log('📋 getDepartmentComplaints: Final processed complaints:', complaints);
     return complaints;
   } catch (error) {
     console.error('❌ getDepartmentComplaints: Error getting department complaints:', error);
+    console.error('❌ getDepartmentComplaints: Error details:', {
+      name: (error as Error).name,
+      message: (error as Error).message,
+      stack: (error as Error).stack
+    });
     return [];
   }
 };

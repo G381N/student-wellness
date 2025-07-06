@@ -16,16 +16,24 @@ export default function DepartmentComplaints() {
   const [departmentInfo, setDepartmentInfo] = useState<any>(null);
 
   useEffect(() => {
-    if (user && (isAdmin || isDepartmentHead)) {
+    console.log('🔍 DepartmentComplaints useEffect triggered:', {
+      user: user?.email,
+      isAdmin,
+      isDepartmentHead,
+      userDepartment
+    });
+    
+    if (user) {
       fetchComplaints();
       if (isDepartmentHead && user.email) {
         // Get department info for department head
         checkDepartmentHeadStatus(user.email).then(({ department }) => {
+          console.log('🏢 Department info loaded:', department);
           setDepartmentInfo(department);
         });
       }
     }
-  }, [user, isAdmin, isDepartmentHead]);
+  }, [user, isAdmin, isDepartmentHead, userDepartment]);
 
   const fetchComplaints = async () => {
     try {
@@ -36,14 +44,14 @@ export default function DepartmentComplaints() {
         isAdmin,
         isDepartmentHead,
         userEmail: user?.email,
-        userRole: user?.email // Add debugging info
+        userDepartment
       });
       
       if (isAdmin) {
         // Admin can see all complaints
         console.log('👑 Admin - fetching all complaints');
         fetchedComplaints = await getDepartmentComplaints();
-        console.log('📋 All complaints fetched:', fetchedComplaints.length);
+        console.log('📋 All complaints fetched:', fetchedComplaints.length, fetchedComplaints);
       } else if (isDepartmentHead && user?.email) {
         // Department head can only see their department's complaints
         console.log('🏢 Department head - checking department status');
@@ -53,7 +61,7 @@ export default function DepartmentComplaints() {
         if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
           console.log('✅ Valid department head, fetching department complaints for:', deptHeadCheck.department.id);
           fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.id);
-          console.log('📋 Department complaints fetched:', fetchedComplaints.length);
+          console.log('📋 Department complaints fetched:', fetchedComplaints.length, fetchedComplaints);
         } else {
           console.log('❌ Not a valid department head');
         }
@@ -114,8 +122,8 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const getPriorityColor = (severity: string) => {
+    switch (severity) {
       case 'Low': return 'text-green-400 bg-green-900';
       case 'Medium': return 'text-yellow-400 bg-yellow-900';
       case 'High': return 'text-orange-400 bg-orange-900';
@@ -233,8 +241,8 @@ export default function DepartmentComplaints() {
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
-                        {complaint.priority}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(complaint.severity)}`}>
+                        {complaint.severity}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
                         {complaint.status}
@@ -324,9 +332,9 @@ export default function DepartmentComplaints() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Priority</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedComplaint.priority)}`}>
-                      {selectedComplaint.priority}
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Severity</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedComplaint.severity)}`}>
+                      {selectedComplaint.severity}
                     </span>
                   </div>
                   <div>

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import ModeratorAnnouncements from '@/components/ModeratorAnnouncements';
 
 export default function AnnouncementsPage() {
-  const { user, loading: authLoading, isModerator, isAdmin } = useAuth();
+  const { user, loading: authLoading, isModerator, isAdmin, isDepartmentHead } = useAuth();
   const router = useRouter();
 
   // Redirect if not logged in
@@ -18,12 +18,12 @@ export default function AnnouncementsPage() {
     }
   }, [user, authLoading, router]);
 
-  // Redirect if not authorized
+  // Redirect if not authorized - now includes department heads
   useEffect(() => {
-    if (!authLoading && user && !isModerator && !isAdmin) {
+    if (!authLoading && user && !isModerator && !isAdmin && !isDepartmentHead) {
       router.push('/dashboard');
     }
-  }, [user, authLoading, isModerator, isAdmin, router]);
+  }, [user, authLoading, isModerator, isAdmin, isDepartmentHead, router]);
 
   if (authLoading) {
     return (
@@ -36,13 +36,13 @@ export default function AnnouncementsPage() {
     );
   }
 
-  if (!user || (!isModerator && !isAdmin)) {
+  if (!user || (!isModerator && !isAdmin && !isDepartmentHead)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
           <FiBell className="text-gray-600 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-400 mb-2">Access Denied</h3>
-          <p className="text-gray-500">You need moderator or admin privileges to access this page</p>
+          <p className="text-gray-500">You need moderator, admin, or department head privileges to access this page</p>
         </div>
       </div>
     );

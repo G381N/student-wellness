@@ -184,7 +184,7 @@ export default function ActivitiesPage() {
           posts.map((post) => (
             <ActivityCard
               key={post.id}
-              post={post}
+              activity={post}
               onUpdate={handleUpdatePost}
               onDelete={handleDeletePost}
             />

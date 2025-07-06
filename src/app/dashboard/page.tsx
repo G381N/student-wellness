@@ -95,7 +95,13 @@ export default function DashboardPage() {
   };
 
   const getSearchResults = () => {
-    if (!searchQuery.trim()) return [];
+    if (!searchQuery.trim()) {
+      return {
+        posts: [],
+        issues: [],
+        totalResults: 0
+      };
+    }
     
     const query = searchQuery.toLowerCase();
     const filteredPosts = posts.filter(post => 
@@ -179,23 +185,23 @@ export default function DashboardPage() {
                     <div key={post.id}>
                       {post.type === 'activity' && (
                         <ActivityCard
-                          post={post}
+                          activity={post}
                           onUpdate={handleUpdatePost}
                           onDelete={handleDeletePost}
                         />
                       )}
                       {post.type === 'concern' && (
                         <ConcernCard
-                          post={post}
+                          concern={post}
                           onUpdate={handleUpdatePost}
                           onDelete={handleDeletePost}
                         />
                       )}
                       {(post.type === 'general' || post.type === 'post') && (
                         <TweetCard
-                          post={post}
+                          tweet={post}
                           onUpdate={handleUpdatePost}
-                          onDelete={handleDeletePost}
+                          onDelete={() => handleDeletePost(post.id)}
                         />
                       )}
                     </div>
@@ -291,23 +297,23 @@ export default function DashboardPage() {
               <div key={post.id}>
                 {post.type === 'activity' && (
                   <ActivityCard
-                    post={post}
+                    activity={post}
                     onUpdate={handleUpdatePost}
                     onDelete={handleDeletePost}
                   />
                 )}
                 {post.type === 'concern' && (
                   <ConcernCard
-                    post={post}
+                    concern={post}
                     onUpdate={handleUpdatePost}
                     onDelete={handleDeletePost}
                   />
                 )}
                 {(post.type === 'general' || post.type === 'post') && (
                   <TweetCard
-                    post={post}
+                    tweet={post}
                     onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
+                    onDelete={() => handleDeletePost(post.id)}
                   />
                 )}
               </div>

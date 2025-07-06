@@ -1,15 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    domains: ['firebasestorage.googleapis.com', 'lh3.googleusercontent.com'],
+  },
   eslint: {
-    // Disable ESLint during builds for production deployment
+    // Disable ESLint during builds
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Disable type checking during builds for production deployment
+    // Disable TypeScript errors during builds
     ignoreBuildErrors: true,
   },
-  images: {
-    domains: ['firebasestorage.googleapis.com'],
+  webpack: (config) => {
+    // Important: return the modified config
+    return config;
   },
 }
 

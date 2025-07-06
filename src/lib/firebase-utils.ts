@@ -16,7 +16,7 @@ import {
   QuerySnapshot,
   Timestamp,
   FieldValue,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot, DocumentData
 } from 'firebase/firestore';
 import { db, auth, storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -168,17 +168,20 @@ export interface DepartmentComplaint {
   studentPhone?: string;
   departmentId: string;
   departmentCode?: string;  // Added for new schema
+  department: string; // Add department name from Firebase
   category: string;
   severity: 'Low' | 'Medium' | 'High' | 'Critical';  // Changed from priority to severity to match Firebase
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed';
+  status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed'; // Reverted status to match firebase
   isResolved: boolean;
   createdAt: any;
   updatedAt: any;
   resolvedAt?: any;
   resolvedBy?: string;
   adminNotes?: string;
+  source?: string; // Added source field
+  timestamp?: any; // Added timestamp field if it exists in Firebase
 }
 
 export interface AnonymousComplaint {
@@ -958,16 +961,16 @@ export const updateDepartmentComplaintStatus = async (
 };
 
 // Get department complaints for specific department (for department heads)
-export const getDepartmentComplaintsByDepartment = async (departmentId: string): Promise<DepartmentComplaint[]> => {
+export const getDepartmentComplaintsByDepartment = async (departmentCode: string): Promise<DepartmentComplaint[]> => {
   try {
-    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department:', departmentId);
+    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department code:', departmentCode);
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
-      where('departmentId', '==', departmentId),
+      where('departmentCode', '==', departmentCode),
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department:', departmentId);
+    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department code:', departmentCode);
     
     const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
@@ -1148,7 +1151,7 @@ export const getGeneralPosts = async (): Promise<GeneralPost[]> => {
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(postsQuery);
-    return querySnapshot.docs.map((doc) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
       id: doc.id,
       ...doc.data()
     } as GeneralPost));

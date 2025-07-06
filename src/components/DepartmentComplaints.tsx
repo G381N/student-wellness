@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiUser, FiX, FiCheck, FiEye, FiBriefcase } from 'react-icons/fi';
-import { getDepartmentComplaints, getDepartmentComplaintsByDepartment, updateDepartmentComplaintStatus, DepartmentComplaint, checkDepartmentHeadStatus } from '@/lib/firebase-utils';
+import { getDepartmentComplaints, getDepartmentComplaintsByDepartment, updateDepartmentComplaintStatus, DepartmentComplaint, checkDepartmentHeadStatus, Department } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function DepartmentComplaints() {
@@ -13,7 +13,7 @@ export default function DepartmentComplaints() {
   const [selectedComplaint, setSelectedComplaint] = useState<DepartmentComplaint | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [updating, setUpdating] = useState(false);
-  const [departmentInfo, setDepartmentInfo] = useState<any>(null);
+  const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null);
 
   useEffect(() => {
     console.log('🔍 DepartmentComplaints useEffect triggered:', {
@@ -29,7 +29,7 @@ export default function DepartmentComplaints() {
         // Get department info for department head
         checkDepartmentHeadStatus(user.email).then(({ department }) => {
           console.log('🏢 Department info loaded:', department);
-          setDepartmentInfo(department);
+          setDepartmentInfo(department || null);
         });
       }
     }
@@ -47,15 +47,11 @@ export default function DepartmentComplaints() {
         userDepartment
       });
       
-      // ALWAYS fetch all complaints for debugging first
-      console.log('👑 Fetching ALL complaints for debugging...');
-      const allComplaints = await getDepartmentComplaints();
-      console.log('📋 ALL complaints in collection:', allComplaints.length, allComplaints);
-      
       if (isAdmin) {
         // Admin can see all complaints
-        console.log('👑 Admin - using all complaints');
-        fetchedComplaints = allComplaints;
+        console.log('👑 Admin - fetching all complaints');
+        fetchedComplaints = await getDepartmentComplaints();
+        console.log('📋 All complaints fetched:', fetchedComplaints.length, fetchedComplaints);
       } else if (isDepartmentHead && user?.email) {
         // Department head can only see their department's complaints
         console.log('🏢 Department head - checking department status');
@@ -63,27 +59,9 @@ export default function DepartmentComplaints() {
         console.log('🔍 Department head check result:', deptHeadCheck);
         
         if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
-          console.log('✅ Valid department head, fetching department complaints for:', deptHeadCheck.department.id);
-          
-          // Let's also try filtering from all complaints locally to debug
-          const filteredComplaints = allComplaints.filter(complaint => 
-            complaint.departmentId === deptHeadCheck.department!.id
-          );
-          console.log('🔍 Locally filtered complaints:', filteredComplaints);
-          
-          // Use the Firebase query
-          fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.id);
-          console.log('📋 Department complaints from Firebase query:', fetchedComplaints.length, fetchedComplaints);
-          
-          // If no complaints from query but we have all complaints, let's debug the department IDs
-          if (fetchedComplaints.length === 0 && allComplaints.length > 0) {
-            console.log('🚨 DEBUG: No complaints found via query, but collection has data');
-            console.log('🚨 Looking for departmentId:', deptHeadCheck.department.id);
-            console.log('🚨 Available departmentIds in complaints:', allComplaints.map(c => c.departmentId));
-            
-            // Temporarily use filtered complaints for debugging
-            fetchedComplaints = filteredComplaints;
-          }
+          console.log('✅ Valid department head, fetching department complaints for:', deptHeadCheck.department.code);
+          fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.code);
+          console.log('📋 Department complaints fetched:', fetchedComplaints.length, fetchedComplaints);
         } else {
           console.log('❌ Not a valid department head');
         }
@@ -117,7 +95,8 @@ export default function DepartmentComplaints() {
               adminNotes, 
               isResolved: status === 'Resolved',
               resolvedBy: status === 'Resolved' ? resolvedBy : complaint.resolvedBy,
-              resolvedAt: status === 'Resolved' ? new Date() : complaint.resolvedAt
+              resolvedAt: status === 'Resolved' ? new Date() : complaint.resolvedAt,
+              updatedAt: new Date(),
             }
           : complaint
       ));
@@ -144,7 +123,7 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const getPriorityColor = (severity: string) => {
+  const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'Low': return 'text-green-400 bg-green-900';
       case 'Medium': return 'text-yellow-400 bg-yellow-900';
@@ -236,34 +215,43 @@ export default function DepartmentComplaints() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-base sm:text-lg font-semibold text-white">{complaint.title}</h3>
-                      {complaint.departmentCode && (
+                      {complaint.department && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
-                          {complaint.departmentCode}
+                          {complaint.department}
                         </span>
                       )}
                     </div>
                     
                     <p className="text-sm sm:text-base text-gray-300 mb-4">{complaint.description}</p>
                     
-                    <div className="mb-4 p-3 bg-gray-800 rounded-lg">
-                      <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <FiUser className="text-xs" />
-                          <span><strong>Student:</strong> {complaint.studentName}</span>
+                    {complaint.studentName && (
+                      <div className="mb-4 p-3 bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                          <div className="flex items-center gap-1">
+                            <FiUser className="text-xs" />
+                            <span><strong>Student:</strong> {complaint.studentName}</span>
+                          </div>
+                          {complaint.studentEmail && (
+                            <div>
+                              <strong>Email:</strong> {complaint.studentEmail}
+                            </div>
+                          )}
+                          {complaint.studentPhone && (
+                            <div>
+                              <strong>Phone:</strong> {complaint.studentPhone}
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <strong>Email:</strong> {complaint.studentEmail}
-                        </div>
-                        {complaint.studentPhone && (
-                          <div>
-                            <strong>Phone:</strong> {complaint.studentPhone}
+                        {complaint.source && (
+                          <div className="mt-2 text-xs text-gray-500">
+                            <strong>Source:</strong> {complaint.source}
                           </div>
                         )}
                       </div>
-                    </div>
+                    )}
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(complaint.severity)}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(complaint.severity)}`}>
                         {complaint.severity}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
@@ -276,7 +264,7 @@ export default function DepartmentComplaints() {
                     
                     <div className="flex items-center text-xs sm:text-sm text-gray-500">
                       <FiClock className="mr-1" />
-                      {formatTimestamp(complaint.createdAt)}
+                      {formatTimestamp(complaint.createdAt || complaint.timestamp)}
                     </div>
                   </div>
                   
@@ -344,7 +332,7 @@ export default function DepartmentComplaints() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Department</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.departmentCode || 'N/A'}</p>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.department || 'N/A'}</p>
                   </div>
                   <div>
                     <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Category</h3>
@@ -355,7 +343,7 @@ export default function DepartmentComplaints() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Severity</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedComplaint.severity)}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedComplaint.severity)}`}>
                       {selectedComplaint.severity}
                     </span>
                   </div>
@@ -367,21 +355,31 @@ export default function DepartmentComplaints() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Name</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentName}</p>
+                {selectedComplaint.studentName && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Name</h3>
+                      <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentName}</p>
+                    </div>
+                    {selectedComplaint.studentEmail && (
+                      <div>
+                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Email</h3>
+                        <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentEmail}</p>
+                      </div>
+                    )}
+                    {selectedComplaint.studentPhone && (
+                      <div>
+                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Phone</h3>
+                        <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentPhone}</p>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Email</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentEmail}</p>
-                  </div>
-                </div>
+                )}
 
-                {selectedComplaint.studentPhone && (
+                {selectedComplaint.source && (
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Phone</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentPhone}</p>
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Source</h3>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.source}</p>
                   </div>
                 )}
               </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiUser, FiX, FiCheck, FiEye, FiBriefcase } from 'react-icons/fi';
-import { getDepartmentComplaints, updateDepartmentComplaintStatus, DepartmentComplaint } from '@/lib/firebase-utils';
+import { getDepartmentComplaints, getDepartmentComplaintsByDepartment, updateDepartmentComplaintStatus, DepartmentComplaint, checkDepartmentHeadStatus } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function DepartmentComplaints() {
@@ -13,17 +13,36 @@ export default function DepartmentComplaints() {
   const [selectedComplaint, setSelectedComplaint] = useState<DepartmentComplaint | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [departmentInfo, setDepartmentInfo] = useState<any>(null);
 
   useEffect(() => {
-    if (isAdmin || isDepartmentHead) {
+    if (user && (isAdmin || isDepartmentHead)) {
       fetchComplaints();
+      if (isDepartmentHead && user.email) {
+        // Get department info for department head
+        checkDepartmentHeadStatus(user.email).then(({ department }) => {
+          setDepartmentInfo(department);
+        });
+      }
     }
-  }, [isAdmin, isDepartmentHead]);
+  }, [user, isAdmin, isDepartmentHead]);
 
   const fetchComplaints = async () => {
     try {
       setLoading(true);
-      const fetchedComplaints = await getDepartmentComplaints();
+      let fetchedComplaints: DepartmentComplaint[] = [];
+      
+      if (isAdmin) {
+        // Admin can see all complaints
+        fetchedComplaints = await getDepartmentComplaints();
+      } else if (isDepartmentHead && user?.email) {
+        // Department head can only see their department's complaints
+        const deptHeadCheck = await checkDepartmentHeadStatus(user.email);
+        if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
+          fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.id);
+        }
+      }
+      
       setComplaints(fetchedComplaints);
     } catch (error) {
       console.error('Error fetching department complaints:', error);
@@ -32,17 +51,25 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const handleUpdateStatus = async (status: 'Open' | 'Under Review' | 'Resolved' | 'Closed') => {
+  const handleUpdateStatus = async (status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed') => {
     if (!selectedComplaint) return;
 
     try {
       setUpdating(true);
-      await updateDepartmentComplaintStatus(selectedComplaint.id, status, adminNotes);
+      const resolvedBy = user?.displayName || user?.email || 'Unknown';
+      await updateDepartmentComplaintStatus(selectedComplaint.id, status, adminNotes, resolvedBy);
       
       // Update local state
       setComplaints(complaints.map(complaint => 
         complaint.id === selectedComplaint.id 
-          ? { ...complaint, status, adminNotes, resolved: status === 'Resolved' }
+          ? { 
+              ...complaint, 
+              status, 
+              adminNotes, 
+              isResolved: status === 'Resolved',
+              resolvedBy: status === 'Resolved' ? resolvedBy : complaint.resolvedBy,
+              resolvedAt: status === 'Resolved' ? new Date() : complaint.resolvedAt
+            }
           : complaint
       ));
       
@@ -68,8 +95,8 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
       case 'Low': return 'text-green-400 bg-green-900';
       case 'Medium': return 'text-yellow-400 bg-yellow-900';
       case 'High': return 'text-orange-400 bg-orange-900';
@@ -80,8 +107,8 @@ export default function DepartmentComplaints() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Open': return 'text-blue-400 bg-blue-900';
-      case 'Under Review': return 'text-yellow-400 bg-yellow-900';
+      case 'Pending': return 'text-blue-400 bg-blue-900';
+      case 'In Progress': return 'text-yellow-400 bg-yellow-900';
       case 'Resolved': return 'text-green-400 bg-green-900';
       case 'Closed': return 'text-gray-400 bg-gray-900';
       default: return 'text-gray-400 bg-gray-900';
@@ -123,14 +150,14 @@ export default function DepartmentComplaints() {
           <p className="text-sm sm:text-base text-gray-400">
             {isAdmin 
               ? 'Manage and review complaints from all departments' 
-              : `Manage complaints for ${userDepartment} department`
+              : `Manage complaints for ${departmentInfo?.name || 'your'} department`
             }
           </p>
-          {isDepartmentHead && (
+          {isDepartmentHead && departmentInfo && (
             <div className="mt-3 p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
               <p className="text-blue-300 text-sm">
                 <FiBriefcase className="inline mr-2" />
-                You can only view and manage complaints for your assigned department: <strong>{userDepartment}</strong>
+                You can only view and manage complaints for your assigned department: <strong>{departmentInfo.name}</strong>
               </p>
             </div>
           )}
@@ -142,7 +169,7 @@ export default function DepartmentComplaints() {
             <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Department Complaints</h3>
             <p className="text-sm sm:text-base text-gray-400">
               {isDepartmentHead 
-                ? `There are currently no complaints for the ${userDepartment} department.`
+                ? `There are currently no complaints for the ${departmentInfo?.name || 'your'} department.`
                 : 'There are currently no department complaints to review.'
               }
             </p>
@@ -160,37 +187,35 @@ export default function DepartmentComplaints() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-base sm:text-lg font-semibold text-white">{complaint.title}</h3>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
-                        {complaint.department}
-                      </span>
+                      {complaint.departmentCode && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
+                          {complaint.departmentCode}
+                        </span>
+                      )}
                     </div>
                     
                     <p className="text-sm sm:text-base text-gray-300 mb-4">{complaint.description}</p>
                     
-                    {complaint.studentName && (
-                      <div className="mb-4 p-3 bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-4 text-sm text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <FiUser className="text-xs" />
-                            <span><strong>Student:</strong> {complaint.studentName}</span>
-                          </div>
-                          {complaint.studentPhone && (
-                            <div>
-                              <strong>Phone:</strong> {complaint.studentPhone}
-                            </div>
-                          )}
+                    <div className="mb-4 p-3 bg-gray-800 rounded-lg">
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <FiUser className="text-xs" />
+                          <span><strong>Student:</strong> {complaint.studentName}</span>
                         </div>
-                        {complaint.source && (
-                          <div className="mt-2 text-xs text-gray-500">
-                            <strong>Source:</strong> {complaint.source}
+                        <div>
+                          <strong>Email:</strong> {complaint.studentEmail}
+                        </div>
+                        {complaint.studentPhone && (
+                          <div>
+                            <strong>Phone:</strong> {complaint.studentPhone}
                           </div>
                         )}
                       </div>
-                    )}
+                    </div>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(complaint.severity)}`}>
-                        {complaint.severity}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
+                        {complaint.priority}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
                         {complaint.status}
@@ -202,7 +227,7 @@ export default function DepartmentComplaints() {
                     
                     <div className="flex items-center text-xs sm:text-sm text-gray-500">
                       <FiClock className="mr-1" />
-                      {formatTimestamp(complaint.timestamp)}
+                      {formatTimestamp(complaint.createdAt)}
                     </div>
                   </div>
                   
@@ -221,7 +246,7 @@ export default function DepartmentComplaints() {
                 {complaint.adminNotes && (
                   <div className="mt-4 p-3 bg-gray-800 rounded-lg border-l-4 border-blue-500">
                     <p className="text-xs sm:text-sm text-gray-300">
-                      <strong className="text-blue-400">Admin Notes:</strong> {complaint.adminNotes}
+                      <strong className="text-blue-400">{isDepartmentHead ? 'Department Head Notes:' : 'Admin Notes:'}</strong> {complaint.adminNotes}
                     </p>
                   </div>
                 )}
@@ -270,7 +295,7 @@ export default function DepartmentComplaints() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Department</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.department}</p>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.departmentCode || 'N/A'}</p>
                   </div>
                   <div>
                     <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Category</h3>
@@ -280,9 +305,9 @@ export default function DepartmentComplaints() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Severity</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedComplaint.severity)}`}>
-                      {selectedComplaint.severity}
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Priority</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedComplaint.priority)}`}>
+                      {selectedComplaint.priority}
                     </span>
                   </div>
                   <div>
@@ -293,25 +318,21 @@ export default function DepartmentComplaints() {
                   </div>
                 </div>
 
-                {selectedComplaint.studentName && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                      <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Name</h3>
-                      <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentName}</p>
-                    </div>
-                    {selectedComplaint.studentPhone && (
-                      <div>
-                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Phone</h3>
-                        <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentPhone}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {selectedComplaint.source && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Source</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.source}</p>
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Name</h3>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentName}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Email</h3>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentEmail}</p>
+                  </div>
+                </div>
+
+                {selectedComplaint.studentPhone && (
+                  <div>
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Student Phone</h3>
+                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.studentPhone}</p>
                   </div>
                 )}
               </div>
@@ -331,11 +352,11 @@ export default function DepartmentComplaints() {
 
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                 <button
-                  onClick={() => handleUpdateStatus('Under Review')}
+                  onClick={() => handleUpdateStatus('In Progress')}
                   disabled={updating}
                   className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
-                  Under Review
+                  In Progress
                 </button>
                 <button
                   onClick={() => handleUpdateStatus('Resolved')}

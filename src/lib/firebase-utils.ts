@@ -863,9 +863,9 @@ export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> 
     
     const complaintsQuery = query(
       collectionRef, 
-      orderBy('createdAt', 'desc')
+      orderBy('timestamp', 'desc') // FIX: Order by 'timestamp' to match bot data
     );
-    console.log('📊 getDepartmentComplaints: Query created with orderBy createdAt desc');
+    console.log("📊 getDepartmentComplaints: Query created with orderBy 'timestamp' desc");
     
     const querySnapshot = await getDocs(complaintsQuery);
     console.log('📊 getDepartmentComplaints: Query executed, found', querySnapshot.size, 'documents');
@@ -972,7 +972,7 @@ export const getDepartmentComplaintsByDepartment = async (departmentName: string
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
       where('department', '==', departmentName), // Changed to 'department' field
-      orderBy('createdAt', 'desc')
+      orderBy('timestamp', 'desc') // FIX: Order by 'timestamp' to match bot data
     );
     const querySnapshot = await getDocs(complaintsQuery);
     console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department NAME:', departmentName);

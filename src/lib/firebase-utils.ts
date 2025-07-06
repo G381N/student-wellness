@@ -853,9 +853,13 @@ export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> 
   try {
     console.log('🔍 getDepartmentComplaints: Starting to fetch all department complaints...');
     
+    // Access Firebase project ID for debugging
+    const appConfig = db.app.options;
+    console.log('📊 getDepartmentComplaints: Connected to Firebase Project ID:', appConfig.projectId);
+
     // First, let's check if the collection exists
     const collectionRef = collection(db, 'departmentComplaints');
-    console.log('📊 getDepartmentComplaints: Collection reference created');
+    console.log('📊 getDepartmentComplaints: Collection reference created at path:', collectionRef.path);
     
     const complaintsQuery = query(
       collectionRef, 
@@ -867,7 +871,7 @@ export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> 
     console.log('📊 getDepartmentComplaints: Query executed, found', querySnapshot.size, 'documents');
     
     if (querySnapshot.empty) {
-      console.log('📊 getDepartmentComplaints: No documents found in departmentComplaints collection');
+      console.log('📊 getDepartmentComplaints: No documents found in departmentComplaints collection for project:', appConfig.projectId);
       return [];
     }
     
@@ -887,7 +891,8 @@ export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> 
     console.error('❌ getDepartmentComplaints: Error details:', {
       name: (error as Error).name,
       message: (error as Error).message,
-      stack: (error as Error).stack
+      stack: (error as Error).stack,
+      projectId: db.app.options.projectId // Also log project ID in error
     });
     return [];
   }
@@ -961,16 +966,16 @@ export const updateDepartmentComplaintStatus = async (
 };
 
 // Get department complaints for specific department (for department heads)
-export const getDepartmentComplaintsByDepartment = async (departmentCode: string): Promise<DepartmentComplaint[]> => {
+export const getDepartmentComplaintsByDepartment = async (departmentName: string): Promise<DepartmentComplaint[]> => {
   try {
-    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department code:', departmentCode);
+    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department NAME:', departmentName);
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
-      where('departmentCode', '==', departmentCode),
+      where('department', '==', departmentName),
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department code:', departmentCode);
+    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department NAME:', departmentName);
     
     const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,

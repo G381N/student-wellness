@@ -209,7 +209,7 @@ export default function ManageModerators() {
                       </div>
                       <div className="flex items-center">
                         <FiCalendar className="mr-2 flex-shrink-0" />
-                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.assignedAt)}</span>
+                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.addedAt)}</span>
                       </div>
                     </div>
                     <div className="flex items-center mt-2">

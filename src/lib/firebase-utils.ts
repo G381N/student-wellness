@@ -170,10 +170,10 @@ export interface DepartmentComplaint {
   departmentCode?: string;  // Added for new schema
   department: string; // Add department name from Firebase
   category: string;
-  severity: 'Low' | 'Medium' | 'High' | 'Critical';  // Changed from priority to severity to match Firebase
+  urgency: 'Low' | 'Medium' | 'High' | 'Critical';  // Changed from severity to urgency to match Firebase
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed'; // Reverted status to match firebase
+  status: 'submitted' | 'Pending' | 'In Progress' | 'Resolved' | 'Closed'; // Added 'submitted' status
   isResolved: boolean;
   createdAt: any;
   updatedAt: any;

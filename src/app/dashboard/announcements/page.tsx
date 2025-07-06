@@ -18,7 +18,7 @@ export default function AnnouncementsPage() {
     }
   }, [user, authLoading, router]);
 
-  // Redirect if not authorized - now includes department heads
+  // Redirect if not authorized
   useEffect(() => {
     if (!authLoading && user && !isModerator && !isAdmin && !isDepartmentHead) {
       router.push('/dashboard');
@@ -36,6 +36,7 @@ export default function AnnouncementsPage() {
     );
   }
 
+  // Check for access based on roles
   if (!user || (!isModerator && !isAdmin && !isDepartmentHead)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">

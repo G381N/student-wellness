@@ -78,7 +78,7 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const handleUpdateStatus = async (status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed') => {
+  const handleUpdateStatus = async (status: 'submitted' | 'Pending' | 'In Progress' | 'Resolved' | 'Closed') => {
     if (!selectedComplaint) return;
 
     try {
@@ -123,8 +123,8 @@ export default function DepartmentComplaints() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
       case 'Low': return 'text-green-400 bg-green-900';
       case 'Medium': return 'text-yellow-400 bg-yellow-900';
       case 'High': return 'text-orange-400 bg-orange-900';
@@ -135,6 +135,7 @@ export default function DepartmentComplaints() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'submitted': return 'text-purple-400 bg-purple-900'; // New status color
       case 'Pending': return 'text-blue-400 bg-blue-900';
       case 'In Progress': return 'text-yellow-400 bg-yellow-900';
       case 'Resolved': return 'text-green-400 bg-green-900';
@@ -251,8 +252,8 @@ export default function DepartmentComplaints() {
                     )}
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(complaint.severity)}`}>
-                        {complaint.severity}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(complaint.urgency)}`}>
+                        {complaint.urgency}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
                         {complaint.status}
@@ -342,9 +343,9 @@ export default function DepartmentComplaints() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Severity</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedComplaint.severity)}`}>
-                      {selectedComplaint.severity}
+                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Urgency</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(selectedComplaint.urgency)}`}>
+                      {selectedComplaint.urgency}
                     </span>
                   </div>
                   <div>
@@ -400,25 +401,34 @@ export default function DepartmentComplaints() {
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                 <button
                   onClick={() => handleUpdateStatus('In Progress')}
-                  disabled={updating}
+                  disabled={updating || selectedComplaint.status === 'In Progress'}
                   className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   In Progress
                 </button>
                 <button
                   onClick={() => handleUpdateStatus('Resolved')}
-                  disabled={updating}
+                  disabled={updating || selectedComplaint.status === 'Resolved'}
                   className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   Mark Resolved
                 </button>
                 <button
                   onClick={() => handleUpdateStatus('Closed')}
-                  disabled={updating}
+                  disabled={updating || selectedComplaint.status === 'Closed'}
                   className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   Close
                 </button>
+                {selectedComplaint.status === 'submitted' && (
+                  <button
+                    onClick={() => handleUpdateStatus('In Progress')}
+                    disabled={updating}
+                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
+                  >
+                    Start Review
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>

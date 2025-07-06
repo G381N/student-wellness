@@ -21,7 +21,7 @@ interface Announcement {
 }
 
 export default function ModeratorAnnouncements() {
-  const { isModerator, isAdmin, user } = useAuth();
+  const { isModerator, isAdmin, user, isDepartmentHead } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -186,12 +186,12 @@ export default function ModeratorAnnouncements() {
     }
   };
 
-  if (!isModerator && !isAdmin) {
+  if (!isModerator && !isAdmin && !isDepartmentHead) {
     return (
       <div className="p-8 text-center">
         <FiAlertTriangle className="text-red-500 text-4xl mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
-        <p className="text-gray-400">Only moderators and administrators can view announcements.</p>
+        <p className="text-gray-400">Only moderators, administrators, or department heads can view announcements.</p>
       </div>
     );
   }

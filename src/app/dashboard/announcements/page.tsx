@@ -21,7 +21,8 @@ export default function AnnouncementsPage() {
   // Redirect if not authorized
   useEffect(() => {
     if (!authLoading && user && !isModerator && !isAdmin && !isDepartmentHead) {
-      router.push('/dashboard');
+      // Removed router.push('/dashboard') to allow debugging of access state.
+      // The Access Denied message will be shown by the render logic below.
     }
   }, [user, authLoading, isModerator, isAdmin, isDepartmentHead, router]);
 

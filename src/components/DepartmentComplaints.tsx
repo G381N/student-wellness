@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiUser, FiX, FiCheck, FiEye, FiBriefcase } from 'react-icons/fi';
+// Make sure these imports are correct and include 'Department' interface
 import { getDepartmentComplaints, getDepartmentComplaintsByDepartment, updateDepartmentComplaintStatus, DepartmentComplaint, checkDepartmentHeadStatus, Department } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -13,6 +14,7 @@ export default function DepartmentComplaints() {
   const [selectedComplaint, setSelectedComplaint] = useState<DepartmentComplaint | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [updating, setUpdating] = useState(false);
+  // Type departmentInfo correctly as Department or null
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null);
 
   useEffect(() => {
@@ -20,16 +22,16 @@ export default function DepartmentComplaints() {
       user: user?.email,
       isAdmin,
       isDepartmentHead,
-      userDepartment
+      userDepartment // This will be the ID, not the code initially
     });
     
     if (user) {
       fetchComplaints();
       if (isDepartmentHead && user.email) {
-        // Get department info for department head
+        // Get full department info (including code) for department head
         checkDepartmentHeadStatus(user.email).then(({ department }) => {
-          console.log('🏢 Department info loaded:', department);
-          setDepartmentInfo(department || null);
+          console.log('🏢 Department info loaded from checkDepartmentHeadStatus:', department);
+          setDepartmentInfo(department || null); // Ensure it's null if department is undefined
         });
       }
     }
@@ -56,17 +58,18 @@ export default function DepartmentComplaints() {
         // Department head can only see their department's complaints
         console.log('🏢 Department head - checking department status');
         const deptHeadCheck = await checkDepartmentHeadStatus(user.email);
-        console.log('🔍 Department head check result:', deptHeadCheck);
+        console.log('🔍 Department head check result: ', deptHeadCheck);
         
         if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
-          console.log('✅ Valid department head, fetching department complaints for:', deptHeadCheck.department.code);
+          // Use department.code for fetching complaints
+          console.log('✅ Valid department head, fetching department complaints for department code:', deptHeadCheck.department.code);
           fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.code);
           console.log('📋 Department complaints fetched:', fetchedComplaints.length, fetchedComplaints);
         } else {
-          console.log('❌ Not a valid department head');
+          console.log('❌ Not a valid department head or department info missing.');
         }
       } else {
-        console.log('❌ No access - not admin or department head');
+        console.log('❌ No access - not admin or department head.');
       }
       
       console.log('📊 Final complaints to display:', fetchedComplaints);
@@ -78,6 +81,7 @@ export default function DepartmentComplaints() {
     }
   };
 
+  // Status values now include 'submitted'
   const handleUpdateStatus = async (status: 'submitted' | 'Pending' | 'In Progress' | 'Resolved' | 'Closed') => {
     if (!selectedComplaint) return;
 
@@ -96,7 +100,7 @@ export default function DepartmentComplaints() {
               isResolved: status === 'Resolved',
               resolvedBy: status === 'Resolved' ? resolvedBy : complaint.resolvedBy,
               resolvedAt: status === 'Resolved' ? new Date() : complaint.resolvedAt,
-              updatedAt: new Date(),
+              updatedAt: new Date(), // Ensure updatedAt is set on status change
             }
           : complaint
       ));
@@ -123,6 +127,7 @@ export default function DepartmentComplaints() {
     }
   };
 
+  // Renamed from getPriorityColor to getUrgencyColor
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'Low': return 'text-green-400 bg-green-900';
@@ -135,7 +140,7 @@ export default function DepartmentComplaints() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'submitted': return 'text-purple-400 bg-purple-900'; // New status color
+      case 'submitted': return 'text-purple-400 bg-purple-900'; // New status color for 'submitted'
       case 'Pending': return 'text-blue-400 bg-blue-900';
       case 'In Progress': return 'text-yellow-400 bg-yellow-900';
       case 'Resolved': return 'text-green-400 bg-green-900';
@@ -216,6 +221,7 @@ export default function DepartmentComplaints() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-base sm:text-lg font-semibold text-white">{complaint.title}</h3>
+                      {/* Display department name from complaint */}
                       {complaint.department && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
                           {complaint.department}
@@ -265,6 +271,7 @@ export default function DepartmentComplaints() {
                     
                     <div className="flex items-center text-xs sm:text-sm text-gray-500">
                       <FiClock className="mr-1" />
+                      {/* Use createdAt or timestamp, depending on what's available */}
                       {formatTimestamp(complaint.createdAt || complaint.timestamp)}
                     </div>
                   </div>
@@ -422,7 +429,7 @@ export default function DepartmentComplaints() {
                 </button>
                 {selectedComplaint.status === 'submitted' && (
                   <button
-                    onClick={() => handleUpdateStatus('In Progress')}
+                    onClick={() => handleUpdateStatus('In Progress')} 
                     disabled={updating}
                     className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                   >

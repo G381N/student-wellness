@@ -1,14 +1,14 @@
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
   serverTimestamp,
   getDoc,
   onSnapshot,
@@ -16,7 +16,8 @@ import {
   QuerySnapshot,
   Timestamp,
   FieldValue,
-  QueryDocumentSnapshot, DocumentData
+  QueryDocumentSnapshot,
+  DocumentData // Explicitly import DocumentData
 } from 'firebase/firestore';
 import { db, auth, storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -70,7 +71,7 @@ export interface User {
   bio?: string;
   createdAt: any;
   lastLogin?: any;  // Add lastLogin
-  department?: string;  // Add department field
+  department?: string;  // Add department field (this stores the ID)
   role?: 'user' | 'student' | 'moderator' | 'admin' | 'department_head';
 }
 
@@ -132,7 +133,7 @@ export interface MindWallIssue {
   authorId: string;
   isAnonymous?: boolean;
   status?: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
-  severity?: 'Low' | 'Medium' | 'High' | 'Critical';
+  urgency?: 'Low' | 'Medium' | 'High' | 'Critical'; // Changed from severity to urgency
   updatedAt?: any;
   resolvedAt?: any;
   resolvedBy?: string;
@@ -288,7 +289,7 @@ export const upvotePost = async (postId: string): Promise<boolean> => {
       throw new Error('Post not found');
     }
     
-    const postData = postDoc.data();
+      const postData = postDoc.data();
     const upvotedBy = postData.upvotedBy || [];
     const downvotedBy = postData.downvotedBy || [];
     const hasUpvoted = upvotedBy.includes(user.uid);
@@ -342,7 +343,7 @@ export const downvotePost = async (postId: string): Promise<boolean> => {
       throw new Error('Post not found');
     }
     
-    const postData = postDoc.data();
+      const postData = postDoc.data();
     const upvotedBy = postData.upvotedBy || [];
     const downvotedBy = postData.downvotedBy || [];
     const hasUpvoted = upvotedBy.includes(user.uid);
@@ -395,10 +396,10 @@ export const getPosts = async (): Promise<Post[]> => {
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(postsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc here
       id: doc.id,
       ...doc.data()
-    } as Post));
+    }) as Post);
   } catch (error) {
     console.error('Error getting posts:', error);
     return [];
@@ -432,7 +433,6 @@ export const addPost = async (postData: Omit<Post, 'id'>): Promise<Post> => {
       downvotes: 0,
       upvotedBy: [],
       downvotedBy: [],
-      votedUsers: [],
       comments: [],
       isAnonymous: postData.isAnonymous || false,
       type: postData.type || 'general',
@@ -645,10 +645,10 @@ export const getMindWallIssues = async (): Promise<MindWallIssue[]> => {
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(issuesQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
       ...doc.data()
-    } as MindWallIssue));
+    }) as MindWallIssue);
   } catch (error) {
     console.error('Error getting mind wall issues:', error);
     return [];
@@ -711,7 +711,7 @@ export const voteMindWallIssue = async (issueId: string): Promise<boolean | null
           votedBy: votedBy.filter((id: string) => id !== userId)
         });
         return false;
-      } else {
+        } else {
         // Add vote
         await updateDoc(issueRef, {
           count: (issueData.count || 0) + 1,
@@ -748,10 +748,10 @@ export const getModerators = async (): Promise<Moderator[]> => {
       orderBy('assignedAt', 'desc')
     );
     const querySnapshot = await getDocs(moderatorsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
       ...doc.data()
-    } as Moderator));
+    }) as Moderator);
   } catch (error) {
     console.error('Error getting moderators:', error);
     return [];
@@ -793,10 +793,10 @@ export const getDepartments = async (): Promise<Department[]> => {
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(deptQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
       ...doc.data()
-    } as Department));
+    }) as Department);
   } catch (error) {
     console.error('Error getting departments:', error);
     return [];
@@ -871,11 +871,11 @@ export const getDepartmentComplaints = async (): Promise<DepartmentComplaint[]> 
       return [];
     }
     
-    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => {
+    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => { // Explicitly type doc
       const data = doc.data();
       console.log('📋 getDepartmentComplaints: Processing document', doc.id, ':', data);
       return {
-        id: doc.id,
+      id: doc.id,
         ...data
       } as DepartmentComplaint;
     });
@@ -899,7 +899,7 @@ export const addDepartmentComplaint = async (complaintData: Omit<DepartmentCompl
       ...complaintData,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      status: 'Pending',
+      status: 'submitted', // Default status for new complaints from bot
       isResolved: false
     });
     return docRef.id;
@@ -927,7 +927,7 @@ export const updateDepartmentComplaintStatus = async (
     };
     
     if (notes) {
-      updateData.hodNotes = notes;
+      updateData.hodNotes = notes; // Ensure this matches your Firebase field if any
     }
     
     if (status === 'Resolved' && resolvedBy) {
@@ -972,10 +972,10 @@ export const getDepartmentComplaintsByDepartment = async (departmentCode: string
     const querySnapshot = await getDocs(complaintsQuery);
     console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department code:', departmentCode);
     
-    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
       ...doc.data()
-    } as DepartmentComplaint));
+    }) as DepartmentComplaint);
     
     console.log('📋 getDepartmentComplaintsByDepartment: Processed complaints:', complaints);
     return complaints;
@@ -996,10 +996,10 @@ export const getAnonymousComplaints = async (): Promise<AnonymousComplaint[]> =>
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
       ...doc.data()
-    } as AnonymousComplaint));
+    }) as AnonymousComplaint);
   } catch (error) {
     console.error('Error getting anonymous complaints:', error);
     return [];
@@ -1068,7 +1068,7 @@ export const deleteExpiredActivities = async (): Promise<void> => {
     const querySnapshot = await getDocs(activitiesQuery);
     const expiredActivities: string[] = [];
     
-    querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
+    querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => { // Explicitly type doc
       const data = doc.data();
       if (data.activityDate) {
         const activityDate = processTimestamp(data.activityDate);
@@ -1122,8 +1122,8 @@ export const addGeneralPost = async (postData: Omit<GeneralPost, 'id'>): Promise
       content: postData.content.trim(),
       category: postData.category.trim(),
       author: displayName,
-      authorName: displayName,
       authorId: user.uid,
+      authorName: displayName,
       timestamp: new Date().toISOString(),
       upvotes: 0,
       downvotes: 0,
@@ -1151,10 +1151,10 @@ export const getGeneralPosts = async (): Promise<GeneralPost[]> => {
       orderBy('timestamp', 'desc')
     );
     const querySnapshot = await getDocs(postsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
       ...doc.data()
-    } as GeneralPost));
+    }) as GeneralPost);
   } catch (error) {
     console.error('Error getting general posts:', error);
     return [];

@@ -40,7 +40,7 @@ export default function DepartmentComplaints() {
   const fetchComplaints = async () => {
     try {
       setLoading(true);
-      let fetchedComplaints: DepartmentComplaint[] = [];
+      let fetchedData: DepartmentComplaint[] = [];
       
       console.log('🔍 Fetching complaints...', {
         isAdmin,
@@ -49,31 +49,16 @@ export default function DepartmentComplaints() {
         userDepartment
       });
       
-      if (isAdmin) {
-        // Admin can see all complaints
+      if (isDepartmentHead && userDepartment) {
+        console.log('✅ Valid department head, fetching department complaints for department ID:', userDepartment);
+        fetchedData = await getDepartmentComplaintsByDepartment(userDepartment);
+      } else if (isAdmin) {
         console.log('👑 Admin - fetching all complaints');
-        fetchedComplaints = await getDepartmentComplaints();
-        console.log('📋 All complaints fetched:', fetchedComplaints.length, fetchedComplaints);
-      } else if (isDepartmentHead && user?.email) {
-        // Department head can only see their department's complaints
-        console.log('🏢 Department head - checking department status');
-        const deptHeadCheck = await checkDepartmentHeadStatus(user.email);
-        console.log('🔍 Department head check result: ', deptHeadCheck);
-        
-        if (deptHeadCheck.isDepartmentHead && deptHeadCheck.department) {
-          // Use department.code for fetching complaints
-          console.log('✅ Valid department head, fetching department complaints for department code:', deptHeadCheck.department.code);
-          fetchedComplaints = await getDepartmentComplaintsByDepartment(deptHeadCheck.department.code);
-          console.log('📋 Department complaints fetched:', fetchedComplaints.length, fetchedComplaints);
-        } else {
-          console.log('❌ Not a valid department head or department info missing.');
-        }
-      } else {
-        console.log('❌ No access - not admin or department head.');
+        fetchedData = await getDepartmentComplaints();
       }
       
-      console.log('📊 Final complaints to display:', fetchedComplaints);
-      setComplaints(fetchedComplaints);
+      console.log('📊 Final complaints to display:', fetchedData.length, fetchedData);
+      setComplaints(fetchedData);
     } catch (error) {
       console.error('❌ Error fetching department complaints:', error);
     } finally {

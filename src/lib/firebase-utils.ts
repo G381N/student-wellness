@@ -961,16 +961,16 @@ export const updateDepartmentComplaintStatus = async (
 };
 
 // Get department complaints for specific department (for department heads)
-export const getDepartmentComplaintsByDepartment = async (departmentCode: string): Promise<DepartmentComplaint[]> => {
+export const getDepartmentComplaintsByDepartment = async (departmentId: string): Promise<DepartmentComplaint[]> => {
   try {
-    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department code:', departmentCode);
+    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department ID:', departmentId);
     const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
-      where('departmentCode', '==', departmentCode),
+      where('departmentId', '==', departmentId),
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(complaintsQuery);
-    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department code:', departmentCode);
+    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department ID:', departmentId);
     
     const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,

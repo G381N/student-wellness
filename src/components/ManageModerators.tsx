@@ -36,11 +36,11 @@ export default function ManageModerators() {
 
   const handleAddModerator = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newModeratorEmail.trim()) return;
+    if (!newModeratorEmail.trim() || !user) return;
 
     try {
       setAdding(true);
-      await addModerator(newModeratorEmail.trim());
+      await addModerator(newModeratorEmail.trim(), user.uid);
       
       // Refresh the list
       await fetchModerators();
@@ -200,7 +200,7 @@ export default function ManageModerators() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start mb-2">
                       <FiUser className="text-blue-400 mr-2 flex-shrink-0 mt-1" />
-                      <h4 className="text-sm sm:text-lg font-bold text-white break-words flex-1 min-w-0">{moderator.email}</h4>
+                      <h4 className="text-sm sm:text-lg font-bold text-white break-words flex-1 min-w-0">{moderator.name}</h4>
                     </div>
                     <div className="flex flex-col gap-1 sm:gap-2 text-gray-400 text-xs sm:text-sm">
                       <div className="flex items-center">
@@ -209,7 +209,7 @@ export default function ManageModerators() {
                       </div>
                       <div className="flex items-center">
                         <FiCalendar className="mr-2 flex-shrink-0" />
-                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.addedAt)}</span>
+                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.assignedAt)}</span>
                       </div>
                     </div>
                     <div className="flex items-center mt-2">

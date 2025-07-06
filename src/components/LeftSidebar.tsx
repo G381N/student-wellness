@@ -77,7 +77,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
       { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
       { href: '/dashboard/manage-departments', icon: FiHardDrive, label: 'Manage Departments' },
       { href: '/dashboard/manage-moderators', icon: FiUserCheck, label: 'Manage Moderators' },
-      // { href: '/dashboard/manage-counselors', icon: FiUsers, label: 'Manage Counselors' } // We will add this next
+      { href: '/dashboard/manage-counselors', icon: FiUsers, label: 'Manage Counselors' }
     );
   } else if (isDepartmentHead) {
     // Department heads only see their specific links if not admin

@@ -745,7 +745,7 @@ export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
 export const getModerators = async (): Promise<Moderator[]> => {
   try {
     const moderatorsQuery = query(
-      collection(db, 'moderators'),
+      collection(db, 'moderators'), 
       orderBy('addedAt', 'desc')
     );
     const querySnapshot = await getDocs(moderatorsQuery);

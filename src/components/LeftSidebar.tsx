@@ -61,32 +61,37 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
     }
   }, [user]);
 
-  // Define all navigation links here
-  let finalLinks = [
+  // --- REVISED LINK LOGIC ---
+  const baseLinks = [
     { href: '/dashboard', icon: FiHome, label: 'Home' },
     { href: '/dashboard/activities', icon: FiCalendar, label: 'Activities' },
     { href: '/dashboard/concerns', icon: FiMessageSquare, label: 'Concerns' },
     { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
     { href: '/dashboard/wellness', icon: FiActivity, label: 'Wellness' },
-    { href: '/dashboard/anonymous-complaints', icon: FiShield, label: 'Anonymous Complaints' },
-    { href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' },
   ];
 
+  let finalLinks = [...baseLinks];
+
+  // Add links for Department Heads
+  if (isDepartmentHead) {
+    finalLinks.push({ href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' });
+  }
+
+  // Add links for Admins (they get everything)
   if (isAdmin) {
     finalLinks.push(
       { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
+      { href: '/dashboard/anonymous-complaints', icon: FiShield, label: 'Anonymous Complaints' },
+      { href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' },
       { href: '/dashboard/manage-departments', icon: FiHardDrive, label: 'Manage Departments' },
       { href: '/dashboard/manage-moderators', icon: FiUserCheck, label: 'Manage Moderators' },
       { href: '/dashboard/manage-counselors', icon: FiUsers, label: 'Manage Counselors' }
     );
-  } else if (isDepartmentHead) {
-    // Department heads only see their specific links if not admin
-    finalLinks = finalLinks.filter(link => 
-        link.href === '/dashboard/department-complaints' || 
-        link.href === '/dashboard/announcements'
-    );
   }
 
+  // Ensure all links are unique
+  const uniqueLinks = Array.from(new Map(finalLinks.map(link => [link.href, link])).values());
+  // --- END REVISED LOGIC ---
 
   return (
     <>
@@ -127,7 +132,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
         {/* Navigation Links with Scrolling */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide">
           <ul className="space-y-1 px-2 py-4">
-            {finalLinks.map((link) => {
+            {uniqueLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <li key={link.href}>

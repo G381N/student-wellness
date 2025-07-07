@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiUsers, FiPlus, FiEdit, FiTrash2, FiX, FiMail, FiPhone, FiClock, FiCalendar, FiStar, FiInfo, FiCheckCircle } from 'react-icons/fi';
+import { FiUsers, FiPlus, FiEdit, FiTrash2, FiX, FiMail, FiPhone, FiClock, FiStar, FiInfo, FiCheckCircle } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { Counselor, getCounselors, addCounselor, updateCounselor, deleteCounselor } from '@/lib/firebase-utils';
-import { format } from 'date-fns';
 
 const initialCounselorState: Omit<Counselor, 'id' | 'createdAt' | 'updatedAt' | 'isActive'> = {
   name: '',
@@ -18,7 +17,7 @@ const initialCounselorState: Omit<Counselor, 'id' | 'createdAt' | 'updatedAt' | 
   notes: '',
 };
 
-const dayOptions = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const dayOptions = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function ManageCounselors() {
   const { isAdmin } = useAuth();
@@ -47,7 +46,12 @@ export default function ManageCounselors() {
   const handleOpenModal = (counselor: Counselor | null = null) => {
     if (counselor) {
       setEditingCounselor(counselor);
-      setFormData(counselor);
+      setFormData({
+        ...initialCounselorState,
+        ...counselor,
+        specializations: Array.isArray(counselor.specializations) ? counselor.specializations : [],
+        availableDays: Array.isArray(counselor.availableDays) ? counselor.availableDays : [],
+      });
     } else {
       setEditingCounselor(null);
       setFormData(initialCounselorState);
@@ -55,21 +59,20 @@ export default function ManageCounselors() {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleCloseModal = () => setIsModalOpen(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    const finalValue = type === 'number' ? parseInt(value, 10) : value;
+    const finalValue = type === 'number' ? (value === '' ? '' : parseInt(value, 10)) : value;
     setFormData(prev => ({ ...prev, [name]: finalValue }));
   };
   
   const handleDayToggle = (day: string) => {
     setFormData(prev => {
-      const availableDays = prev.availableDays.includes(day)
-        ? prev.availableDays.filter((d: string) => d !== day)
-        : [...prev.availableDays, day];
+      const currentDays = prev.availableDays || [];
+      const availableDays = currentDays.includes(day)
+        ? currentDays.filter((d: string) => d !== day)
+        : [...currentDays, day];
       return { ...prev, availableDays };
     });
   };
@@ -79,7 +82,9 @@ export default function ManageCounselors() {
     try {
       const dataToSave = {
         ...formData,
-        specializations: Array.isArray(formData.specializations) ? formData.specializations : (formData.specializations as string).split(',').map(s => s.trim()).filter(Boolean)
+        specializations: Array.isArray(formData.specializations) 
+          ? formData.specializations 
+          : (formData.specializations as string).split(',').map(s => s.trim()).filter(Boolean)
       };
       
       if (editingCounselor) {
@@ -125,27 +130,47 @@ export default function ManageCounselors() {
           <p className="text-gray-400 mt-2">Add your first counselor to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {counselors.map(c => (
-            <motion.div key={c.id} layout className="bg-gray-800/50 p-5 rounded-lg border border-gray-700 flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start">
-                  <h2 className="text-xl font-bold text-white mb-2">{c.name}</h2>
+            <motion.div key={c.id} layout className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all hover:border-blue-500 hover:shadow-lg">
+              <div className="p-5 bg-gray-800/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-600 p-3 rounded-full"><FiUsers className="text-white h-6 w-6" /></div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">{c.name}</h2>
+                      <p className="text-sm text-gray-400">{c.email}</p>
+                    </div>
+                  </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
                     {c.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
-                <p className="text-gray-400 flex items-center gap-2 mb-1"><FiMail size={14} /> {c.email}</p>
-                <p className="text-gray-400 flex items-center gap-2"><FiPhone size={14} /> {c.phone}</p>
-                
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <p className="text-sm text-gray-300 flex items-center gap-2 mb-2"><FiStar size={14}/> <strong>Specializations:</strong> {Array.isArray(c.specializations) ? c.specializations.join(', ') : 'N/A'}</p>
-                  <p className="text-sm text-gray-300 flex items-center gap-2"><FiClock size={14}/> <strong>Hours:</strong> {c.workingHours}</p>
+              </div>
+
+              <div className="p-5 space-y-4 flex-grow">
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Specializations</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.isArray(c.specializations) && c.specializations.length > 0 ? c.specializations.map(spec => (
+                      <span key={spec} className="bg-gray-700 text-gray-300 px-2.5 py-1 text-xs rounded-full">{spec}</span>
+                    )) : <span className="text-gray-500 text-sm">N/A</span>}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Availability</h3>
+                  <p className="text-sm text-gray-300 flex items-center gap-2"><FiClock size={14} /> {c.workingHours}</p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {dayOptions.map(day => (
+                      <span key={day} className={`px-2 py-0.5 text-xs rounded-full ${Array.isArray(c.availableDays) && c.availableDays.includes(day) ? 'bg-blue-900/70 text-blue-300' : 'bg-gray-700/50 text-gray-500'}`}>{day}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="mt-4 flex gap-2">
-                  <button onClick={() => handleOpenModal(c)} className="bg-yellow-600 text-white px-4 py-2 rounded-md text-sm hover:bg-yellow-700 flex-grow flex items-center justify-center gap-2"><FiEdit />Edit</button>
-                  <button onClick={() => handleDelete(c.id)} className="bg-red-600 text-white p-2 rounded-md text-sm hover:bg-red-700"><FiTrash2 /></button>
+
+              <div className="p-4 bg-gray-800/50 border-t border-gray-700 flex gap-2">
+                <button onClick={() => handleOpenModal(c)} className="bg-yellow-600 text-white px-4 py-2 rounded-md text-sm hover:bg-yellow-700 flex-grow flex items-center justify-center gap-2"><FiEdit />Edit</button>
+                <button onClick={() => handleDelete(c.id)} className="bg-red-600 text-white p-2 rounded-md text-sm hover:bg-red-700"><FiTrash2 /></button>
               </div>
             </motion.div>
           ))}
@@ -177,7 +202,7 @@ export default function ManageCounselors() {
                   <label className="block text-sm font-medium text-gray-400 mb-2">Available Days</label>
                   <div className="flex flex-wrap gap-2">
                     {dayOptions.map(day => (
-                      <button type="button" key={day} onClick={() => handleDayToggle(day)} className={`px-3 py-1.5 text-sm rounded-full transition-colors ${formData.availableDays.includes(day) ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                      <button type="button" key={day} onClick={() => handleDayToggle(day)} className={`px-3 py-1.5 text-sm rounded-full transition-colors ${Array.isArray(formData.availableDays) && formData.availableDays.includes(day) ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
                         {day}
                       </button>
                     ))}

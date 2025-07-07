@@ -775,9 +775,79 @@ export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promis
 // Remove moderator
 export const removeModerator = async (moderatorId: string): Promise<void> => {
   try {
+    // Future enhancement: Find the user by moderatorId and demote their role
     await deleteDoc(doc(db, 'moderators', moderatorId));
   } catch (error) {
     console.error('Error removing moderator:', error);
+    throw error;
+  }
+};
+
+// ============================================================================
+// COUNSELOR MANAGEMENT
+// ============================================================================
+
+export interface Counselor {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  specializations: string[];
+  availableDays: string[];
+  workingHours: string;
+  maxSessionsPerDay: number;
+  isActive: boolean;
+  notes?: string;
+  createdAt: any;
+  updatedAt?: any;
+}
+
+export const getCounselors = async (): Promise<Counselor[]> => {
+  try {
+    const counselorsQuery = query(collection(db, 'counselors'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(counselorsQuery);
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Counselor[];
+  } catch (error) {
+    console.error('Error getting counselors:', error);
+    return [];
+  }
+};
+
+export const addCounselor = async (counselorData: Omit<Counselor, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>): Promise<string> => {
+  try {
+    const docRef = await addDoc(collection(db, 'counselors'), {
+      ...counselorData,
+      isActive: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding counselor:', error);
+    throw error;
+  }
+};
+
+export const updateCounselor = async (counselorId: string, updateData: Partial<Omit<Counselor, 'id'>>): Promise<void> => {
+  try {
+    await updateDoc(doc(db, 'counselors', counselorId), {
+      ...updateData,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Error updating counselor:', error);
+    throw error;
+  }
+};
+
+export const deleteCounselor = async (counselorId: string): Promise<void> => {
+  try {
+    await deleteDoc(doc(db, 'counselors', counselorId));
+  } catch (error) {
+    console.error('Error deleting counselor:', error);
     throw error;
   }
 };

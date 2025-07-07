@@ -115,48 +115,51 @@ export default function ManageCounselors() {
   }
   
   return (
-    <div className="p-2 sm:p-4 md:p-6 min-h-screen text-white">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-2 sm:gap-0">
-        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 sm:gap-3"><FiUsers /> Manage Counselors</h1>
-        <button onClick={() => handleOpenModal()} className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors w-full sm:w-auto justify-center">
+    <div className="p-4 sm:p-6 min-h-screen text-white">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold flex items-center gap-3"><FiUsers /> Manage Counselors</h1>
+        <button onClick={() => handleOpenModal()} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors">
           <FiPlus /> Add Counselor
         </button>
       </div>
 
       {counselors.length === 0 ? (
-        <div className="text-center py-10 sm:py-16 bg-gray-900 rounded-lg">
-          <FiUsers className="mx-auto text-4xl sm:text-5xl text-gray-500 mb-4" />
-          <h3 className="text-lg sm:text-xl font-semibold">No Counselors Found</h3>
+        <div className="text-center py-16 bg-gray-900 rounded-lg">
+          <FiUsers className="mx-auto text-5xl text-gray-500 mb-4" />
+          <h3 className="text-xl font-semibold">No Counselors Found</h3>
           <p className="text-gray-400 mt-2">Add your first counselor to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {counselors.map(c => (
-            <motion.div key={c.id} layout className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all hover:border-blue-500 hover:shadow-lg min-w-0">
-              <div className="p-4 sm:p-5 bg-gray-800/50">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="bg-blue-600 p-2 sm:p-3 rounded-full"><FiUsers className="text-white h-5 w-5 sm:h-6 sm:w-6" /></div>
-                    <div className="min-w-0">
-                      <h2 className="text-base sm:text-lg font-bold text-white truncate">{c.name}</h2>
-                      <p className="text-xs sm:text-sm text-gray-400 truncate">{c.email}</p>
+            <motion.div key={c.id} layout className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all hover:border-blue-500 hover:shadow-lg">
+              <div className="p-5 bg-gray-800/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-600 p-3 rounded-full"><FiUsers className="text-white h-6 w-6" /></div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">{c.name}</h2>
+                      <p className="text-sm text-gray-400">{c.email}</p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>{c.isActive ? 'Active' : 'Inactive'}</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
+                    {c.isActive ? 'Active' : 'Inactive'}
+                  </span>
                 </div>
               </div>
-              <div className="p-4 sm:p-5 space-y-3 sm:space-y-4 flex-grow min-w-0">
+
+              <div className="p-5 space-y-4 flex-grow">
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 sm:mb-2">Specializations</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Specializations</h3>
                   <div className="flex flex-wrap gap-2">
-                    {Array.isArray(c.specializations) && c.specializations.length > 0 ? c.specializations.map(spec => (
-                      <span key={spec} className="bg-gray-700 text-gray-300 px-2.5 py-1 text-xs rounded-full truncate">{spec}</span>
-                    )) : <span className="text-gray-500 text-xs sm:text-sm">N/A</span>}
+                    {Array.isArray(c.specializations) && c.specializations.length > 0 ? c.specializations.map((spec: string) => (
+                      <span key={spec} className="bg-gray-700 text-gray-300 px-2.5 py-1 text-xs rounded-full">{spec}</span>
+                    )) : <span className="text-gray-500 text-sm">N/A</span>}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 sm:mb-2">Availability</h3>
-                  <p className="text-xs sm:text-sm text-gray-300 flex items-center gap-2"><FiClock size={14} /> {c.workingHours}</p>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Availability</h3>
+                  <p className="text-sm text-gray-300 flex items-center gap-2"><FiClock size={14} /> {c.workingHours}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {dayOptions.map(day => (
                       <span key={day} className={`px-2 py-0.5 text-xs rounded-full ${Array.isArray(c.availableDays) && c.availableDays.includes(day) ? 'bg-blue-900/70 text-blue-300' : 'bg-gray-700/50 text-gray-500'}`}>{day}</span>
@@ -164,7 +167,8 @@ export default function ManageCounselors() {
                   </div>
                 </div>
               </div>
-              <div className="p-3 sm:p-4 bg-gray-800/50 border-t border-gray-700 flex flex-col sm:flex-row gap-2">
+
+              <div className="p-4 bg-gray-800/50 border-t border-gray-700 flex gap-2">
                 <button onClick={() => handleOpenModal(c)} className="bg-yellow-600 text-white px-4 py-2 rounded-md text-sm hover:bg-yellow-700 flex-grow flex items-center justify-center gap-2"><FiEdit />Edit</button>
                 <button onClick={() => handleDelete(c.id)} className="bg-red-600 text-white p-2 rounded-md text-sm hover:bg-red-700"><FiTrash2 /></button>
               </div>
@@ -175,43 +179,43 @@ export default function ManageCounselors() {
 
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 sm:p-4">
-            <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="bg-gray-900 border border-gray-700 rounded-lg p-3 sm:p-6 w-full max-w-lg sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-2xl font-bold">{editingCounselor ? 'Edit' : 'Add New'} Counselor</h2>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">{editingCounselor ? 'Edit' : 'Add New'} Counselor</h2>
                 <button onClick={handleCloseModal} className="text-gray-400 hover:text-white"><FiX size={24} /></button>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white focus:ring-2 focus:ring-blue-500" required />
-                  <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white" required />
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white focus:ring-2 focus:ring-blue-500" required />
+                  <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" required />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white" required />
-                  <input name="workingHours" value={formData.workingHours} onChange={handleChange} placeholder="Working Hours (e.g., 9 AM - 5 PM)" className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white" />
-                </div>
-                <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1 sm:mb-2">Specializations (comma-separated)</label>
-                    <input name="specializations" value={Array.isArray(formData.specializations) ? formData.specializations.join(', ') : formData.specializations} onChange={handleChange} placeholder="e.g., Anxiety, Stress, Relationships" className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" required />
+                  <input name="workingHours" value={formData.workingHours} onChange={handleChange} placeholder="Working Hours (e.g., 9 AM - 5 PM)" className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" />
                 </div>
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1 sm:mb-2">Available Days</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Specializations (comma-separated)</label>
+                    <input name="specializations" value={Array.isArray(formData.specializations) ? formData.specializations.join(', ') : formData.specializations} onChange={handleChange} placeholder="e.g., Anxiety, Stress, Relationships" className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Available Days</label>
                   <div className="flex flex-wrap gap-2">
                     {dayOptions.map(day => (
-                      <button type="button" key={day} onClick={() => handleDayToggle(day)} className={`px-3 py-1.5 text-xs sm:text-sm rounded-full transition-colors ${Array.isArray(formData.availableDays) && formData.availableDays.includes(day) ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                      <button type="button" key={day} onClick={() => handleDayToggle(day)} className={`px-3 py-1.5 text-sm rounded-full transition-colors ${Array.isArray(formData.availableDays) && formData.availableDays.includes(day) ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
                         {day}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1 sm:mb-2">Max Sessions Per Day</label>
-                    <input name="maxSessionsPerDay" type="number" value={formData.maxSessionsPerDay} onChange={handleChange} className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white" />
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Max Sessions Per Day</label>
+                    <input name="maxSessionsPerDay" type="number" value={formData.maxSessionsPerDay} onChange={handleChange} className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" />
                 </div>
-                <textarea name="notes" value={formData.notes || ''} onChange={handleChange} placeholder="Internal notes about the counselor..." className="w-full p-2 sm:p-3 bg-gray-800 rounded border border-gray-700 text-white" rows={3} />
-                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 pt-2 sm:pt-4">
-                  <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white px-6 py-2 rounded-lg w-full sm:w-auto">Cancel</button>
-                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 w-full sm:w-auto"><FiCheckCircle/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
+                <textarea name="notes" value={formData.notes || ''} onChange={handleChange} placeholder="Internal notes about the counselor..." className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" rows={3} />
+                <div className="flex justify-end gap-4 pt-4">
+                  <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white px-6 py-2 rounded-lg">Cancel</button>
+                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"><FiCheckCircle/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
                 </div>
               </form>
             </motion.div>

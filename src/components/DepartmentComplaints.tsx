@@ -176,63 +176,41 @@ export default function DepartmentComplaints() {
             <p className="text-gray-400">There are no complaints to review at this time.</p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6">
+          <div className="grid gap-6">
             {complaints.map((complaint) => (
               <motion.div
                 key={complaint.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gray-900/70 backdrop-blur-sm border border-gray-700 rounded-lg p-4 sm:p-5 hover:border-blue-500 transition-colors"
+                className="bg-gray-900 border border-gray-700 rounded-lg p-6 hover:border-blue-500 transition-colors"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3 flex-wrap">
-                      <h3 className="text-base sm:text-lg font-semibold text-white">{complaint.title}</h3>
-                      {complaint.department && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
-                          {complaint.department}
-                        </span>
-                      )}
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-2">
+                            <h3 className="text-lg font-semibold text-white">{complaint.title}</h3>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(complaint.urgency)}`}>{complaint.urgency}</span>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(complaint.status)}`}>{complaint.status}</span>
+                        </div>
+                         <p className="text-sm text-gray-400 mb-1">
+                            <span className="font-semibold text-gray-300">Department:</span> {complaint.department}
+                        </p>
+                        <p className="text-sm text-gray-400 mb-4">
+                            <span className="font-semibold text-gray-300">Category:</span> {complaint.category}
+                        </p>
+                        <p className="text-gray-300 mb-4">{complaint.description}</p>
+                        <div className="flex items-center text-xs text-gray-500">
+                            <FiClock className="mr-1.5" />
+                            Submitted: {formatTimestamp(complaint.createdAt)}
+                        </div>
                     </div>
-                    
-                    <p className="text-sm text-gray-300 mb-4">{complaint.description}</p>
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getUrgencyColor(complaint.urgency)}`}>
-                        {complaint.urgency}
-                      </span>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
-                        {complaint.status}
-                      </span>
-                      <span className="px-2.5 py-1 rounded-full text-xs font-medium text-gray-400 bg-gray-800">
-                        {complaint.category}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs sm:text-sm text-gray-500">
-                      <FiClock className="mr-1.5" />
-                      <span>{formatTimestamp(complaint.createdAt || complaint.timestamp)}</span>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => {
-                      setSelectedComplaint(complaint);
-                      setAdminNotes(complaint.adminNotes || '');
-                    }}
-                    className="w-full sm:w-auto mt-2 sm:mt-0 flex-shrink-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
-                  >
-                    <FiEye className="text-sm" />
-                    Review
-                  </button>
+                     <button
+                        onClick={() => setSelectedComplaint(complaint)}
+                        className="self-start sm:self-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                        <FiEye />
+                        Review
+                    </button>
                 </div>
-                
-                {complaint.adminNotes && (
-                  <div className="mt-4 bg-gray-800 p-3 rounded-md">
-                    <h4 className="font-semibold text-white mb-2">Admin/HOD Notes</h4>
-                    <p className="text-gray-300">{complaint.adminNotes}</p>
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>

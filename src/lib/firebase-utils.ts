@@ -21,7 +21,6 @@ import {
 } from 'firebase/firestore';
 import { db, auth, storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { formatDistanceToNow } from 'date-fns';
 
 // WhatsApp notification function (imported from WhatsApp bot)
 let sendWhatsAppNotification: Function | null = null;
@@ -37,18 +36,6 @@ try {
   console.log('WhatsApp notifications not available in this environment');
   sendWhatsAppNotification = null;
 }
-
-// Helper to format timestamps consistently across the app
-export const formatTimestamp = (timestamp: any): string => {
-  if (!timestamp) return 'Just now';
-  try {
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return formatDistanceToNow(date, { addSuffix: true });
-  } catch (error) {
-    console.error('Error formatting timestamp:', error);
-    return 'Invalid date';
-  }
-};
 
 // Helper function to ensure timestamp consistency
 export const processTimestamp = (timestamp: any): Date => {
@@ -157,24 +144,9 @@ export interface Moderator {
   id: string;
   userId: string;
   email: string;
-  name:string;
-  addedAt?: any; // This will be set by the server
-  isActive?: boolean; // This will be set by the server
-}
-
-export interface Counselor {
-  id: string;
   name: string;
-  email: string;
-  phone: string;
-  specializations: string[];
-  availableDays: string[];
-  workingHours: string;
-  maxSessionsPerDay: number;
-  notes?: string;
+  assignedAt: any;
   isActive: boolean;
-  createdAt: any;
-  updatedAt: any;
 }
 
 export interface Department {
@@ -773,7 +745,7 @@ export const getModerators = async (): Promise<Moderator[]> => {
   try {
     const moderatorsQuery = query(
       collection(db, 'moderators'), 
-      orderBy('addedAt', 'desc')
+      orderBy('assignedAt', 'desc')
     );
     const querySnapshot = await getDocs(moderatorsQuery);
     return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
@@ -790,7 +762,7 @@ export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promis
   try {
     const docRef = await addDoc(collection(db, 'moderators'), {
       ...moderatorData,
-      addedAt: serverTimestamp(),
+      assignedAt: serverTimestamp(),
       isActive: true
     });
     return docRef.id;
@@ -809,69 +781,6 @@ export const removeModerator = async (moderatorId: string): Promise<void> => {
     throw error;
   }
 };
-
-// ============================================================================
-// COUNSELOR MANAGEMENT
-// ============================================================================
-
-const counselorsCollection = collection(db, 'counselors');
-
-// Get all counselors
-export const getCounselors = async (): Promise<Counselor[]> => {
-  try {
-    const q = query(counselorsCollection, orderBy('name', 'asc'));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Counselor));
-  } catch (error) {
-    console.error("Error getting counselors: ", error);
-    throw new Error("Could not fetch counselors.");
-  }
-};
-
-// Add a new counselor
-export const addCounselor = async (counselorData: Omit<Counselor, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>): Promise<string> => {
-  try {
-    const docRef = await addDoc(counselorsCollection, {
-      ...counselorData,
-      isActive: true,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-    return docRef.id;
-  } catch (error) {
-    console.error("Error adding counselor: ", error);
-    throw new Error("Could not add counselor.");
-  }
-};
-
-// Update an existing counselor
-export const updateCounselor = async (counselorId: string, updates: Partial<Omit<Counselor, 'id'>>): Promise<void> => {
-  try {
-    const counselorRef = doc(db, 'counselors', counselorId);
-    await updateDoc(counselorRef, {
-      ...updates,
-      updatedAt: serverTimestamp(),
-    });
-  } catch (error) {
-    console.error("Error updating counselor: ", error);
-    throw new Error("Could not update counselor.");
-  }
-};
-
-// Delete a counselor (soft delete by setting isActive to false)
-export const deleteCounselor = async (counselorId: string): Promise<void> => {
-  try {
-    const counselorRef = doc(db, 'counselors', counselorId);
-    await updateDoc(counselorRef, { 
-      isActive: false,
-      updatedAt: serverTimestamp()
-    });
-  } catch (error) {
-    console.error("Error deleting counselor: ", error);
-    throw new Error("Could not delete counselor.");
-  }
-};
-
 
 // ============================================================================
 // DEPARTMENT MANAGEMENT

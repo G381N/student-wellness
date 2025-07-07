@@ -102,7 +102,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
           onClick={onToggle}
         />
       )}
-    
+  
       {/* Sidebar */}
       <motion.div
         className={`fixed top-0 left-0 h-full z-40 ${
@@ -112,14 +112,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
         animate={{ width: isCollapsed ? 64 : 256 }}
       >
         {/* Header with Logo and Toggle */}
-        <div className="flex items-center justify-between px-4 h-16 border-b border-gray-800 relative">
+        <div className="flex items-center justify-between px-2 sm:px-4 h-16 border-b border-gray-800 relative min-w-0">
           {!isCollapsed && (
-            <Link href="/dashboard" className="flex items-center">
+            <Link href="/dashboard" className="flex items-center min-w-0">
               <div className="text-blue-500 text-2xl mr-2">💙</div>
-              <span className="text-white font-bold text-xl">CampusWell</span>
+              <span className="text-white font-bold text-lg sm:text-xl truncate">CampusWell</span>
             </Link>
           )}
-          
           {/* Collapse/Expand Toggle Button */}
           <button
             onClick={onToggle}
@@ -128,52 +127,47 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
             <FiChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} />
           </button>
         </div>
-        
         {/* Navigation Links with Scrolling */}
-        <nav className="flex-1 overflow-y-auto scrollbar-hide">
-          <ul className="space-y-1 px-2 py-4">
+        <nav className="flex-1 overflow-y-auto scrollbar-hide min-w-0">
+          <ul className="space-y-1 px-1 sm:px-2 py-4">
             {uniqueLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
+                    className={`flex items-center px-3 sm:px-4 py-3 rounded-xl transition-colors min-w-0 ${
                       isActive
                         ? 'bg-blue-600 text-white'
                         : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                     }`}
                   >
-                    <link.icon className={`${isCollapsed ? 'mx-auto' : 'mr-3'} text-xl`} />
-                    {!isCollapsed && <span>{link.label}</span>}
+                    <link.icon className={`${isCollapsed ? 'mx-auto' : 'mr-3'} text-xl flex-shrink-0`} />
+                    {!isCollapsed && <span className="truncate">{link.label}</span>}
                   </Link>
                 </li>
               );
             })}
           </ul>
         </nav>
-        
-        {/* Mobile-only Profile Button */}
-        {isMobile && (
-          <div className="p-4 border-t border-gray-800">
-            <button
-              onClick={() => {
-                // This will be handled in the LayoutShell component
-                window.dispatchEvent(new CustomEvent('openProfileModal'));
-              }}
-              className="flex items-center w-full px-4 py-2 rounded-xl hover:bg-gray-800 transition-colors"
-            >
-              <div className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                  <FiUser className="w-5 h-5 text-white" />
-                </div>
-                {!isCollapsed && (
-                  <span className="ml-3 text-gray-300">Profile</span>
-                )}
+        {/* Profile Button always at the bottom */}
+        <div className="p-2 sm:p-4 border-t border-gray-800 mt-auto bg-gray-900 sticky bottom-0">
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('openProfileModal'));
+            }}
+            className="flex items-center w-full px-3 py-2 rounded-xl hover:bg-gray-800 transition-colors"
+          >
+            <div className="flex items-center space-x-3 p-2 bg-gray-800 rounded-lg w-full">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <FiUser className="w-5 h-5 text-white" />
               </div>
-            </button>
-          </div>
-        )}
+              {!isCollapsed && (
+                <span className="ml-3 text-gray-300 truncate">Profile</span>
+              )}
+            </div>
+          </button>
+        </div>
       </motion.div>
     </>
   );

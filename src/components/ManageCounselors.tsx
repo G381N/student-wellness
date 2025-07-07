@@ -116,44 +116,47 @@ export default function ManageCounselors() {
   
   return (
     <div className="p-4 sm:p-6 min-h-screen text-white">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-3"><FiUsers /> Manage Counselors</h1>
-        <button onClick={() => handleOpenModal()} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3"><FiUsers /> Manage Counselors</h1>
+          <p className="text-gray-400 mt-1">Add, edit, or remove counselor profiles.</p>
+        </div>
+        <button onClick={() => handleOpenModal()} className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors font-semibold">
           <FiPlus /> Add Counselor
         </button>
       </div>
 
       {counselors.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900 rounded-lg">
-          <FiUsers className="mx-auto text-5xl text-gray-500 mb-4" />
-          <h3 className="text-xl font-semibold">No Counselors Found</h3>
-          <p className="text-gray-400 mt-2">Add your first counselor to get started.</p>
+        <div className="text-center py-20 px-4 bg-gray-900/50 rounded-lg border border-dashed border-gray-700">
+          <FiUsers className="mx-auto text-6xl text-gray-600 mb-4" />
+          <h3 className="text-xl font-semibold text-white">No Counselors Found</h3>
+          <p className="text-gray-400 mt-2">Click "Add Counselor" to get started.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {counselors.map(c => (
-            <motion.div key={c.id} layout className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all hover:border-blue-500 hover:shadow-lg">
-              <div className="p-5 bg-gray-800/50">
-                <div className="flex items-center justify-between">
+            <motion.div key={c.id} layout className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex flex-col transition-all hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-900/20">
+              <div className="p-5">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="bg-blue-600 p-3 rounded-full"><FiUsers className="text-white h-6 w-6" /></div>
-                    <div>
-                      <h2 className="text-lg font-bold text-white">{c.name}</h2>
-                      <p className="text-sm text-gray-400">{c.email}</p>
+                    <div className="bg-gray-800 p-3 rounded-full border border-gray-700"><FiUsers className="text-blue-400 h-6 w-6" /></div>
+                    <div className="min-w-0">
+                      <h2 className="text-lg font-bold text-white truncate" title={c.name}>{c.name}</h2>
+                      <p className="text-sm text-gray-400 truncate" title={c.email}>{c.email}</p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
+                  <span className={`mt-2 sm:mt-0 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${c.isActive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                     {c.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
 
-              <div className="p-5 space-y-4 flex-grow">
+              <div className="p-5 space-y-4 flex-grow border-y border-gray-800">
                 <div>
                   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Specializations</h3>
                   <div className="flex flex-wrap gap-2">
-                    {Array.isArray(c.specializations) && c.specializations.length > 0 ? c.specializations.map(spec => (
-                      <span key={spec} className="bg-gray-700 text-gray-300 px-2.5 py-1 text-xs rounded-full">{spec}</span>
+                    {Array.isArray(c.specializations) && c.specializations.length > 0 ? c.specializations.map((spec: string) => (
+                      <span key={spec} className="bg-gray-700/80 text-gray-300 px-2.5 py-1 text-xs rounded-full">{spec}</span>
                     )) : <span className="text-gray-500 text-sm">N/A</span>}
                   </div>
                 </div>
@@ -162,15 +165,15 @@ export default function ManageCounselors() {
                   <p className="text-sm text-gray-300 flex items-center gap-2"><FiClock size={14} /> {c.workingHours}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {dayOptions.map(day => (
-                      <span key={day} className={`px-2 py-0.5 text-xs rounded-full ${Array.isArray(c.availableDays) && c.availableDays.includes(day) ? 'bg-blue-900/70 text-blue-300' : 'bg-gray-700/50 text-gray-500'}`}>{day}</span>
+                      <span key={day} className={`px-2 py-0.5 text-xs rounded-full ${Array.isArray(c.availableDays) && c.availableDays.includes(day) ? 'bg-blue-600/20 text-blue-300' : 'bg-gray-800 text-gray-500'}`}>{day}</span>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 bg-gray-800/50 border-t border-gray-700 flex gap-2">
-                <button onClick={() => handleOpenModal(c)} className="bg-yellow-600 text-white px-4 py-2 rounded-md text-sm hover:bg-yellow-700 flex-grow flex items-center justify-center gap-2"><FiEdit />Edit</button>
-                <button onClick={() => handleDelete(c.id)} className="bg-red-600 text-white p-2 rounded-md text-sm hover:bg-red-700"><FiTrash2 /></button>
+              <div className="p-3 bg-gray-900/50 flex gap-2">
+                <button onClick={() => handleOpenModal(c)} className="bg-gray-700/80 text-white px-4 py-2 rounded-md text-sm hover:bg-gray-700 flex-grow flex items-center justify-center gap-2 transition-colors"><FiEdit />Edit</button>
+                <button onClick={() => handleDelete(c.id)} className="bg-red-600/20 text-red-400 p-2 rounded-md text-sm hover:bg-red-600/40 hover:text-white transition-colors"><FiTrash2 /></button>
               </div>
             </motion.div>
           ))}

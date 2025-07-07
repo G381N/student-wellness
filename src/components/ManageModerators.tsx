@@ -1,248 +1,171 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FiShield, FiPlus, FiTrash2, FiMail, FiCalendar, FiUser, FiAlertTriangle, FiUsers, FiUserPlus, FiUserMinus } from 'react-icons/fi';
+import { FiUsers, FiUserPlus, FiTrash2, FiAlertTriangle } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
-import { Moderator, getModerators, addModerator, removeModerator } from '@/lib/firebase-utils';
-import { formatDistanceToNow } from 'date-fns';
+import { getModerators, addModerator, removeModerator, formatTimestamp } from '@/lib/firebase-utils';
+import type { Moderator } from '@/lib/firebase-utils';
 
 export default function ManageModerators() {
-  const { isAdmin, user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [moderators, setModerators] = useState<Moderator[]>([]);
+  const [newModeratorEmail, setNewModeratorEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
-  const [newModeratorEmail, setNewModeratorEmail] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAdmin) {
-      fetchModerators();
-    }
-  }, [isAdmin]);
-
-  const fetchModerators = async () => {
-    try {
-      setLoading(true);
-      const fetchedModerators = await getModerators();
-      setModerators(fetchedModerators);
-    } catch (error) {
-      console.error('Error fetching moderators:', error);
-    } finally {
+    if (!isAdmin) {
+      setError("You don't have permission to manage moderators.");
       setLoading(false);
+      return;
     }
-  };
+
+    const fetchModerators = async () => {
+      try {
+        setLoading(true);
+        const fetchedModerators = await getModerators();
+        setModerators(fetchedModerators);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching moderators:', err);
+        setError('Failed to load moderators. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModerators();
+  }, [isAdmin]);
 
   const handleAddModerator = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newModeratorEmail.trim() || !user) return;
 
+    setAdding(true);
+    setError(null);
     try {
-      setAdding(true);
-      await addModerator(newModeratorEmail.trim(), user.uid);
-      
-      // Refresh the list
-      await fetchModerators();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newModeratorEmail)) {
+        throw new Error('Invalid email format.');
+      }
+
+      // The backend function should handle finding the user by email to get name/uid.
+      // For now, we pass placeholder values.
+      await addModerator({ 
+        email: newModeratorEmail.trim(), 
+        name: 'Name updated on user login', // Placeholder name
+        userId: 'UID updated on user login' // Placeholder UID
+      });
       
       setNewModeratorEmail('');
-      setShowAddForm(false);
-      alert('Moderator added successfully!');
-    } catch (error: any) {
-      console.error('Error adding moderator:', error);
-      alert(error.message || 'Failed to add moderator');
+      const fetchedModerators = await getModerators();
+      setModerators(fetchedModerators);
+
+    } catch (err: any) {
+      console.error('Error adding moderator:', err);
+      setError(err.message || 'Failed to add moderator. The user may not exist.');
     } finally {
       setAdding(false);
     }
   };
 
   const handleRemoveModerator = async (moderatorId: string) => {
-    if (!confirm('Are you sure you want to remove this moderator? This action cannot be undone.')) {
+    if (!window.confirm('Are you sure you want to remove this moderator?')) {
       return;
     }
-
+    setRemoving(moderatorId);
+    setError(null);
     try {
-      setRemoving(moderatorId);
       await removeModerator(moderatorId);
-      
-      // Update local state
-      setModerators(moderators.map(mod => 
-        mod.id === moderatorId 
-          ? { ...mod, isActive: false }
-          : mod
-      ));
-      
-      alert('Moderator removed successfully!');
-    } catch (error: any) {
-      console.error('Error removing moderator:', error);
-      alert(error.message || 'Failed to remove moderator');
+      setModerators(prev => prev.filter(mod => mod.id !== moderatorId));
+    } catch (err) {
+      console.error('Error removing moderator:', err);
+      setError('Failed to remove moderator.');
     } finally {
       setRemoving(null);
     }
   };
 
-  const formatTimestamp = (timestamp: any) => {
-    if (!timestamp) return 'Unknown';
-    
-    try {
-      let date;
-      if (timestamp.toDate && typeof timestamp.toDate === 'function') {
-        date = timestamp.toDate();
-      } else if (timestamp instanceof Date) {
-        date = timestamp;
-      } else {
-        date = new Date(timestamp);
-      }
-      
-      return formatDistanceToNow(date, { addSuffix: true });
-    } catch (error) {
-      return 'Unknown';
-    }
-  };
-
-  if (!isAdmin) {
-    return (
-      <div className="p-8 text-center">
-        <FiAlertTriangle className="text-red-500 text-4xl mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
-        <p className="text-gray-400">Only administrators can manage moderators.</p>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
       </div>
     );
   }
-
-  const activeModerators = moderators.filter(mod => mod.isActive);
-  const inactiveModerators = moderators.filter(mod => !mod.isActive);
-
+  
+  if (!isAdmin || error) {
+    return (
+      <div className="p-8 text-center bg-gray-900 rounded-lg max-w-md mx-auto mt-10 border border-red-800">
+        <FiAlertTriangle className="text-red-500 text-5xl mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-white mb-2">{error ? 'An Error Occurred' : 'Access Denied'}</h2>
+        <p className="text-gray-400">{error || 'Only administrators can manage moderators.'}</p>
+      </div>
+    );
+  }
+  
   return (
-    <div className="p-2 sm:p-6 space-y-3 sm:space-y-6 max-w-full overflow-hidden min-h-screen">
-      {/* Header */}
-      <div className="text-center mb-4 sm:mb-8">
-        <div className="flex items-center justify-center mb-3 sm:mb-4">
-          <FiUsers className="text-white text-xl sm:text-3xl mr-2 sm:mr-3 flex-shrink-0" />
-          <h1 className="text-xl sm:text-3xl font-bold text-white break-words leading-tight">Manage Moderators</h1>
-        </div>
-        <p className="text-gray-400 text-sm sm:text-lg px-2 break-words">Add and manage moderators for the platform</p>
-      </div>
-
-      {/* Statistics */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-3 sm:mb-6">
-        <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
-          <div className="text-lg sm:text-2xl font-bold text-blue-400">{activeModerators.length}</div>
-          <div className="text-xs sm:text-sm text-gray-400 break-words">Total Moderators</div>
-        </div>
-        <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
-          <div className="text-lg sm:text-2xl font-bold text-green-400">{activeModerators.length}</div>
-          <div className="text-xs sm:text-sm text-gray-400 break-words">Active Moderators</div>
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+            <FiUsers /> Manage Moderators
+          </h1>
+          <p className="text-gray-400 mt-1">Add or remove platform moderators by email.</p>
         </div>
       </div>
 
-      {/* Add Moderator Form */}
-      <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800 mb-3 sm:mb-6">
-        <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Add New Moderator</h3>
-        <form onSubmit={handleAddModerator} className="space-y-3 sm:space-y-4">
-          <div>
-            <label className="text-gray-400 text-xs sm:text-sm block mb-2">Email Address</label>
-            <input
-              type="email"
-              value={newModeratorEmail}
-              onChange={(e) => setNewModeratorEmail(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
-              placeholder="Enter moderator's email"
-              required
-            />
-          </div>
-          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
-            <button
-              type="submit"
-              disabled={adding}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold transition-colors flex items-center justify-center text-sm sm:text-base w-full sm:w-auto"
-            >
-              <FiUserPlus className="mr-2 flex-shrink-0" />
-              <span className="whitespace-nowrap">{adding ? 'Adding...' : 'Add Moderator'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setNewModeratorEmail('')}
-              className="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold transition-colors text-sm sm:text-base w-full sm:w-auto"
-            >
-              Clear
-            </button>
-          </div>
+      <div className="bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold text-white mb-4">Add New Moderator</h3>
+        <form onSubmit={handleAddModerator} className="flex flex-col sm:flex-row gap-4">
+          <input
+            type="email"
+            value={newModeratorEmail}
+            onChange={(e) => setNewModeratorEmail(e.target.value)}
+            className="w-full flex-grow bg-gray-800 border border-gray-600 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            placeholder="Enter user's email to promote"
+            required
+          />
+          <button
+            type="submit"
+            disabled={adding}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold transition-colors flex items-center justify-center"
+          >
+            <FiUserPlus className="mr-2" />
+            {adding ? 'Adding...' : 'Add Moderator'}
+          </button>
         </form>
       </div>
 
-      {/* Current Moderators */}
-      <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800">
-        <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Current Moderators</h3>
-        
-        {moderators.length === 0 ? (
-          <div className="text-center py-6 sm:py-12 px-4">
-            <FiUsers className="text-gray-600 text-3xl sm:text-6xl mx-auto mb-4" />
-            <p className="text-gray-400 text-sm sm:text-lg break-words">No moderators found</p>
-            <p className="text-gray-500 text-xs sm:text-sm mt-2 break-words">Add your first moderator to get started</p>
-          </div>
-        ) : (
-          <div className="space-y-2 sm:space-y-4">
-            {moderators.map((moderator, index) => (
-              <div
-                key={moderator.id}
-                className="bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-700 hover:border-gray-600 transition-all"
-              >
-                <div className="flex flex-col gap-3 sm:gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start mb-2">
-                      <FiUser className="text-blue-400 mr-2 flex-shrink-0 mt-1" />
-                      <h4 className="text-sm sm:text-lg font-bold text-white break-words flex-1 min-w-0">{moderator.name}</h4>
-                    </div>
-                    <div className="flex flex-col gap-1 sm:gap-2 text-gray-400 text-xs sm:text-sm">
-                      <div className="flex items-center">
-                        <FiMail className="mr-2 flex-shrink-0" />
-                        <span className="break-words min-w-0 flex-1">{moderator.email}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <FiCalendar className="mr-2 flex-shrink-0" />
-                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.addedAt)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center mt-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        moderator.isActive 
-                          ? 'bg-green-900 text-green-300' 
-                          : 'bg-red-900 text-red-300'
-                      }`}>
-                        {moderator.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                  </div>
-                  {moderator.isActive && (
-                    <div className="flex justify-end flex-shrink-0">
-                      <button
-                        onClick={() => handleRemoveModerator(moderator.id)}
-                        disabled={removing === moderator.id}
-                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white p-2 rounded-lg transition-colors"
-                        title="Remove Moderator"
-                      >
-                        {removing === moderator.id ? (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <FiUserMinus className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  )}
+      <div className="bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold text-white mb-4">Current Moderators ({moderators.length})</h3>
+        <div className="space-y-3">
+          {moderators.map((moderator) => (
+            <div key={moderator.id} className="bg-gray-800 p-3 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-10 rounded-full ${moderator.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <div>
+                  <h4 className="font-bold text-white">{moderator.name}</h4>
+                  <p className="text-sm text-gray-400">{moderator.email}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              <div className="flex items-center gap-4 w-full sm:w-auto">
+                <span className="text-sm text-gray-500 flex-grow sm:flex-grow-0">
+                  Added {formatTimestamp(moderator.addedAt)}
+                </span>
+                <button
+                  onClick={() => handleRemoveModerator(moderator.id)}
+                  disabled={removing === moderator.id}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white p-2 rounded-lg transition-colors"
+                  title="Remove Moderator"
+                >
+                  {removing === moderator.id ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <FiTrash2 />}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -220,14 +220,3 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
 };
 
 export default LeftSidebar; 
-                )}
-              </div>
-            </button>
-          </div>
-        )}
-      </motion.div>
-    </>
-  );
-};
-
-export default LeftSidebar; 

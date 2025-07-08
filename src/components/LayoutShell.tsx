@@ -78,11 +78,13 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* Left Sidebar */}
-      <LeftSidebar 
-        isCollapsed={leftSidebarCollapsed}
-        onToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
-      />
+      {/* Left Sidebar - Desktop Only */}
+      {!isMobile && (
+        <LeftSidebar 
+          isCollapsed={leftSidebarCollapsed}
+          onToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
+        />
+      )}
 
       {/* Right Sidebar */}
       <RightSidebar 
@@ -102,7 +104,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       <motion.main
         className={`transition-all duration-300 pt-24 p-4 sm:p-6 md:p-8 pb-20 md:pb-8`}
         style={{
-          marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
+          marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '80px' : '272px'),
           marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
         }}
       >
@@ -125,6 +127,16 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         
         {children}
       </motion.main>
+
+      {/* Desktop Profile FAB (only shown when right sidebar is collapsed) */}
+      {!isMobile && rightSidebarCollapsed && (
+        <button
+          onClick={() => setRightSidebarCollapsed(false)}
+          className="fixed top-4 right-4 z-40 w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-colors"
+        >
+          <FiUser className="text-white" />
+        </button>
+      )}
 
       {/* Mobile Bottom Navbar */}
       {isMobile && <BottomNavbar />}

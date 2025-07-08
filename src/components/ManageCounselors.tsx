@@ -130,7 +130,7 @@ export default function ManageCounselors() {
           <p className="text-gray-400 mt-2">Add your first counselor to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
           {counselors.map(c => (
             <motion.div key={c.id} layout className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all hover:border-blue-500 hover:shadow-lg">
               <div className="p-5 bg-gray-800/50">
@@ -160,6 +160,7 @@ export default function ManageCounselors() {
                 <div>
                   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Availability</h3>
                   <p className="text-sm text-gray-300 flex items-center gap-2"><FiClock size={14} /> {c.workingHours}</p>
+                   <p className="text-sm text-gray-400 flex items-center gap-2 mt-1"><FiPhone size={14} /> {c.phone}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {dayOptions.map(day => (
                       <span key={day} className={`px-2 py-0.5 text-xs rounded-full ${Array.isArray(c.availableDays) && c.availableDays.includes(day) ? 'bg-blue-900/70 text-blue-300' : 'bg-gray-700/50 text-gray-500'}`}>{day}</span>

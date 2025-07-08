@@ -36,11 +36,11 @@ export default function ManageModerators() {
 
   const handleAddModerator = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newModeratorEmail.trim() || !user) return;
+    if (!newModeratorEmail.trim()) return;
 
     try {
       setAdding(true);
-      await addModerator(newModeratorEmail.trim(), user.uid);
+      await addModerator(newModeratorEmail.trim());
       
       // Refresh the list
       await fetchModerators();
@@ -81,22 +81,14 @@ export default function ManageModerators() {
     }
   };
 
-  const formatTimestamp = (timestamp: any) => {
-    if (!timestamp) return 'Unknown';
-    
+  const formatTimestamp = (timestamp: any): string => {
+    if (!timestamp) return 'Date unknown';
     try {
-      let date;
-      if (timestamp.toDate && typeof timestamp.toDate === 'function') {
-        date = timestamp.toDate();
-      } else if (timestamp instanceof Date) {
-        date = timestamp;
-      } else {
-        date = new Date(timestamp);
-      }
-      
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
       return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
-      return 'Unknown';
+      console.error("Failed to format timestamp:", error);
+      return 'Invalid date';
     }
   };
 
@@ -198,46 +190,34 @@ export default function ManageModerators() {
               >
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start mb-2">
-                      <FiUser className="text-blue-400 mr-2 flex-shrink-0 mt-1" />
-                      <h4 className="text-sm sm:text-lg font-bold text-white break-words flex-1 min-w-0">{moderator.name}</h4>
-                    </div>
-                    <div className="flex flex-col gap-1 sm:gap-2 text-gray-400 text-xs sm:text-sm">
-                      <div className="flex items-center">
-                        <FiMail className="mr-2 flex-shrink-0" />
-                        <span className="break-words min-w-0 flex-1">{moderator.email}</span>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center mb-2">
+                          <FiShield className="text-blue-400 text-lg sm:text-xl mr-2 sm:mr-3 flex-shrink-0" />
+                          <p className="text-sm sm:text-base font-bold text-white truncate">{moderator.email}</p>
                       </div>
-                      <div className="flex items-center">
-                        <FiCalendar className="mr-2 flex-shrink-0" />
-                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.addedAt)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center mt-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        moderator.isActive 
-                          ? 'bg-green-900 text-green-300' 
-                          : 'bg-red-900 text-red-300'
-                      }`}>
-                        {moderator.isActive ? 'Active' : 'Inactive'}
+                      <span className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded-full ${moderator.isActive ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                        {moderator.isActive ? 'Active' : 'Removed'}
                       </span>
                     </div>
-                  </div>
-                  {moderator.isActive && (
-                    <div className="flex justify-end flex-shrink-0">
-                      <button
-                        onClick={() => handleRemoveModerator(moderator.id)}
-                        disabled={removing === moderator.id}
-                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white p-2 rounded-lg transition-colors"
-                        title="Remove Moderator"
-                      >
-                        {removing === moderator.id ? (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <FiUserMinus className="w-4 h-4" />
+
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2">
+                        <div className="flex items-center text-gray-400 text-xs sm:text-sm mb-2 sm:mb-0">
+                            <FiCalendar className="mr-2 flex-shrink-0" />
+                            <span>Added: {formatTimestamp(moderator.addedAt)}</span>
+                        </div>
+                        
+                        {moderator.isActive && (
+                            <button
+                                onClick={() => handleRemoveModerator(moderator.id)}
+                                disabled={removing === moderator.id}
+                                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-3 py-1 rounded-lg font-bold transition-colors flex items-center justify-center text-xs sm:text-sm w-full sm:w-auto"
+                            >
+                                <FiUserMinus className="mr-2 flex-shrink-0" />
+                                <span>{removing === moderator.id ? 'Removing...' : 'Remove'}</span>
+                            </button>
                         )}
-                      </button>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             ))}

@@ -19,11 +19,14 @@ import {
   FiSpeaker,
   FiBriefcase,
   FiChevronRight,
+  FiChevronLeft,
   FiUser,
   FiHardDrive,
-  FiUserCheck
+  FiUserCheck,
+  FiLogOut
 } from 'react-icons/fi';
-import { useAuth } from '@/context/AuthContext';
+import { IconType } from 'react-icons';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LeftSidebarProps {
   isCollapsed: boolean;
@@ -46,14 +49,18 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
   }, []);
 
   const handleLogout = async () => {
-    // Handle logout logic here
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Failed to log out:", error);
+    }
   };
 
   const openProfileModal = () => {
-    // Handle opening profile modal logic here
+    window.dispatchEvent(new CustomEvent('openProfileModal'));
   };
 
-  const NavLink = ({ href, icon, text }: { href: string; icon: React.ReactNode; text: string }) => (
+  const NavLink = ({ href, icon, text }: { href: string; icon: IconType; text: string }) => (
     <li key={href}>
       <Link
         href={href}
@@ -147,6 +154,10 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
               )}
             </div>
           )}
+          <button onClick={handleLogout} className="w-full mt-2 text-left flex items-center p-2 rounded-lg hover:bg-red-800 text-gray-400 hover:text-white transition-colors">
+              <FiLogOut className={`${isCollapsed ? 'mx-auto' : 'mr-3'} text-xl`} />
+              {!isCollapsed && <span>Logout</span>}
+          </button>
         </div>
       </aside>
     </>

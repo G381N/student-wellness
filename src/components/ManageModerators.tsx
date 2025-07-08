@@ -36,11 +36,11 @@ export default function ManageModerators() {
 
   const handleAddModerator = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newModeratorEmail.trim()) return;
+    if (!newModeratorEmail.trim() || !user) return;
 
     try {
       setAdding(true);
-      await addModerator(newModeratorEmail.trim());
+      await addModerator(newModeratorEmail.trim(), user.uid);
       
       // Refresh the list
       await fetchModerators();

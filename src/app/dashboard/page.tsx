@@ -148,7 +148,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
       {/* Welcome Header */}
       <div className="mb-8 hidden md:block">
         <motion.div
@@ -284,6 +284,6 @@ export default function DashboardPage() {
         onClose={() => setShowCreateModal(false)}
         onPostCreated={handlePostCreated}
       />
-    </div>
+    </>
   );
 } 

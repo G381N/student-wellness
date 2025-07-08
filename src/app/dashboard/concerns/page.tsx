@@ -84,9 +84,9 @@ export default function ConcernsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
       {/* Header */}
-      <div className="mb-8 pt-8">
+      <div className="mb-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -142,6 +142,6 @@ export default function ConcernsPage() {
         onClose={() => setShowCreateModal(false)}
         onPostCreated={handlePostCreated}
       />
-    </div>
+    </>
   );
 } 

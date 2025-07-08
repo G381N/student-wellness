@@ -148,7 +148,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pt-8">
       {/* Search Results */}
       {searchQuery && (
         <div className="mb-8">

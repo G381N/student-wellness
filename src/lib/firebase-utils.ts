@@ -781,6 +781,87 @@ export const deleteCounselor = async (counselorId: string): Promise<void> => {
 
 
 // ============================================================================
+// SEARCH FUNCTIONALITY
+// ============================================================================
+
+export const searchAllContent = async (
+  query: string,
+  permissions: { isAdmin: boolean; isModerator: boolean; isDepartmentHead: boolean; department?: Department }
+) => {
+  const searchText = query.toLowerCase();
+  let searchResults: any[] = [];
+
+  // 1. Search Posts (Activities, Concerns, General)
+  const postsQuery = await getDocs(collection(db, 'posts'));
+  const posts = postsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post))
+    .filter(post => 
+      post.content?.toLowerCase().includes(searchText) ||
+      post.title?.toLowerCase().includes(searchText) ||
+      post.authorName?.toLowerCase().includes(searchText)
+    ).map(post => ({
+      id: post.id,
+      title: post.title || post.content.substring(0, 50),
+      type: 'Post',
+      link: `/dashboard` // All posts are on the main feed
+    }));
+  searchResults = [...searchResults, ...posts];
+
+  // 2. Search Mind Wall
+  const mindWallQuery = await getDocs(collection(db, 'mindWallIssues'));
+  const issues = mindWallQuery.docs.map(doc => ({ id: doc.id, ...doc.data() } as MindWallIssue))
+    .filter(issue => 
+      issue.title?.toLowerCase().includes(searchText) ||
+      issue.description?.toLowerCase().includes(searchText)
+    ).map(issue => ({
+      id: issue.id,
+      title: issue.title,
+      type: 'Mind Wall Issue',
+      link: '/dashboard/mind-wall'
+    }));
+  searchResults = [...searchResults, ...issues];
+
+  // 3. Search Department Complaints (Admins and relevant Dept Heads)
+  if (permissions.isAdmin || permissions.isDepartmentHead) {
+    const complaintsQuery = await getDocs(collection(db, 'departmentComplaints'));
+    let complaints = complaintsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() } as DepartmentComplaint))
+      .filter(c => 
+        c.title?.toLowerCase().includes(searchText) ||
+        c.description?.toLowerCase().includes(searchText)
+      );
+
+    if (permissions.isDepartmentHead && !permissions.isAdmin) {
+      complaints = complaints.filter(c => c.departmentId === permissions.department?.id);
+    }
+    
+    searchResults = [...searchResults, ...complaints.map(c => ({
+      id: c.id,
+      title: c.title,
+      type: 'Dept Complaint',
+      link: '/dashboard/department-complaints'
+    }))];
+  }
+
+  // 4. Search Anonymous Complaints (Admins only)
+  if (permissions.isAdmin) {
+    const anonComplaintsQuery = await getDocs(collection(db, 'anonymousComplaints'));
+    const anonComplaints = anonComplaintsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() } as AnonymousComplaint))
+      .filter(c => 
+        c.title?.toLowerCase().includes(searchText) ||
+        c.description?.toLowerCase().includes(searchText)
+      ).map(c => ({
+        id: c.id,
+        title: c.title,
+        type: 'Anon Complaint',
+        link: '/dashboard/anonymous-complaints'
+      }));
+    searchResults = [...searchResults, ...anonComplaints];
+  }
+
+  return searchResults;
+};
+
+
+// ============================================================================
 // MODERATOR MANAGEMENT
 // ============================================================================
 

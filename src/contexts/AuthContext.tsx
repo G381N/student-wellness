@@ -7,235 +7,131 @@ import {
   signOut as firebaseSignOut
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { User, startActivityCleanup, stopActivityCleanup, checkDepartmentHeadStatus } from '@/lib/firebase-utils';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { User, Department, startActivityCleanup, stopActivityCleanup, checkDepartmentHeadStatus } from '@/lib/firebase-utils';
 
 interface AuthContextType {
   user: FirebaseUser | null;
-  userData: User | null;
+  userInfo: any | null;
   loading: boolean;
-  userRole: string;
-  userDepartment: string | null;
   isAdmin: boolean;
   isModerator: boolean;
   isDepartmentHead: boolean;
-  signOut: () => Promise<void>;
+  department?: Department;
+  logout: () => void;
   refreshUserData: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  userData: null,
-  loading: true,
-  userRole: 'user',
-  userDepartment: null,
-  isAdmin: false,
-  isModerator: false,
-  isDepartmentHead: false,
-  signOut: async () => {},
-  refreshUserData: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [userData, setUserData] = useState<User | null>(null);
+  const [userInfo, setUserInfo] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const refreshUserData = async () => {
-    if (!user) return;
-    
-    try {
-      // First, reload the Firebase Auth user to get latest profile data
-      await user.reload();
-      
-      // Get the refreshed user from auth
-      const refreshedUser = auth.currentUser;
-      if (refreshedUser) {
-        setUser(refreshedUser);
-      }
-      
-      // Then update Firestore data
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        const userData = userSnap.data() as User;
-        setUserData(userData);
-      }
-    } catch (error) {
-      console.error('Error refreshing user data:', error);
-    }
-  };
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isDepartmentHead, setIsDepartmentHead] = useState(false);
+  const [department, setDepartment] = useState<Department | undefined>(undefined);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      
-      if (firebaseUser) {
-        try {
-          // Get user data from Firestore
-          const userRef = doc(db, 'users', firebaseUser.uid);
-          const userSnap = await getDoc(userRef);
-          
-          if (userSnap.exists()) {
-            // User exists - update their data with latest info from Firebase Auth
-            const existingUserData = userSnap.data() as User;
-            
-            // Check if user is department head
-            let isDeptHead = false;
-            let departmentInfo = null;
-            if (firebaseUser.email) {
-              const deptHeadCheck = await checkDepartmentHeadStatus(firebaseUser.email);
-              isDeptHead = deptHeadCheck.isDepartmentHead;
-              departmentInfo = deptHeadCheck.department;
-            }
-            
-            // Prepare updated data
-            const updatedData = {
-              ...existingUserData,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || existingUserData.email,
-              displayName: firebaseUser.displayName || existingUserData.displayName,
-              photoURL: firebaseUser.photoURL || existingUserData.photoURL,
-              lastLogin: serverTimestamp(),
-              // Update role if user is department head
-              role: isDeptHead ? 'department_head' : (existingUserData.role || 'user'),
-              department: departmentInfo?.id || existingUserData.department
-            };
-            
-            // Only update if there are actual changes
-            const hasChanges = 
-              existingUserData.email !== updatedData.email ||
-              existingUserData.displayName !== updatedData.displayName ||
-              existingUserData.photoURL !== updatedData.photoURL ||
-              existingUserData.role !== updatedData.role ||
-              existingUserData.department !== updatedData.department;
-            
-            if (hasChanges) {
-              await updateDoc(userRef, updatedData);
-              console.log('✅ User data updated with latest auth info');
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        setUserInfo(userDoc.exists() ? { uid: user.uid, ...userDoc.data() } : null);
+
+        // Check roles
+        const adminDocRef = doc(db, 'admins', user.uid);
+        const moderatorDocRef = doc(db, 'moderators', user.uid);
+        
+        const adminDoc = await getDoc(adminDocRef);
+        setIsAdmin(adminDoc.exists());
+
+        const moderatorDoc = await getDoc(moderatorDocRef);
+        setIsModerator(moderatorDoc.exists());
+        
+        // Check if user is a department head
+        if (user.email) {
+            const departmentsQuery = query(collection(db, "departments"), where("headEmail", "==", user.email));
+            const querySnapshot = await getDocs(departmentsQuery);
+            if (!querySnapshot.empty) {
+                setIsDepartmentHead(true);
+                const deptDoc = querySnapshot.docs[0];
+                setDepartment({ id: deptDoc.id, ...deptDoc.data() } as Department);
             } else {
-              // Just update last login
-              await updateDoc(userRef, { lastLogin: serverTimestamp() });
+                setIsDepartmentHead(false);
+                setDepartment(undefined);
             }
-            
-            setUserData(updatedData as User);
-          } else {
-            // New user - create user document
-            const email = firebaseUser.email || '';
-            const displayName = firebaseUser.displayName || email.split('@')[0] || 'Anonymous';
-            
-            // Check if user is department head
-            let isDeptHead = false;
-            let departmentInfo = null;
-            if (email) {
-              const deptHeadCheck = await checkDepartmentHeadStatus(email);
-              isDeptHead = deptHeadCheck.isDepartmentHead;
-              departmentInfo = deptHeadCheck.department;
-            }
-            
-            // Try to extract first and last name from display name or email
-            let firstName = '', lastName = '';
-            
-            if (displayName && displayName.includes(' ')) {
-              // If display name has a space, use it to split into first and last name
-              const nameParts = displayName.split(' ');
-              firstName = nameParts[0];
-              lastName = nameParts.slice(1).join(' ');
-            } else if (email && email.includes('.') && email.includes('@')) {
-              // Try to extract from email if it's in the format firstname.lastname@domain
-              const localPart = email.split('@')[0];
-              if (localPart.includes('.')) {
-                const nameParts = localPart.split('.');
-                firstName = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
-                lastName = nameParts[1].charAt(0).toUpperCase() + nameParts[1].slice(1);
-              } else {
-                firstName = displayName;
-                lastName = '';
-              }
-            } else {
-              firstName = displayName;
-              lastName = '';
-            }
-            
-            const newUserData: User = {
-              uid: firebaseUser.uid,
-              email,
-              displayName,
-              firstName,
-              lastName,
-              photoURL: firebaseUser.photoURL || undefined,
-              role: isDeptHead ? 'department_head' : 'user', // Set role based on department head status
-              department: departmentInfo?.id || undefined,
-              createdAt: serverTimestamp()
-            };
-            
-            // Save user data to Firestore
-            await setDoc(userRef, {
-              ...newUserData,
-              createdAt: serverTimestamp(),
-              lastLogin: serverTimestamp()
-            });
-            
-            console.log('✅ New user created in Firestore');
-            setUserData(newUserData);
-          }
-        } catch (error) {
-          console.error('Error handling user authentication:', error);
         }
+
       } else {
-        setUserData(null);
+        setUserInfo(null);
+        setIsAdmin(false);
+        setIsModerator(false);
+        setIsDepartmentHead(false);
+        setDepartment(undefined);
       }
-      
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Start activity cleanup service when the provider mounts
-  useEffect(() => {
-    startActivityCleanup();
-    
-    // Note: stopActivityCleanup doesn't need to be called as startActivityCleanup() 
-    // handles cleanup automatically and returns void
-    return () => {
-      // No cleanup needed as the function manages its own intervals
-    };
-  }, []);
+  const logout = async () => {
+    await firebaseSignOut(auth);
+  };
+  
+  const refreshUserData = async () => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+        // Re-run the logic from onAuthStateChanged
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        setUserInfo(userDoc.exists() ? { uid: currentUser.uid, ...userDoc.data() } : null);
 
-  const signOut = async () => {
-    try {
-      await firebaseSignOut(auth);
-      setUser(null);
-      setUserData(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
+        const adminDocRef = doc(db, 'admins', currentUser.uid);
+        const adminDoc = await getDoc(adminDocRef);
+        setIsAdmin(adminDoc.exists());
+
+        const moderatorDocRef = doc(db, 'moderators', currentUser.uid);
+        const moderatorDoc = await getDoc(moderatorDocRef);
+        setIsModerator(moderatorDoc.exists());
+        
+        if (currentUser.email) {
+            const departmentsQuery = query(collection(db, "departments"), where("headEmail", "==", currentUser.email));
+            const querySnapshot = await getDocs(departmentsQuery);
+            if (!querySnapshot.empty) {
+                setIsDepartmentHead(true);
+                const deptDoc = querySnapshot.docs[0];
+                setDepartment({ id: deptDoc.id, ...deptDoc.data() } as Department);
+            } else {
+                setIsDepartmentHead(false);
+                setDepartment(undefined);
+            }
+        }
     }
+  }
+
+  const value = {
+    user,
+    userInfo,
+    isAdmin,
+    isModerator,
+    isDepartmentHead,
+    department,
+    loading,
+    logout,
+    refreshUserData,
   };
 
-  const userRole = userData?.role || 'user';
-  const userDepartment = userData?.department || null;
-  const isAdmin = userRole === 'admin';
-  const isModerator = userRole === 'moderator' || userRole === 'admin';
-  const isDepartmentHead = userRole === 'department_head';
-
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      userData, 
-      loading, 
-      userRole, 
-      userDepartment,
-      isAdmin, 
-      isModerator, 
-      isDepartmentHead,
-      signOut,
-      refreshUserData
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }; 

@@ -149,23 +149,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Welcome Header */}
-      <div className="mb-8 hidden md:block">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-            Welcome back, {user.displayName || user.email?.split('@')[0]}! 👋
-          </h1>
-          <p className="text-gray-400 text-lg">
-            Your mental wellness dashboard
-          </p>
-        </motion.div>
-      </div>
-
       {/* Search Results */}
       {searchQuery && (
         <div className="mb-8">

@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiMessageSquare, FiPlus, FiSettings, FiUser } from 'react-icons/fi';
+import { FiHome, FiMessageSquare, FiPlus, FiSettings, FiUser, FiHeart } from 'react-icons/fi';
 
 export default function BottomNavbar() {
   const pathname = usePathname();
 
   const navItems = [
     { href: '/dashboard', icon: FiHome, label: 'Home' },
-    { href: '/dashboard/concerns', icon: FiMessageSquare, label: 'Concerns' },
-    { href: '/dashboard/mind-wall', icon: FiPlus, label: 'Mind Wall' },
+    { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
+    { href: '/create-post', icon: FiPlus, label: 'Create' },
     { href: '/dashboard/wellness', icon: FiSettings, label: 'Wellness' },
     { href: '/profile', icon: FiUser, label: 'Profile' },
   ];

@@ -54,8 +54,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
   // --- REVISED LINK LOGIC ---
   const baseLinks = [
     { href: '/dashboard', icon: FiHome, label: 'Home' },
-    { href: '/dashboard/activities', icon: FiCalendar, label: 'Activities' },
-    { href: '/dashboard/concerns', icon: FiMessageSquare, label: 'Concerns' },
     { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
     { href: '/dashboard/wellness', icon: FiActivity, label: 'Wellness' },
   ];

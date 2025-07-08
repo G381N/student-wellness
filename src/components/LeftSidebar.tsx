@@ -68,7 +68,7 @@ const LeftSidebar = ({ isCollapsed, onToggle }: LeftSidebarProps) => {
   const sidebarWidth = isMobile ? '80px' : (trulyCollapsed ? '80px' : '256px');
 
   return (
-    <motion.div
+      <motion.div
       className="fixed top-0 left-0 h-full bg-gray-900 text-white flex flex-col z-40 border-r border-gray-800"
       animate={{ width: sidebarWidth }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -78,42 +78,42 @@ const LeftSidebar = ({ isCollapsed, onToggle }: LeftSidebarProps) => {
         <Link href="/dashboard" className="flex items-center gap-2">
             <div className="text-white text-2xl">🤍</div>
             {!trulyCollapsed && !isMobile && <span className="text-white font-bold text-xl">CampusWell</span>}
-        </Link>
-        {!isMobile && (
-          <button
-            onClick={onToggle}
+          </Link>
+          {!isMobile && (
+            <button
+              onClick={onToggle}
             className="p-2 rounded-full hover:bg-gray-800 transition-colors"
           >
             {isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}
-          </button>
-        )}
-      </div>
-      
+            </button>
+          )}
+        </div>
+
       {/* Navigation Links */}
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className={`space-y-1 ${isMobile || trulyCollapsed ? 'px-2' : 'px-4'}`}>
-          {uniqueLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
+            {uniqueLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
                   title={link.label}
                   className={`flex items-center py-3 rounded-xl transition-colors ${isMobile || trulyCollapsed ? 'justify-center px-3' : 'px-4'} ${
-                    isActive
+                      isActive
                       ? 'bg-gray-700 text-white'
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
-                >
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                    }`}
+                  >
                   <link.icon className={`text-xl ${!trulyCollapsed && !isMobile ? 'mr-3' : ''}`} />
                   {!trulyCollapsed && !isMobile && <span>{link.label}</span>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-      
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+        
       {/* Bottom Buttons */}
       <div className={`p-4 border-t border-gray-800 ${isMobile || trulyCollapsed ? 'px-2' : 'px-4'}`}>
         <div className="space-y-4">
@@ -125,19 +125,19 @@ const LeftSidebar = ({ isCollapsed, onToggle }: LeftSidebarProps) => {
             <FiPlus className="w-6 h-6 text-white" />
             {!trulyCollapsed && !isMobile && <span className="ml-2 text-white">New Post</span>}
           </button>
-          <button
+            <button
             onClick={handleProfileClick}
             title="Profile"
             className={`flex items-center w-full h-12 rounded-xl hover:bg-gray-800 transition-colors ${isMobile || trulyCollapsed ? 'justify-center' : ''}`}
           >
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-              <FiUser className="w-5 h-5 text-white" />
-            </div>
+                <FiUser className="w-5 h-5 text-white" />
+              </div>
              {!trulyCollapsed && !isMobile && <span className="ml-2 text-white font-medium">Profile</span>}
-          </button>
-        </div>
-      </div>
-    </motion.div>
+            </button>
+          </div>
+          </div>
+      </motion.div>
   );
 };
 

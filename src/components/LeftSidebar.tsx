@@ -24,9 +24,11 @@ import {
   FiUserCheck,
   FiMenu,
   FiLogOut,
-  FiX
+  FiX,
+  FiSearch
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
+import SearchComponent from './SearchComponent';
 
 interface LeftSidebarProps {
   isCollapsed: boolean;
@@ -37,6 +39,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
   const { user, isAdmin, isDepartmentHead } = useAuth();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   
   useEffect(() => {
     const checkMobile = () => {
@@ -79,6 +82,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
   // Ensure all links are unique
   const uniqueLinks = Array.from(new Map(finalLinks.map(link => [link.href, link])).values());
   // --- END REVISED LOGIC ---
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Filter search results based on user permissions
+    console.log('Searching for:', searchQuery);
+    // Implement search functionality here
+  };
 
   // On mobile, when collapsed, show only a burger button
   if (isMobile && isCollapsed) {
@@ -123,11 +133,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
             )}
           </Link>
           
-          {/* Collapse/Expand Toggle Button (desktop only) */}
+          {/* Collapse/Expand Toggle Button (desktop only) - Positioned better */}
           {!isMobile && (
             <button
               onClick={onToggle}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors z-10"
+              className="p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors z-10"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <FiChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} />
@@ -145,6 +155,17 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
             </button>
           )}
         </div>
+
+        {/* Search Bar (mobile only) */}
+        {isMobile && (
+          <div className="px-3 py-3 border-b border-gray-800">
+            <SearchComponent 
+              placeholder="Search..."
+              onSearch={(results) => console.log('Mobile search results:', results)}
+              className="text-sm"
+            />
+          </div>
+        )}
         
         {/* Navigation Links with Scrolling - Scrollable */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide py-4">
@@ -170,18 +191,18 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
           </ul>
         </nav>
         
-        {/* Profile Button - Fixed at bottom */}
-        <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
-          <button
-            onClick={() => {
-              window.dispatchEvent(new CustomEvent('openProfileModal'));
-            }}
-            className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-gray-800 transition-colors"
-          >
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <FiUser className="w-5 h-5 text-white" />
-            </div>
-            {(!isCollapsed || isMobile) && (
+        {/* Profile Button - Fixed at bottom (mobile only) */}
+        {isMobile && (
+          <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
+            <button
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('openProfileModal'));
+              }}
+              className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+            >
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <FiUser className="w-5 h-5 text-white" />
+              </div>
               <div className="ml-3 text-left">
                 <span className="text-white font-medium block truncate">
                   {user?.displayName || 'Profile'}
@@ -190,9 +211,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
                   {user?.email || 'View profile'}
                 </span>
               </div>
-            )}
-          </button>
-        </div>
+            </button>
+          </div>
+        )}
       </motion.div>
     </>
   );

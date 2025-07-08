@@ -16,8 +16,9 @@ export default function DepartmentComplaints() {
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // First, check department head status if needed
   useEffect(() => {
-    console.log('--- useEffect Triggered ---');
+    console.log('--- Initial useEffect Triggered ---');
     console.log(`User: ${user?.email}, Admin: ${isAdmin}, DeptHead: ${isDepartmentHead}`);
 
     if (!user) {
@@ -26,17 +27,14 @@ export default function DepartmentComplaints() {
       return;
     }
 
-    if (isAdmin) {
-      console.log('User is Admin. Fetching all complaints.');
-      fetchComplaints(null);
-    } else if (isDepartmentHead && user.email) {
+    // For department heads, we need to get their department first
+    if (isDepartmentHead && user.email) {
       console.log('User is Department Head. Checking department status...');
       checkDepartmentHeadStatus(user.email)
         .then(({ department }) => {
           if (department && department.name) {
-            console.log(`Department found: ${department.name}. Fetching complaints for this department.`);
+            console.log(`Department found: ${department.name}`);
             setDepartmentInfo(department);
-            fetchComplaints(department.name);
           } else {
             console.log('Department Head status checked, but no department name found.');
             setError('You are a department head, but your department could not be identified.');
@@ -48,12 +46,23 @@ export default function DepartmentComplaints() {
           setError('An error occurred while verifying your department.');
           setLoading(false);
         });
-    } else {
-      console.log('User is not an Admin or Department Head. Access denied.');
-      setError('You are not authorized to view this page.');
-      setLoading(false);
     }
-  }, [user, isAdmin, isDepartmentHead]);
+  }, [user, isDepartmentHead]);
+
+  // Then fetch complaints based on role and department info
+  useEffect(() => {
+    console.log('--- Fetch Complaints useEffect Triggered ---');
+    
+    if (!user) return;
+    
+    if (isAdmin) {
+      console.log('User is Admin. Fetching all complaints.');
+      fetchComplaints(null);
+    } else if (isDepartmentHead && departmentInfo?.name) {
+      console.log(`Department info available. Fetching complaints for: ${departmentInfo.name}`);
+      fetchComplaints(departmentInfo.name);
+    }
+  }, [user, isAdmin, isDepartmentHead, departmentInfo]);
 
   const fetchComplaints = async (departmentName: string | null) => {
     console.log(`--- fetchComplaints called with departmentName: ${departmentName} ---`);
@@ -62,8 +71,10 @@ export default function DepartmentComplaints() {
     try {
       let fetchedData: DepartmentComplaint[] = [];
       if (departmentName) {
+        console.log(`Fetching complaints for department: ${departmentName}`);
         fetchedData = await getDepartmentComplaintsByDepartment(departmentName);
       } else if (isAdmin) {
+        console.log('Fetching all department complaints as admin');
         fetchedData = await getDepartmentComplaints();
       }
       console.log(`Fetched ${fetchedData.length} complaints.`);

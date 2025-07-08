@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiSearch, FiX } from 'react-icons/fi';
+import SearchComponent from './SearchComponent';
 
 interface TopBarProps {
   leftSidebarCollapsed: boolean;
@@ -15,8 +15,8 @@ export default function TopBar({
   rightSidebarCollapsed,
   onRightSidebarToggle
 }: TopBarProps) {
-  const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -42,8 +42,9 @@ export default function TopBar({
     };
   };
 
-  const handleClearSearch = () => {
-    setSearchQuery('');
+  const handleSearchResults = (results: any[]) => {
+    setSearchResults(results);
+    console.log('Search results:', results);
   };
 
   return (
@@ -54,24 +55,13 @@ export default function TopBar({
     >
       <div className="w-full px-4">
         <div className="max-w-3xl mx-auto relative">
-          <div className="relative">
-            <input
-              type="text"
+          {/* Only show search on desktop - mobile search is in sidebar */}
+          {!isMobile && (
+            <SearchComponent 
               placeholder="Search CampusWell..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-800 text-white rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+              onSearch={handleSearchResults}
             />
-            <FiSearch className="absolute left-3 top-2.5 text-gray-500" />
-            {searchQuery && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-300"
-              >
-                <FiX />
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </motion.div>

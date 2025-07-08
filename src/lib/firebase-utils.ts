@@ -1064,25 +1064,37 @@ export const updateDepartmentComplaintStatus = async (
 // Get department complaints for specific department (for department heads)
 export const getDepartmentComplaintsByDepartment = async (departmentName: string): Promise<DepartmentComplaint[]> => {
   try {
-    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department NAME:', departmentName);
-    const complaintsQuery = query(
+    console.log(`Fetching complaints for department: "${departmentName}"`);
+    console.log(`Firebase Project ID: ${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unknown'}`);
+    console.log(`Collection path: "departmentComplaints"`);
+    
+    // Query using the 'department' field which contains the department name
+    const q = query(
       collection(db, 'departmentComplaints'),
-      where('department', '==', departmentName), // Changed to 'department' field
-      orderBy('timestamp', 'desc') // FIX: Order by 'timestamp' to match bot data
+      where('department', '==', departmentName),
+      orderBy('createdAt', 'desc')
     );
-    const querySnapshot = await getDocs(complaintsQuery);
-    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department NAME:', departmentName);
     
-    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
-      id: doc.id,
-      ...doc.data()
-    }) as DepartmentComplaint);
+    const querySnapshot = await getDocs(q);
+    console.log(`Found ${querySnapshot.size} complaints for department: ${departmentName}`);
     
-    console.log('📋 getDepartmentComplaintsByDepartment: Processed complaints:', complaints);
+    const complaints: DepartmentComplaint[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      complaints.push({
+        id: doc.id,
+        ...data,
+        createdAt: processTimestamp(data.createdAt),
+        updatedAt: processTimestamp(data.updatedAt),
+        resolvedAt: data.resolvedAt ? processTimestamp(data.resolvedAt) : null,
+      } as DepartmentComplaint);
+    });
+    
     return complaints;
   } catch (error) {
-    console.error('❌ getDepartmentComplaintsByDepartment: Error getting department complaints by department:', error);
-    return [];
+    console.error(`Error fetching department complaints for ${departmentName}:`, error);
+    console.error(`Project ID: ${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unknown'}`);
+    throw error;
   }
 };
 

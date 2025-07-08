@@ -77,56 +77,42 @@ export default function LayoutShell({ children }: LayoutShellProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="flex h-screen bg-gray-950 text-white">
       {/* Left Sidebar - Desktop Only */}
       {!isMobile && (
-        <LeftSidebar 
+        <LeftSidebar
           isCollapsed={leftSidebarCollapsed}
           onToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
         />
       )}
 
+      {/* Main Content Area */}
+      <div className="flex flex-col flex-grow relative">
+        {/* Top Bar */}
+        <TopBar
+          leftSidebarCollapsed={leftSidebarCollapsed}
+          rightSidebarCollapsed={rightSidebarCollapsed}
+          onRightSidebarToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+        />
+
+        {/* Main Scrollable Content */}
+        <motion.main
+          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8"
+          style={{
+            marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
+          }}
+        >
+          {children}
+        </motion.main>
+      </div>
+
+
       {/* Right Sidebar */}
-      <RightSidebar 
+      <RightSidebar
         isCollapsed={rightSidebarCollapsed}
         onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
         onCreatePost={() => setShowCreateModal(true)}
       />
-
-      {/* Top Bar */}
-      <TopBar 
-        leftSidebarCollapsed={leftSidebarCollapsed}
-        rightSidebarCollapsed={rightSidebarCollapsed}
-        onRightSidebarToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
-      />
-
-      {/* Main Content */}
-      <motion.main
-        className={`transition-all duration-300 pt-24 p-4 sm:p-6 md:p-8 pb-20 md:pb-8`}
-        style={{
-          marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '80px' : '272px'),
-          marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
-        }}
-      >
-        {/* Search Results Display - conditionally rendered */}
-        {searchResults.length > 0 && (
-          <div className="max-w-3xl mx-auto p-4 mt-4 bg-gray-800 rounded-lg shadow-lg">
-            <h3 className="text-lg font-medium mb-2">Search Results</h3>
-            <div className="space-y-2">
-              {searchResults.map((result, index) => (
-                <div key={index} className="p-3 bg-gray-700 rounded hover:bg-gray-600 transition-colors">
-                  <Link href={result.link} className="block">
-                    <h4 className="font-medium text-blue-400">{result.title}</h4>
-                    <p className="text-sm text-gray-300">{result.description}</p>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {children}
-      </motion.main>
 
       {/* Desktop Profile FAB (only shown when right sidebar is collapsed) */}
       {!isMobile && rightSidebarCollapsed && (

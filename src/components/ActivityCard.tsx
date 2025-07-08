@@ -26,16 +26,16 @@ const DEFAULT_IMAGES = {
 // Fallback image if category doesn't match
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
 
-// Categories with corresponding colors for dark theme
+// Categories mapping (colors removed)
 const CATEGORIES = {
-  'Academic': { bg: 'bg-blue-900', text: 'text-blue-300' },
-  'Sports': { bg: 'bg-green-900', text: 'text-green-300' },
-  'Cultural': { bg: 'bg-purple-900', text: 'text-purple-300' },
-  'Social': { bg: 'bg-pink-900', text: 'text-pink-300' },
-  'Wellness': { bg: 'bg-teal-900', text: 'text-teal-300' },
-  'Professional': { bg: 'bg-indigo-900', text: 'text-indigo-300' },
-  'Volunteer': { bg: 'bg-orange-900', text: 'text-orange-300' },
-  'Entertainment': { bg: 'bg-red-900', text: 'text-red-300' },
+  'Academic': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Sports': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Cultural': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Social': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Wellness': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Professional': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Volunteer': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Entertainment': { bg: 'bg-gray-800', text: 'text-gray-300' },
   'Other': { bg: 'bg-gray-800', text: 'text-gray-300' }
 };
 
@@ -183,7 +183,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
       <div className="px-4 py-3 hover:bg-gray-950 hover:bg-opacity-40 transition-all duration-300 cursor-pointer border-b border-gray-800">
         <div className="flex space-x-3">
           {/* Profile Picture */}
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
             <FiUser className="text-white text-base" />
           </div>
 
@@ -224,11 +224,11 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
                 <button
                   onClick={handleDeletePost}
                   disabled={loading.delete}
-                  className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
+                  className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
                   title={isAuthor ? "Delete your activity" : "Delete as moderator"}
                 >
                   {loading.delete ? (
-                    <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <FiTrash2 className="text-sm" />
                   )}

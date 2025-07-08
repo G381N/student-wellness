@@ -7,24 +7,27 @@ import { Post, upvotePost, downvotePost, addComment, processTimestamp, deletePos
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserInfo } from '@/hooks/useUserInfo';
 
-// Categories with corresponding colors for dark theme
+// Fallback image if category doesn't match
+const FALLBACK_IMAGE = '/images/activity-default.jpg';
+
+// Categories mapping (colors removed)
 const CATEGORIES = {
-  'Mental Health': { bg: 'bg-purple-900', text: 'text-purple-300' },
-  'Bullying': { bg: 'bg-red-900', text: 'text-red-300' },
-  'Loneliness': { bg: 'bg-blue-900', text: 'text-blue-300' },
-  'Academic Stress': { bg: 'bg-orange-900', text: 'text-orange-300' },
-  'Discrimination': { bg: 'bg-pink-900', text: 'text-pink-300' },
-  'Safety': { bg: 'bg-yellow-900', text: 'text-yellow-300' },
-  'Wellness': { bg: 'bg-green-900', text: 'text-green-300' },
+  'Mental Health': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Bullying': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Loneliness': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Academic Stress': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Discrimination': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Safety': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'Wellness': { bg: 'bg-gray-800', text: 'text-gray-300' },
   'Facilities': { bg: 'bg-gray-800', text: 'text-gray-300' },
   'Other': { bg: 'bg-gray-800', text: 'text-gray-300' }
 };
 
-// Status badges for dark theme
+// Status badges for dark theme (colors removed)
 const STATUS_BADGES = {
-  'new': { bg: 'bg-blue-900', text: 'text-blue-300' },
-  'reviewing': { bg: 'bg-yellow-900', text: 'text-yellow-300' },
-  'resolved': { bg: 'bg-green-900', text: 'text-green-300' }
+  'new': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'reviewing': { bg: 'bg-gray-800', text: 'text-gray-300' },
+  'resolved': { bg: 'bg-gray-800', text: 'text-gray-300' }
 };
 
 interface ConcernCardProps {
@@ -146,7 +149,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
     <div className="px-4 py-3 hover:bg-gray-950 hover:bg-opacity-40 transition-all duration-300 cursor-pointer border-b border-gray-800">
       <div className="flex space-x-3">
         {/* Profile Picture */}
-        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
           <FiUser className="text-white text-base" />
         </div>
 
@@ -192,11 +195,11 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
               <button
                 onClick={handleDeletePost}
                 disabled={loading.delete}
-                className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
+                className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
                 title={isAuthor ? "Delete your concern" : "Delete as moderator"}
               >
                 {loading.delete ? (
-                  <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <FiTrash2 className="text-sm" />
                 )}
@@ -225,9 +228,9 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
           <div className="flex items-center space-x-6 text-gray-500">
             <button
               onClick={handleToggleComment}
-              className="flex items-center space-x-2 hover:text-blue-400 transition-colors group"
+              className="flex items-center space-x-2 hover:text-white transition-colors group"
             >
-              <div className="p-2 rounded-full group-hover:bg-blue-900 group-hover:bg-opacity-20 transition-colors">
+              <div className="p-2 rounded-full group-hover:bg-gray-800 transition-colors">
                 <FiMessageCircle className="w-[18px] h-[18px]" />
               </div>
               <span className="text-sm">{concern.comments?.length || 0}</span>
@@ -237,18 +240,18 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
               onClick={handleEscalate}
               disabled={loading.upvote}
               className={`flex items-center space-x-2 transition-colors group ${
-                hasUpvoted ? 'text-orange-400' : 'hover:text-orange-400'
+                hasUpvoted ? 'text-white' : 'hover:text-white'
               }`}
             >
               <div className={`p-2 rounded-full transition-colors ${
                 hasUpvoted 
-                  ? 'bg-orange-900 bg-opacity-20' 
-                  : 'group-hover:bg-orange-900 group-hover:bg-opacity-20'
+                  ? 'bg-gray-700' 
+                  : 'group-hover:bg-gray-800'
               }`}>
                 {loading.upvote ? (
-                  <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <FiAlertCircle className="w-[18px] h-[18px]" />
+                  <FiThumbsUp className="w-[18px] h-[18px]" />
                 )}
               </div>
               <span className="text-sm">{concern.upvotes || 0}</span>
@@ -292,8 +295,8 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                 
                 {/* Add comment form */}
                 <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <FiUser className="text-white text-xs" />
+                  <div className="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                    <FiUser className="text-gray-400 text-xs" />
                   </div>
                   <div className="flex-grow relative">
                     <input
@@ -302,7 +305,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="w-full bg-transparent border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                      className="w-full bg-transparent border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -313,7 +316,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                     <button
                       onClick={handleAddComment}
                       disabled={!comment.trim() || loading.comment}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-400 disabled:text-gray-600 text-sm font-medium"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 disabled:text-gray-600 text-sm font-medium"
                     >
                       {loading.comment ? (
                         <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>

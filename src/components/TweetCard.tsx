@@ -208,7 +208,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
             {canDelete && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-gray-400 hover:text-red-400 transition-colors duration-200 p-2 rounded-full hover:bg-red-900 hover:bg-opacity-30"
+                className="text-gray-400 hover:text-white transition-colors duration-200 p-2 rounded-full hover:bg-gray-700"
               >
                 <FiTrash2 className="text-lg" />
               </button>
@@ -231,10 +231,10 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 disabled={isJoining || (isFull && !isParticipating)}
                 className={`mt-4 w-full py-2 px-4 rounded-full flex items-center justify-center space-x-2 transition-all duration-200 ${
                   isParticipating
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    ? 'bg-gray-700 hover:bg-gray-600 text-white'
                     : isFull
-                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-600 hover:bg-gray-500 text-white'
                 }`}
               >
                 {isJoining ? (

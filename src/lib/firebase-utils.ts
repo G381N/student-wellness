@@ -140,6 +140,20 @@ export interface MindWallIssue {
   adminNotes?: string;
 }
 
+export interface Counselor {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  specialization: string;
+  availableHours: string;
+  bio: string;
+  imageUrl?: string;
+  isActive: boolean;
+  addedBy: string;
+  createdAt: any;
+}
+
 export interface Moderator {
   id: string;
   userId: string;
@@ -736,6 +750,34 @@ export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
     throw error;
   }
 };
+
+// ============================================================================
+// COUNSELOR MANAGEMENT
+// ============================================================================
+
+export const getCounselors = async (): Promise<Counselor[]> => {
+  const counselorsCollection = collection(db, 'counselors');
+  const q = query(counselorsCollection, orderBy('name', 'asc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Counselor));
+};
+
+export const addCounselor = async (counselorData: Omit<Counselor, 'id'>): Promise<string> => {
+  const docRef = await addDoc(collection(db, 'counselors'), {
+    ...counselorData,
+    createdAt: serverTimestamp()
+  });
+  return docRef.id;
+};
+
+export const updateCounselor = async (counselorId: string, updateData: Partial<Counselor>): Promise<void> => {
+  await updateDoc(doc(db, 'counselors', counselorId), updateData);
+};
+
+export const deleteCounselor = async (counselorId: string): Promise<void> => {
+  await deleteDoc(doc(db, 'counselors', counselorId));
+};
+
 
 // ============================================================================
 // MODERATOR MANAGEMENT

@@ -150,7 +150,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Welcome Header */}
-      <div className="mb-8">
+      <div className="mb-8 hidden md:block">
                 <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

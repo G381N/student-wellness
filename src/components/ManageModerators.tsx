@@ -18,6 +18,7 @@ export default function ManageModerators() {
   const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
+    console.log('ManageModerators useEffect triggered. isAdmin:', isAdmin);
     if (isAdmin) {
       fetchModerators();
     }

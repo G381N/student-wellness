@@ -17,7 +17,8 @@ import {
   FiCheck, 
   FiX, 
   FiAlertTriangle,
-  FiSave 
+  FiSave,
+  FiCheckCircle
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { Counselor, getCounselors, addCounselor, updateCounselor, deleteCounselor } from '@/lib/firebase-utils';
@@ -172,39 +173,42 @@ export default function ManageCounselors() {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    {/* Specializations */}
-                    <div>
-                      <h4 className="text-gray-300 text-sm font-medium mb-2">Specializations</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {counselor.specializations.map((spec: string, index: number) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-blue-900/30 text-blue-300 rounded-full text-xs font-medium border border-blue-800/50"
-                          >
-                            {spec}
-                          </span>
-                        ))}
+                  <div className="space-y-4">
+                    {/* Specializations and Available Days in 2 columns on larger screens */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Specializations */}
+                      <div>
+                        <h4 className="text-gray-300 text-sm font-medium mb-2">Specializations</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {counselor.specializations.map((spec: string, index: number) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-blue-900/30 text-blue-300 rounded-full text-xs font-medium border border-blue-800/50"
+                            >
+                              {spec}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Available Days */}
-                    <div>
-                      <h4 className="text-gray-300 text-sm font-medium mb-2">Available Days</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {counselor.availableDays.map((day, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-green-900/30 text-green-300 rounded-full text-xs font-medium border border-green-800/50"
-                          >
-                            {day}
-                          </span>
-                        ))}
+                      {/* Available Days */}
+                      <div>
+                        <h4 className="text-gray-300 text-sm font-medium mb-2">Available Days</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {counselor.availableDays.map((day, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-green-900/30 text-green-300 rounded-full text-xs font-medium border border-green-800/50"
+                            >
+                              {day}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
                     {/* Working Details */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-800">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-gray-800">
                       <div>
                         <h4 className="text-gray-400 text-xs uppercase tracking-wide mb-1">Working Hours</h4>
                         <p className="text-white text-sm font-medium">{counselor.workingHours}</p>
@@ -216,7 +220,7 @@ export default function ManageCounselors() {
                     </div>
 
                     {counselor.notes && (
-                      <div className="pt-2 border-t border-gray-800">
+                      <div className="pt-4 border-t border-gray-800">
                         <h4 className="text-gray-400 text-xs uppercase tracking-wide mb-1">Notes</h4>
                         <p className="text-gray-300 text-sm break-words">{counselor.notes}</p>
                       </div>
@@ -231,7 +235,7 @@ export default function ManageCounselors() {
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
                   >
                     <FiEdit2 className="w-4 h-4" />
-                    <span className="hidden sm:inline">Edit</span>
+                    <span className="sm:inline">Edit</span>
                   </button>
                   <button
                     onClick={() => handleDeleteCounselor(counselor.id)}
@@ -243,7 +247,7 @@ export default function ManageCounselors() {
                     ) : (
                       <FiTrash2 className="w-4 h-4" />
                     )}
-                    <span className="hidden sm:inline">{deleting === counselor.id ? 'Deleting...' : 'Delete'}</span>
+                    <span className="sm:inline">{deleting === counselor.id ? 'Deleting...' : 'Delete'}</span>
                   </button>
                 </div>
               </div>
@@ -306,7 +310,7 @@ export default function ManageCounselors() {
                 <textarea name="notes" value={formData.notes || ''} onChange={handleChange} placeholder="Internal notes about the counselor..." className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" rows={3} />
                 <div className="flex justify-end gap-4 pt-4">
                   <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white px-6 py-2 rounded-lg">Cancel</button>
-                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"><FiCheck/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
+                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"><FiCheckCircle/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
                 </div>
               </form>
             </motion.div>

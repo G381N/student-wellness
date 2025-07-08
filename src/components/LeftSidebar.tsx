@@ -1,25 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  FiHome, 
-  FiMessageSquare, 
-  FiUsers, 
-  FiShield, 
-  FiSettings, 
-  FiMenu,
+import {
+  FiHome,
+  FiMessageSquare,
+  FiHeart,
+  FiActivity,
+  FiAlertCircle,
+  FiWind,
+  FiBell,
+  FiUsers,
+  FiShield,
+  FiPhone,
+  FiCalendar,
+  FiSpeaker,
+  FiBriefcase,
   FiChevronRight,
   FiUser,
-  FiHeart,
-  FiFlag,
-  FiFileText,
+  FiHardDrive,
   FiUserCheck,
-  FiCalendar,
-  FiActivity,
-  FiBell,
-  FiAlertCircle
+  FiMenu,
+  FiLogOut,
+  FiX
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -28,11 +33,11 @@ interface LeftSidebarProps {
   onToggle: () => void;
 }
 
-export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps) {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
   const { user, isAdmin, isDepartmentHead } = useAuth();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
-
+  
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -43,89 +48,112 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Navigation items based on user role
-  const getNavItems = () => {
-    const baseItems = [
-      { href: '/dashboard', icon: FiHome, label: 'Dashboard' },
-      { href: '/discussion-hub', icon: FiMessageSquare, label: 'Discussion Hub' },
-      { href: '/mind-wall', icon: FiHeart, label: 'Mind Wall' },
-    ];
+  // --- REVISED LINK LOGIC ---
+  const baseLinks = [
+    { href: '/dashboard', icon: FiHome, label: 'Home' },
+    { href: '/dashboard/activities', icon: FiCalendar, label: 'Activities' },
+    { href: '/dashboard/concerns', icon: FiMessageSquare, label: 'Concerns' },
+    { href: '/dashboard/mind-wall', icon: FiHeart, label: 'Mind Wall' },
+    { href: '/dashboard/wellness', icon: FiActivity, label: 'Wellness' },
+  ];
 
-    if (isAdmin) {
-      return [
-        ...baseItems,
-        { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
-        { href: '/complaints-hub', icon: FiFlag, label: 'Manage Complaints' },
-        { href: '/dashboard/manage-counselors', icon: FiUsers, label: 'Manage Counselors' },
-        { href: '/dashboard/manage-moderators', icon: FiShield, label: 'Manage Moderators' },
-        { href: '/dashboard/manage-departments', icon: FiFileText, label: 'Manage Departments' },
-        { href: '/settings', icon: FiSettings, label: 'Settings' },
-      ];
-    } else if (isDepartmentHead) {
-      return [
-        ...baseItems,
-        { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
-        { href: '/dashboard/department-complaints', icon: FiFlag, label: 'Department Complaints' },
-        { href: '/dashboard/manage-counselors', icon: FiUsers, label: 'Manage Counselors' },
-        { href: '/settings', icon: FiSettings, label: 'Settings' },
-      ];
-    } else {
-      return [
-        ...baseItems,
-        { href: '/dashboard/activities', icon: FiCalendar, label: 'Activities' },
-        { href: '/dashboard/concerns', icon: FiAlertCircle, label: 'Concerns' },
-        { href: '/dashboard/wellness', icon: FiActivity, label: 'Wellness' },
-        { href: '/settings', icon: FiSettings, label: 'Settings' },
-      ];
-    }
-  };
+  let finalLinks = [...baseLinks];
 
-  const navItems = getNavItems();
+  // Add links for Department Heads
+  if (isDepartmentHead) {
+    finalLinks.push({ href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' });
+  }
+
+  // Add links for Admins (they get everything)
+  if (isAdmin) {
+    finalLinks.push(
+      { href: '/dashboard/announcements', icon: FiBell, label: 'Announcements' },
+      { href: '/dashboard/anonymous-complaints', icon: FiShield, label: 'Anonymous Complaints' },
+      { href: '/dashboard/department-complaints', icon: FiBriefcase, label: 'Department Complaints' },
+      { href: '/dashboard/manage-departments', icon: FiHardDrive, label: 'Manage Departments' },
+      { href: '/dashboard/manage-moderators', icon: FiUserCheck, label: 'Manage Moderators' },
+      { href: '/dashboard/manage-counselors', icon: FiUsers, label: 'Manage Counselors' }
+    );
+  }
+
+  // Ensure all links are unique
+  const uniqueLinks = Array.from(new Map(finalLinks.map(link => [link.href, link])).values());
+  // --- END REVISED LOGIC ---
+
+  // On mobile, when collapsed, show only a burger button
+  if (isMobile && isCollapsed) {
+    return (
+      <button
+        onClick={onToggle}
+        className="fixed top-4 left-4 z-50 p-3 bg-gray-900 text-white rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors shadow-lg"
+        aria-label="Open menu"
+      >
+        <FiMenu className="w-6 h-6" />
+      </button>
+    );
+  }
 
   return (
     <>
       {/* Mobile overlay */}
       {isMobile && !isCollapsed && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="fixed inset-0 bg-black bg-opacity-70 z-30"
           onClick={onToggle}
         />
       )}
-
+    
       {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-full z-40 ${
-          isCollapsed ? 'w-16' : 'w-64'
-        } bg-gray-900 border-r border-gray-800 transition-all duration-300 flex flex-col ${
-          isMobile && isCollapsed ? '-translate-x-full' : 'translate-x-0'
-        }`}
+      <motion.div
+        className={`fixed top-0 left-0 h-full z-40 flex flex-col ${
+          isCollapsed && !isMobile ? 'w-16' : 'w-64'
+        } bg-gray-900 border-r border-gray-800 transition-all duration-300`}
+        initial={false}
+        animate={{ 
+          width: isCollapsed && !isMobile ? 64 : 256,
+          x: isMobile && isCollapsed ? -300 : 0
+        }}
       >
-        {/* Header with Logo and Toggle */}
-        <div className="flex items-center justify-between px-4 h-16 border-b border-gray-800 relative">
-          {!isCollapsed && (
-            <Link href="/dashboard" className="flex items-center">
-              <div className="text-blue-500 text-2xl mr-2">💙</div>
+        {/* Header with Logo - Fixed */}
+        <div className="flex items-center justify-between px-4 h-16 border-b border-gray-800 relative sticky top-0 bg-gray-900 z-10">
+          <Link href="/dashboard" className="flex items-center">
+            <div className="text-blue-500 text-2xl mr-2">💙</div>
+            {(!isCollapsed || isMobile) && (
               <span className="text-white font-bold text-xl">CampusWell</span>
-            </Link>
+            )}
+          </Link>
+          
+          {/* Collapse/Expand Toggle Button (desktop only) */}
+          {!isMobile && (
+            <button
+              onClick={onToggle}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors z-10"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <FiChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} />
+            </button>
           )}
           
-          {/* Collapse/Expand Toggle Button */}
-          <button
-            onClick={onToggle}
-            className={`absolute ${isCollapsed ? 'right-1' : 'right-2'} top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors z-10`}
-          >
-            <FiChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} />
-          </button>
+          {/* Close button (mobile only) */}
+          {isMobile && (
+            <button
+              onClick={onToggle}
+              className="p-2 text-gray-400 hover:text-white"
+              aria-label="Close sidebar"
+            >
+              <FiX className="w-5 h-5" />
+            </button>
+          )}
         </div>
-
-        {/* Navigation Links with Scrolling */}
-        <nav className="flex-1 overflow-y-auto scrollbar-hide">
-          <ul className="space-y-1 px-2 py-4">
-            {navItems.map((link) => {
+        
+        {/* Navigation Links with Scrolling - Scrollable */}
+        <nav className="flex-1 overflow-y-auto scrollbar-hide py-4">
+          <ul className="space-y-1 px-2">
+            {uniqueLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
                       isActive
@@ -133,34 +161,41 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
                         : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                     }`}
                   >
-                    <link.icon className={`${isCollapsed ? 'mx-auto' : 'mr-3'} text-xl`} />
-                    {!isCollapsed && <span>{link.label}</span>}
+                    <link.icon className={`${isCollapsed && !isMobile ? 'mx-auto' : 'mr-3'} text-xl`} />
+                    {(!isCollapsed || isMobile) && <span>{link.label}</span>}
                   </Link>
                 </li>
               );
             })}
           </ul>
         </nav>
-
-        {/* Mobile-only Profile Section */}
-        {isMobile && !isCollapsed && (
-          <div className="p-4 border-t border-gray-800">
-            <div className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <FiUser className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm truncate">
-                  {user?.displayName || user?.email || 'User'}
-                </p>
-                <p className="text-gray-400 text-xs">
-                  {isAdmin ? 'Administrator' : isDepartmentHead ? 'Department Head' : 'Student'}
-                </p>
-              </div>
+        
+        {/* Profile Button - Fixed at bottom */}
+        <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('openProfileModal'));
+            }}
+            className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+          >
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <FiUser className="w-5 h-5 text-white" />
             </div>
-          </div>
-        )}
-      </div>
+            {(!isCollapsed || isMobile) && (
+              <div className="ml-3 text-left">
+                <span className="text-white font-medium block truncate">
+                  {user?.displayName || 'Profile'}
+                </span>
+                <span className="text-gray-400 text-xs truncate block">
+                  {user?.email || 'View profile'}
+                </span>
+              </div>
+            )}
+          </button>
+        </div>
+      </motion.div>
     </>
   );
-} 
+};
+
+export default LeftSidebar; 

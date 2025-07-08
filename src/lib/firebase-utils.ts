@@ -145,7 +145,9 @@ export interface Moderator {
   userId: string;
   email: string;
   name: string;
-  addedAt: any;
+  assignedAt?: any; // Keep for backward compatibility
+  addedAt?: any;    // Add to match the field in the database
+  addedBy?: string; // Add to match the field in the database
   isActive: boolean;
 }
 
@@ -743,31 +745,55 @@ export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
 
 export const getModerators = async (): Promise<Moderator[]> => {
   try {
+    console.log('🔍 getModerators: Starting to fetch moderators...');
+    
+    // Access Firebase project ID for debugging
+    const appConfig = db.app.options;
+    console.log('📊 getModerators: Connected to Firebase Project ID:', appConfig.projectId);
+    
     const moderatorsQuery = query(
       collection(db, 'moderators'), 
       orderBy('addedAt', 'desc')
     );
+    console.log("📊 getModerators: Query created with orderBy 'addedAt' desc");
+    
     const querySnapshot = await getDocs(moderatorsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
-      id: doc.id,
-      ...doc.data()
-    }) as Moderator);
+    console.log('📊 getModerators: Query executed, found', querySnapshot.size, 'documents');
+    
+    const moderators = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data();
+      console.log('📋 getModerators: Processing document', doc.id, ':', data);
+      return {
+        id: doc.id,
+        ...data,
+        // Ensure we have the right field for timestamps
+        assignedAt: data.addedAt || data.assignedAt || null
+      } as Moderator;
+    });
+    
+    console.log('✅ getModerators: Returning', moderators.length, 'moderators');
+    return moderators;
   } catch (error) {
-    console.error('Error getting moderators:', error);
+    console.error('❌ getModerators: Error getting moderators:', error);
     return [];
   }
 };
 
 export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promise<string> => {
   try {
+    console.log('🔍 addModerator: Adding new moderator with data:', moderatorData);
+    
     const docRef = await addDoc(collection(db, 'moderators'), {
       ...moderatorData,
       addedAt: serverTimestamp(),
+      assignedAt: serverTimestamp(), // Keep for backward compatibility
       isActive: true
     });
+    
+    console.log('✅ addModerator: Successfully added moderator with ID:', docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error('Error adding moderator:', error);
+    console.error('❌ addModerator: Error adding moderator:', error);
     throw error;
   }
 };

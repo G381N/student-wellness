@@ -46,13 +46,14 @@ export default function ManageModerators() {
       
       // Create the moderator object with all required fields
       const moderatorData: Omit<Moderator, 'id'> = {
-        userId: '', // Will be set when user signs up or is found
+        userId: user.uid, // Use the current user's ID as the one who added the moderator
         email: newModeratorEmail.trim(),
         name: newModeratorName.trim(),
-        addedAt: new Date(), // Will be overridden by serverTimestamp in the function
+        addedBy: user.uid, // Add the user ID of who added this moderator
         isActive: true
       };
       
+      console.log('Adding moderator with data:', moderatorData);
       await addModerator(moderatorData);
       
       // Refresh the list
@@ -95,6 +96,7 @@ export default function ManageModerators() {
     if (!timestamp) return 'Unknown';
     
     try {
+      console.log('Formatting timestamp:', timestamp);
       let date;
       if (timestamp.toDate && typeof timestamp.toDate === 'function') {
         date = timestamp.toDate();
@@ -106,6 +108,7 @@ export default function ManageModerators() {
       
       return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
+      console.error('Error formatting timestamp:', error);
       return 'Unknown';
     }
   };
@@ -235,7 +238,7 @@ export default function ManageModerators() {
                       
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className="text-right">
-                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.addedAt)}</p>
+                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.addedAt || moderator.assignedAt)}</p>
                           <p className={`text-xs font-medium ${moderator.isActive ? 'text-green-400' : 'text-gray-500'}`}>
                             {moderator.isActive ? 'Active' : 'Inactive'}
                           </p>

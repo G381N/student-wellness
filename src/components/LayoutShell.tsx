@@ -50,14 +50,14 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       return {
         paddingLeft: '0px',
         paddingRight: '0px',
-        paddingTop: '0px', // Remove excessive top padding on mobile
+        paddingTop: '64px', // Space for top bar
       };
     }
     
     return {
-      paddingLeft: leftSidebarCollapsed ? '64px' : '256px', // Adjusted for sidebar widths
-      paddingRight: rightSidebarCollapsed ? '0px' : '320px',
-      paddingTop: '0px', // Remove excessive top padding on desktop
+      paddingLeft: leftSidebarCollapsed ? '80px' : '272px', // 64px/256px for sidebar + 16px padding
+      paddingRight: rightSidebarCollapsed ? '16px' : '336px', // 320px for sidebar + 16px padding
+      paddingTop: '80px', // Space for top bar + padding
     };
   };
 
@@ -67,7 +67,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Left Sidebar */}
       <LeftSidebar 
         isCollapsed={leftSidebarCollapsed}
@@ -81,83 +81,25 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         onCreatePost={() => setShowCreateModal(true)}
       />
 
-      {/* Mobile Top Bar with Burger Menu */}
-      {isMobile && (
-        <div className="fixed top-0 left-0 right-0 h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 z-50">
-          <div className="flex items-center space-x-3">
-            {/* Mobile Burger Menu */}
-            <button
-              onClick={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
-              className="p-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            
-            {/* App Logo */}
-            <div className="flex items-center">
-              <div className="text-blue-500 text-xl mr-2">💙</div>
-              <span className="text-white font-semibold">CampusWell</span>
-            </div>
-          </div>
-
-          {/* Mobile Search Bar */}
-          <div className="flex-1 max-w-md mx-4">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Right Side Icons */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
-              className="p-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors"
-            >
-              <FiUser className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Desktop Floating Search Bar */}
-      {!isMobile && (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-96">
-          <div className="relative">
-            <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search discussions, posts, or ask a question..."
-              className="w-full pl-12 pr-4 py-3 bg-gray-800/95 backdrop-blur-sm border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg"
-            />
-          </div>
-        </div>
-      )}
+      {/* Top Bar */}
+      <TopBar 
+        leftSidebarCollapsed={leftSidebarCollapsed}
+        rightSidebarCollapsed={rightSidebarCollapsed}
+        onRightSidebarToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+      />
 
       {/* Main Content */}
       <motion.main
-        className={`min-h-screen transition-all duration-300 bg-gray-950 ${isMobile ? 'pt-16' : 'pt-20'}`}
+        className="min-h-screen transition-all duration-300"
         style={getMainContentStyles()}
         layout
       >
-        <div className="w-full max-w-none px-4 py-6">
+        <div className="max-w-3xl mx-auto">
           {children}
         </div>
       </motion.main>
 
-      {/* Desktop Profile Button - Hidden as requested by user */}
-      {/* Commenting out as user requested to hide profile button on desktop */}
-      {/*
+      {/* Desktop Profile FAB (only shown when right sidebar is collapsed) */}
       {!isMobile && rightSidebarCollapsed && (
         <button
           onClick={() => setRightSidebarCollapsed(false)}
@@ -166,7 +108,6 @@ export default function LayoutShell({ children }: LayoutShellProps) {
           <FiUser className="text-white" />
         </button>
       )}
-      */}
 
       {/* Mobile Create Post Button */}
       {isMobile && (
@@ -187,7 +128,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         onPostCreated={handlePostCreated}
       />
 
-      {/* Profile Modal */}
+      {/* Mobile Profile Modal */}
       <ProfileModal 
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}

@@ -151,7 +151,7 @@ export default function ManageCounselors() {
           <p className="text-gray-400 mt-2">Add your first counselor to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {counselors.map((counselor) => (
             <motion.div
               key={counselor.id}
@@ -306,7 +306,7 @@ export default function ManageCounselors() {
                 <textarea name="notes" value={formData.notes || ''} onChange={handleChange} placeholder="Internal notes about the counselor..." className="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white" rows={3} />
                 <div className="flex justify-end gap-4 pt-4">
                   <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white px-6 py-2 rounded-lg">Cancel</button>
-                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"><FiCheckCircle/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
+                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"><FiCheck/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
                 </div>
               </form>
             </motion.div>

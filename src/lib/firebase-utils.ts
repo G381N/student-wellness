@@ -145,7 +145,7 @@ export interface Moderator {
   userId: string;
   email: string;
   name: string;
-  assignedAt: any;
+  addedAt: any;
   isActive: boolean;
 }
 
@@ -745,7 +745,7 @@ export const getModerators = async (): Promise<Moderator[]> => {
   try {
     const moderatorsQuery = query(
       collection(db, 'moderators'), 
-      orderBy('assignedAt', 'desc')
+      orderBy('addedAt', 'desc')
     );
     const querySnapshot = await getDocs(moderatorsQuery);
     return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
@@ -762,7 +762,7 @@ export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promis
   try {
     const docRef = await addDoc(collection(db, 'moderators'), {
       ...moderatorData,
-      assignedAt: serverTimestamp(),
+      addedAt: serverTimestamp(),
       isActive: true
     });
     return docRef.id;

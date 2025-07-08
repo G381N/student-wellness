@@ -26,7 +26,9 @@ export default function ManageModerators() {
   const fetchModerators = async () => {
     try {
       setLoading(true);
+      console.log('Fetching moderators...');
       const fetchedModerators = await getModerators();
+      console.log('Fetched moderators:', fetchedModerators);
       setModerators(fetchedModerators);
     } catch (error) {
       console.error('Error fetching moderators:', error);
@@ -47,7 +49,7 @@ export default function ManageModerators() {
         userId: '', // Will be set when user signs up or is found
         email: newModeratorEmail.trim(),
         name: newModeratorName.trim(),
-        assignedAt: new Date(), // Will be overridden by serverTimestamp in the function
+        addedAt: new Date(), // Will be overridden by serverTimestamp in the function
         isActive: true
       };
       
@@ -233,7 +235,7 @@ export default function ManageModerators() {
                       
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className="text-right">
-                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.assignedAt)}</p>
+                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.addedAt)}</p>
                           <p className={`text-xs font-medium ${moderator.isActive ? 'text-green-400' : 'text-gray-500'}`}>
                             {moderator.isActive ? 'Active' : 'Inactive'}
                           </p>

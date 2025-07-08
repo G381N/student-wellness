@@ -7,6 +7,7 @@ import RightSidebar from './RightSidebar';
 import TopBar from './TopBar';
 import ProfileModal from './ProfileModal';
 import CreatePostModal from './CreatePostModal';
+import BottomNavbar from './BottomNavbar';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -99,13 +100,10 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
       {/* Main Content */}
       <motion.main
-        className={`transition-all duration-300 pt-24 p-4 sm:p-6 md:p-8 pb-8`}
+        className={`transition-all duration-300 pt-24 p-4 sm:p-6 md:p-8 pb-20 md:pb-8`}
         style={{
-          marginLeft: isMobile ? '80px' : (leftSidebarCollapsed ? '80px' : '256px'),
+          marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
           marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
-        }}
-        animate={{
-          // This animate block is no longer needed as the margin is now static
         }}
       >
         {/* Search Results Display - conditionally rendered */}
@@ -127,6 +125,9 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         
         {children}
       </motion.main>
+
+      {/* Mobile Bottom Navbar */}
+      {isMobile && <BottomNavbar />}
 
       {/* Create Post Modal */}
       <CreatePostModal

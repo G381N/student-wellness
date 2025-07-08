@@ -3,70 +3,67 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import SearchComponent from './SearchComponent';
-import useWindowSize from '@/hooks/useWindowSize';
-import { FiMenu } from 'react-icons/fi';
 
 interface TopBarProps {
-  onToggleLeftSidebar: () => void;
   leftSidebarCollapsed: boolean;
+  rightSidebarCollapsed: boolean;
+  onRightSidebarToggle?: () => void;
 }
 
-const TopBar = ({ onToggleLeftSidebar, leftSidebarCollapsed }: TopBarProps) => {
+export default function TopBar({ 
+  leftSidebarCollapsed,
+  rightSidebarCollapsed,
+  onRightSidebarToggle
+}: TopBarProps) {
+  const [isMobile, setIsMobile] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const { isMobile } = useWindowSize();
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const getTopBarStyles = () => {
+    if (isMobile) {
+      return {
+        left: '0px',
+        right: '0px',
+      };
+    }
+    
+    return {
+      left: leftSidebarCollapsed ? '64px' : '256px',
+      right: rightSidebarCollapsed ? '0px' : '320px',
+    };
+  };
 
   const handleSearchResults = (results: any[]) => {
     setSearchResults(results);
-  };
-
-  const getTopBarStyles = () => {
-    let left = '0px';
-    let width = '100%';
-
-    if (isMobile) {
-      left = '80px';
-      width = 'calc(100% - 80px)';
-    } else {
-      left = leftSidebarCollapsed ? '80px' : '256px';
-      width = `calc(100% - ${left})`;
-    }
-
-    return {
-      left,
-      width,
-      transition: 'left 0.3s ease-in-out, width 0.3s ease-in-out',
-    };
+    console.log('Search results:', results);
   };
 
   return (
     <motion.div
-      className="fixed top-0 h-16 z-30 backdrop-blur-custom border-b border-gray-800 flex items-center justify-between px-4 sm:px-6 md:px-8"
+      className="fixed top-0 h-16 z-30 backdrop-blur-custom border-b border-gray-800 flex items-center transition-all duration-300"
       style={getTopBarStyles()}
       layout
     >
-      <div className="flex items-center gap-4">
-        {/* Hamburger Menu (desktop only) */}
-        {!isMobile && (
-           <button 
-             onClick={onToggleLeftSidebar} 
-             className="text-gray-400 hover:text-white"
-           >
-             <FiMenu className="w-6 h-6" />
-           </button>
-        )}
-        
-        {/* Search Component */}
-        <div className="w-full max-w-lg">
-          <SearchComponent 
-            placeholder="Search CampusWell..."
-            onSearch={handleSearchResults}
-          />
+      <div className="w-full px-4">
+        <div className="max-w-3xl mx-auto relative">
+          {/* Only show search on desktop - mobile search is in sidebar */}
+          {!isMobile && (
+            <SearchComponent 
+              placeholder="Search CampusWell..."
+              onSearch={handleSearchResults}
+            />
+          )}
         </div>
       </div>
-      
-      {/* Other controls can go here, e.g., Profile button for mobile top bar */}
     </motion.div>
   );
-};
-
-export default TopBar; 
+} 

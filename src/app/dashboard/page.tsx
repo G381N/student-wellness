@@ -148,10 +148,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-black text-white">
       {/* Welcome Header */}
       <div className="mb-8 hidden md:block">
-                <motion.div
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -163,8 +163,8 @@ export default function DashboardPage() {
           <p className="text-gray-400 text-lg">
             Your mental wellness dashboard
           </p>
-                </motion.div>
-        </div>
+        </motion.div>
+      </div>
 
       {/* Search Results */}
       {searchQuery && (
@@ -213,70 +213,70 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between text-xs text-gray-400">
                         <span>{issue.category}</span>
                         <span>{issue.count} voices</span>
-                  </div>
-              </div>
-                  ))}
+                      </div>
                     </div>
+                  ))}
+                </div>
               ) : (
                 <p className="text-gray-400">No results found for your search.</p>
               );
             })()}
           </motion.div>
-                  </div>
+        </div>
       )}
 
       {/* Main Feed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
         className="space-y-6"
-        >
-          {getFilteredPosts().length > 0 ? (
-            getFilteredPosts().map((post) => (
-              <div key={post.id}>
-                {post.type === 'activity' && (
-                  <ActivityCard
-                    activity={post}
-                    onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
-                  />
-                )}
-                {post.type === 'concern' && (
-                  <ConcernCard
-                    concern={post}
-                    onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
-                  />
-                )}
-                {(post.type === 'general' || post.type === 'post') && (
-                  <TweetCard
-                    tweet={post}
-                    onUpdate={handleUpdatePost}
-                    onDelete={() => handleDeletePost(post.id)}
-                  />
-                )}
-                      </div>
-                    ))
-                  ) : (
+      >
+        {getFilteredPosts().length > 0 ? (
+          getFilteredPosts().map((post) => (
+            <div key={post.id}>
+              {post.type === 'activity' && (
+                <ActivityCard
+                  activity={post}
+                  onUpdate={handleUpdatePost}
+                  onDelete={handleDeletePost}
+                />
+              )}
+              {post.type === 'concern' && (
+                <ConcernCard
+                  concern={post}
+                  onUpdate={handleUpdatePost}
+                  onDelete={handleDeletePost}
+                />
+              )}
+              {(post.type === 'general' || post.type === 'post') && (
+                <TweetCard
+                  tweet={post}
+                  onUpdate={handleUpdatePost}
+                  onDelete={() => handleDeletePost(post.id)}
+                />
+              )}
+            </div>
+          ))
+        ) : (
           <div className="text-center py-16">
             <FiHome className="text-gray-600 text-6xl mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">It's quiet in here...</h3>
             <p className="text-gray-500">Be the first to share something with the community!</p>
-                        </div>
-                      )}
-        </motion.div>
+          </div>
+        )}
+      </motion.div>
 
-        {/* Refresh Button */}
-        <div className="text-center pt-8">
-                  <button
-            onClick={handleRefresh}
-            className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"
-          >
-            <FiRefreshCw className="text-lg" />
-            <span>Refresh Feed</span>
-                  </button>
-              </div>
+      {/* Refresh Button */}
+      <div className="text-center pt-8">
+        <button
+          onClick={handleRefresh}
+          className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"
+        >
+          <FiRefreshCw className="text-lg" />
+          <span>Refresh Feed</span>
+        </button>
+      </div>
 
       {/* Create Post Modal */}
       <CreatePostModal
@@ -284,6 +284,6 @@ export default function DashboardPage() {
         onClose={() => setShowCreateModal(false)}
         onPostCreated={handlePostCreated}
       />
-    </>
+    </div>
   );
 } 

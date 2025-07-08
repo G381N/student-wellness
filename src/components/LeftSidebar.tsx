@@ -125,11 +125,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
         {/* Header with Logo - Fixed */}
         <div className={`flex items-center ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} px-4 h-16 border-b border-gray-800 relative sticky top-0 bg-gray-900 z-10`}>
           {(!isCollapsed || isMobile) && (
-            <Link href="/dashboard" className="flex items-center">
+          <Link href="/dashboard" className="flex items-center">
               <div className="text-white text-2xl mr-2">🤍</div>
               <span className="text-white font-bold text-xl">CampusWell</span>
             </Link>
-          )}
+            )}
           
           {/* Collapse/Expand Toggle Button (desktop only) - Positioned better */}
           {!isMobile && (

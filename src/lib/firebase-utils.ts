@@ -145,9 +145,7 @@ export interface Moderator {
   userId: string;
   email: string;
   name: string;
-  assignedAt?: any; // Keep for backward compatibility
-  addedAt?: any;    // Add to match the field in the database
-  addedBy?: string; // Add to match the field in the database
+  assignedAt: any;
   isActive: boolean;
 }
 
@@ -745,55 +743,31 @@ export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
 
 export const getModerators = async (): Promise<Moderator[]> => {
   try {
-    console.log('🔍 getModerators: Starting to fetch moderators...');
-    
-    // Access Firebase project ID for debugging
-    const appConfig = db.app.options;
-    console.log('📊 getModerators: Connected to Firebase Project ID:', appConfig.projectId);
-    
     const moderatorsQuery = query(
       collection(db, 'moderators'), 
-      orderBy('addedAt', 'desc')
+      orderBy('assignedAt', 'desc')
     );
-    console.log("📊 getModerators: Query created with orderBy 'addedAt' desc");
-    
     const querySnapshot = await getDocs(moderatorsQuery);
-    console.log('📊 getModerators: Query executed, found', querySnapshot.size, 'documents');
-    
-    const moderators = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-      const data = doc.data();
-      console.log('📋 getModerators: Processing document', doc.id, ':', data);
-      return {
-        id: doc.id,
-        ...data,
-        // Ensure we have the right field for timestamps
-        assignedAt: data.addedAt || data.assignedAt || null
-      } as Moderator;
-    });
-    
-    console.log('✅ getModerators: Returning', moderators.length, 'moderators');
-    return moderators;
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
+      id: doc.id,
+      ...doc.data()
+    }) as Moderator);
   } catch (error) {
-    console.error('❌ getModerators: Error getting moderators:', error);
+    console.error('Error getting moderators:', error);
     return [];
   }
 };
 
 export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promise<string> => {
   try {
-    console.log('🔍 addModerator: Adding new moderator with data:', moderatorData);
-    
     const docRef = await addDoc(collection(db, 'moderators'), {
       ...moderatorData,
-      addedAt: serverTimestamp(),
-      assignedAt: serverTimestamp(), // Keep for backward compatibility
+      assignedAt: serverTimestamp(),
       isActive: true
     });
-    
-    console.log('✅ addModerator: Successfully added moderator with ID:', docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error('❌ addModerator: Error adding moderator:', error);
+    console.error('Error adding moderator:', error);
     throw error;
   }
 };
@@ -801,79 +775,9 @@ export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promis
 // Remove moderator
 export const removeModerator = async (moderatorId: string): Promise<void> => {
   try {
-    // Future enhancement: Find the user by moderatorId and demote their role
     await deleteDoc(doc(db, 'moderators', moderatorId));
   } catch (error) {
     console.error('Error removing moderator:', error);
-    throw error;
-  }
-};
-
-// ============================================================================
-// COUNSELOR MANAGEMENT
-// ============================================================================
-
-export interface Counselor {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  specializations: string[];
-  availableDays: string[];
-  workingHours: string;
-  maxSessionsPerDay: number;
-  isActive: boolean;
-  notes?: string;
-  createdAt: any;
-  updatedAt?: any;
-}
-
-export const getCounselors = async (): Promise<Counselor[]> => {
-  try {
-    const counselorsQuery = query(collection(db, 'counselors'), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(counselorsQuery);
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Counselor[];
-  } catch (error) {
-    console.error('Error getting counselors:', error);
-    return [];
-  }
-};
-
-export const addCounselor = async (counselorData: Omit<Counselor, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>): Promise<string> => {
-  try {
-    const docRef = await addDoc(collection(db, 'counselors'), {
-      ...counselorData,
-      isActive: true,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-    return docRef.id;
-  } catch (error) {
-    console.error('Error adding counselor:', error);
-    throw error;
-  }
-};
-
-export const updateCounselor = async (counselorId: string, updateData: Partial<Omit<Counselor, 'id'>>): Promise<void> => {
-  try {
-    await updateDoc(doc(db, 'counselors', counselorId), {
-      ...updateData,
-      updatedAt: serverTimestamp(),
-    });
-  } catch (error) {
-    console.error('Error updating counselor:', error);
-    throw error;
-  }
-};
-
-export const deleteCounselor = async (counselorId: string): Promise<void> => {
-  try {
-    await deleteDoc(doc(db, 'counselors', counselorId));
-  } catch (error) {
-    console.error('Error deleting counselor:', error);
     throw error;
   }
 };
@@ -1064,37 +968,25 @@ export const updateDepartmentComplaintStatus = async (
 // Get department complaints for specific department (for department heads)
 export const getDepartmentComplaintsByDepartment = async (departmentName: string): Promise<DepartmentComplaint[]> => {
   try {
-    console.log(`Fetching complaints for department: "${departmentName}"`);
-    console.log(`Firebase Project ID: ${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unknown'}`);
-    console.log(`Collection path: "departmentComplaints"`);
-    
-    // Query using the 'department' field which contains the department name
-    const q = query(
+    console.log('🔍 getDepartmentComplaintsByDepartment: Fetching complaints for department NAME:', departmentName);
+    const complaintsQuery = query(
       collection(db, 'departmentComplaints'),
-      where('department', '==', departmentName),
-      orderBy('createdAt', 'desc')
+      where('department', '==', departmentName), // Changed to 'department' field
+      orderBy('timestamp', 'desc') // FIX: Order by 'timestamp' to match bot data
     );
+    const querySnapshot = await getDocs(complaintsQuery);
+    console.log('📊 getDepartmentComplaintsByDepartment: Found', querySnapshot.size, 'complaints for department NAME:', departmentName);
     
-    const querySnapshot = await getDocs(q);
-    console.log(`Found ${querySnapshot.size} complaints for department: ${departmentName}`);
+    const complaints = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
+      id: doc.id,
+      ...doc.data()
+    }) as DepartmentComplaint);
     
-    const complaints: DepartmentComplaint[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      complaints.push({
-        id: doc.id,
-        ...data,
-        createdAt: processTimestamp(data.createdAt),
-        updatedAt: processTimestamp(data.updatedAt),
-        resolvedAt: data.resolvedAt ? processTimestamp(data.resolvedAt) : null,
-      } as DepartmentComplaint);
-    });
-    
+    console.log('📋 getDepartmentComplaintsByDepartment: Processed complaints:', complaints);
     return complaints;
   } catch (error) {
-    console.error(`Error fetching department complaints for ${departmentName}:`, error);
-    console.error(`Project ID: ${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unknown'}`);
-    throw error;
+    console.error('❌ getDepartmentComplaintsByDepartment: Error getting department complaints by department:', error);
+    return [];
   }
 };
 

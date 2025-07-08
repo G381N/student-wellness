@@ -266,3 +266,52 @@ export default function ManageModerators() {
     </div>
   );
 } 
+                  <div className="flex-1 min-w-0">                    <div className="flex items-start mb-2">
+                      <FiUser className="text-blue-400 mr-2 flex-shrink-0 mt-1" />
+                      <h4 className="text-sm sm:text-lg font-bold text-white break-words flex-1 min-w-0">{moderator.email}</h4>
+                    </div>
+                    <div className="flex flex-col gap-1 sm:gap-2 text-gray-400 text-xs sm:text-sm">
+                      <div className="flex items-center">
+                        <FiMail className="mr-2 flex-shrink-0" />
+                        <span className="break-words min-w-0 flex-1">{moderator.email}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FiCalendar className="mr-2 flex-shrink-0" />
+                        <span className="whitespace-nowrap">Added {formatTimestamp(moderator.addedAt)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        moderator.isActive 
+                          ? 'bg-green-900 text-green-300' 
+                          : 'bg-red-900 text-red-300'
+                      }`}>
+                        {moderator.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                  </div>
+                  {moderator.isActive && (
+                    <div className="flex justify-end flex-shrink-0">
+                      <button
+                        onClick={() => handleRemoveModerator(moderator.id)}
+                        disabled={removing === moderator.id}
+                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white p-2 rounded-lg transition-colors"
+                        title="Remove Moderator"
+                      >
+                        {removing === moderator.id ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <FiUserMinus className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+} 

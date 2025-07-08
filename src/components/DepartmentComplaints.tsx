@@ -196,7 +196,7 @@ export default function DepartmentComplaints() {
                 className="bg-gray-900 border border-gray-700 rounded-lg p-6 hover:border-blue-500 transition-colors"
               >
                 <div className="flex flex-col sm:flex-row justify-between gap-4">
-                    <div className="flex-1">
+                  <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
                             <h3 className="text-lg font-semibold text-white">{complaint.title}</h3>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(complaint.urgency)}`}>{complaint.urgency}</span>
@@ -212,15 +212,15 @@ export default function DepartmentComplaints() {
                         <div className="flex items-center text-xs text-gray-500">
                             <FiClock className="mr-1.5" />
                             Submitted: {formatTimestamp(complaint.createdAt)}
-                        </div>
                     </div>
-                     <button
+                    </div>
+                  <button
                         onClick={() => setSelectedComplaint(complaint)}
                         className="self-start sm:self-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                     >
                         <FiEye />
-                        Review
-                    </button>
+                    Review
+                  </button>
                 </div>
               </motion.div>
             ))}
@@ -243,41 +243,41 @@ export default function DepartmentComplaints() {
               className="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
                 <div className="flex items-start justify-between mb-6">
-                    <div>
+                <div>
                         <h2 className="text-xl font-bold text-white">{selectedComplaint.title}</h2>
                         <p className="text-sm text-gray-400">{selectedComplaint.department} / {selectedComplaint.category}</p>
-                    </div>
+                </div>
                     <button onClick={() => setSelectedComplaint(null)} className="text-gray-400 hover:text-white transition-colors">
                         <FiX size={24} />
                     </button>
                 </div>
-
+                
                 <div className="space-y-4">
                     <div>
                         <h3 className="font-semibold text-white mb-2">Description</h3>
                         <p className="text-gray-300 bg-gray-800 p-3 rounded-md">{selectedComplaint.description}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
+                      <div>
                             <h3 className="font-semibold text-white mb-2">Student Name</h3>
                             <p className="text-gray-300">{selectedComplaint.studentName}</p>
-                        </div>
-                         <div>
+                  </div>
+                  <div>
                             <h3 className="font-semibold text-white mb-2">Student Email</h3>
                             <p className="text-gray-300">{selectedComplaint.studentEmail}</p>
-                        </div>
-                    </div>
+                  </div>
+              </div>
                     <div>
                         <label className="block text-sm font-medium text-white mb-2">Admin/HOD Notes</label>
-                        <textarea
-                          value={adminNotes}
-                          onChange={(e) => setAdminNotes(e.target.value)}
+                <textarea
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
                           className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
                           rows={4}
                           placeholder="Add notes here..."
                         />
                     </div>
-                </div>
+              </div>
 
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex gap-2">
@@ -288,11 +288,11 @@ export default function DepartmentComplaints() {
                      <p className="text-xs text-gray-500">
                         Complaint ID: {selectedComplaint.id}
                     </p>
-                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-}
+} 

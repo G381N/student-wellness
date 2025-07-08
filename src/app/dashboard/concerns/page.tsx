@@ -105,65 +105,6 @@ export default function ConcernsPage() {
         </motion.div>
       </div>
 
-      {/* Create Concern Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="mb-8"
-      >
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="w-full bg-red-600 hover:bg-red-700 rounded-2xl p-6 border border-red-500 transition-all duration-200 group"
-        >
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center group-hover:bg-red-400 transition-colors">
-              <FiAlertCircle className="text-white text-xl" />
-            </div>
-            <div className="text-left">
-              <h3 className="text-white font-semibold">Share a Concern</h3>
-              <p className="text-red-100 text-sm">Help us address campus issues</p>
-            </div>
-          </div>
-        </button>
-      </motion.div>
-
-      {/* Concerns Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
-      >
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center space-x-3">
-            <FiAlertCircle className="text-red-500 text-xl" />
-            <div>
-              <p className="text-white font-semibold">{posts.length}</p>
-              <p className="text-gray-400 text-sm">Total Concerns</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center space-x-3">
-            <FiMessageCircle className="text-blue-500 text-xl" />
-            <div>
-              <p className="text-white font-semibold">{posts.reduce((acc, post) => acc + (post.comments?.length || 0), 0)}</p>
-              <p className="text-gray-400 text-sm">Total Comments</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center space-x-3">
-            <FiTrendingUp className="text-green-500 text-xl" />
-            <div>
-              <p className="text-white font-semibold">{posts.reduce((acc, post) => acc + (post.upvotes || 0), 0)}</p>
-              <p className="text-gray-400 text-sm">Total Upvotes</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Concerns Feed */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

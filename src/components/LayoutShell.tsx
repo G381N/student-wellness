@@ -99,7 +99,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
       {/* Main Content */}
       <motion.main
-        className={`transition-all duration-300 pt-16 p-4 sm:p-6 md:p-8`}
+        className={`transition-all duration-300 pt-20 p-4 sm:p-6 md:p-8`}
         style={{
           marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
           marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),

@@ -47,11 +47,12 @@ export default function ManageModerators() {
       
       // Create the moderator object with all required fields
       const moderatorData: Omit<Moderator, 'id'> = {
-        userId: user.uid, // Use the current user's ID as the one who added the moderator
         email: newModeratorEmail.trim(),
         name: newModeratorName.trim(),
-        assignedAt: new Date(), // Use assignedAt instead of addedAt
-        isActive: true
+        addedBy: user.uid,
+        addedAt: new Date(),
+        isActive: true,
+        userId: user.uid,
       };
       
       console.log('Adding moderator with data:', moderatorData);
@@ -232,14 +233,14 @@ export default function ManageModerators() {
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${moderator.isActive ? 'bg-green-500' : 'bg-gray-500'}`}></div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="text-white font-semibold text-sm sm:text-base break-words">{moderator.name}</h4>
+                          <h4 className="text-white font-semibold text-sm sm:text-base break-words">{moderator.name || moderator.email}</h4>
                           <p className="text-gray-400 text-xs sm:text-sm break-all">{moderator.email}</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className="text-right">
-                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.assignedAt)}</p>
+                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.addedAt)}</p>
                           <p className={`text-xs font-medium ${moderator.isActive ? 'text-green-400' : 'text-gray-500'}`}>
                             {moderator.isActive ? 'Active' : 'Inactive'}
                           </p>

@@ -151,7 +151,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-black text-white">
       {/* Welcome Header */}
       <div className="mb-8 hidden md:block">
-                <motion.div
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -163,8 +163,8 @@ export default function DashboardPage() {
           <p className="text-gray-400 text-lg">
             Your mental wellness dashboard
           </p>
-                </motion.div>
-        </div>
+        </motion.div>
+      </div>
 
       {/* Search Results */}
       {searchQuery && (
@@ -226,115 +226,49 @@ export default function DashboardPage() {
       )}
 
       {/* Main Feed */}
-      <div className="space-y-6">
-        {/* Create Post Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="w-full bg-gray-900 hover:bg-gray-800 rounded-2xl p-6 border border-gray-700 transition-all duration-200 group"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center group-hover:bg-blue-700 transition-colors">
-                <FiPlus className="text-white text-xl" />
-                      </div>
-              <div className="text-left">
-                <h3 className="text-white font-semibold">Share your thoughts</h3>
-                <p className="text-gray-400 text-sm">What's on your mind today?</p>
-                        </div>
-                        </div>
-          </button>
-        </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="space-y-6"
+      >
+        {getFilteredPosts().length > 0 ? (
+          getFilteredPosts().map((post) => (
+            <div key={post.id}>
+              {post.type === 'activity' && (
+                <ActivityCard
+                  activity={post}
+                  onUpdate={handleUpdatePost}
+                  onDelete={handleDeletePost}
+                />
+              )}
+              {post.type === 'concern' && (
+                <ConcernCard
+                  concern={post}
+                  onUpdate={handleUpdatePost}
+                  onDelete={handleDeletePost}
+                />
+              )}
+              {(post.type === 'general' || post.type === 'post') && (
+                <TweetCard
+                  tweet={post}
+                  onUpdate={handleUpdatePost}
+                  onDelete={() => handleDeletePost(post.id)}
+                />
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-16">
+            <FiHome className="text-gray-600 text-6xl mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">It's quiet in here...</h3>
+            <p className="text-gray-500">Be the first to share something with the community!</p>
+          </div>
+        )}
+      </motion.div>
 
-        {/* Quick Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
-        >
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center space-x-3">
-              <FiUsers className="text-blue-500 text-xl" />
-                        <div>
-                <p className="text-white font-semibold">{posts.length}</p>
-                <p className="text-gray-400 text-sm">Total Posts</p>
-                        </div>
-                        </div>
-                      </div>
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center space-x-3">
-              <FiActivity className="text-green-500 text-xl" />
-                        <div>
-                <p className="text-white font-semibold">{posts.filter(p => p.type === 'activity').length}</p>
-                <p className="text-gray-400 text-sm">Activities</p>
-                        </div>
-                        </div>
-                      </div>
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center space-x-3">
-              <FiHeart className="text-red-500 text-xl" />
-                        <div>
-                <p className="text-white font-semibold">{mindWallIssues.length}</p>
-                <p className="text-gray-400 text-sm">Mind Wall Issues</p>
-                        </div>
-                        </div>
-                      </div>
-        </motion.div>
-
-        {/* Posts Feed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="space-y-4"
-        >
-          {getFilteredPosts().length > 0 ? (
-            getFilteredPosts().map((post) => (
-              <div key={post.id}>
-                {post.type === 'activity' && (
-                  <ActivityCard
-                    activity={post}
-                    onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
-                  />
-                )}
-                {post.type === 'concern' && (
-                  <ConcernCard
-                    concern={post}
-                    onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
-                  />
-                )}
-                {(post.type === 'general' || post.type === 'post') && (
-                  <TweetCard
-                    tweet={post}
-                    onUpdate={handleUpdatePost}
-                    onDelete={() => handleDeletePost(post.id)}
-                  />
-                )}
-                      </div>
-                    ))
-                  ) : (
-            <div className="text-center py-12">
-              <FiMessageCircle className="text-gray-600 text-6xl mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-400 mb-2">No posts yet</h3>
-              <p className="text-gray-500 mb-4">Be the first to share something with the community!</p>
-                  <button
-                    onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Create First Post
-                  </button>
-                        </div>
-                      )}
-        </motion.div>
-
-        {/* Refresh Button */}
-        <div className="text-center pt-8">
+      {/* Refresh Button */}
+      <div className="text-center pt-8">
                   <button
             onClick={handleRefresh}
             className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"

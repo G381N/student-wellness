@@ -156,11 +156,12 @@ export interface Counselor {
 
 export interface Moderator {
   id: string;
-  userId: string;
   email: string;
-  name: string;
-  assignedAt: any;
   isActive: boolean;
+  addedBy: string;
+  addedAt: any;
+  name?: string; // name is optional now
+  userId?: string; // userId is optional now
 }
 
 export interface Department {
@@ -787,7 +788,7 @@ export const getModerators = async (): Promise<Moderator[]> => {
   try {
     const moderatorsQuery = query(
       collection(db, 'moderators'), 
-      orderBy('assignedAt', 'desc')
+      orderBy('addedAt', 'desc') // Changed from assignedAt to addedAt
     );
     const querySnapshot = await getDocs(moderatorsQuery);
     return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
@@ -804,7 +805,7 @@ export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promis
   try {
     const docRef = await addDoc(collection(db, 'moderators'), {
       ...moderatorData,
-      assignedAt: serverTimestamp(),
+      addedAt: serverTimestamp(), // Changed from assignedAt to addedAt
       isActive: true
     });
     return docRef.id;

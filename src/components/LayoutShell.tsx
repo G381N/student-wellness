@@ -7,7 +7,7 @@ import RightSidebar from './RightSidebar';
 import TopBar from './TopBar';
 import ProfileModal from './ProfileModal';
 import CreatePostModal from './CreatePostModal';
-import BottomNavbar from './BottomNavbar';
+// import BottomNavbar from './BottomNavbar';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -80,14 +80,16 @@ export default function LayoutShell({ children }: LayoutShellProps) {
     <div className="flex h-screen bg-gray-950 text-white">
       {/* Left Sidebar - Desktop Only */}
       {!isMobile && (
-        <LeftSidebar
-          isCollapsed={leftSidebarCollapsed}
-          onToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
-        />
+        <div className="flex-shrink-0">
+          <LeftSidebar
+            isCollapsed={leftSidebarCollapsed}
+            onToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
+          />
+        </div>
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-col flex-grow relative">
+      <div className="flex flex-col flex-grow">
         {/* Top Bar */}
         <TopBar
           leftSidebarCollapsed={leftSidebarCollapsed}
@@ -96,23 +98,21 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         />
 
         {/* Main Scrollable Content */}
-        <motion.main
-          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8"
-          style={{
-            marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
-          }}
-        >
+        <motion.main className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8">
           {children}
         </motion.main>
       </div>
 
-
       {/* Right Sidebar */}
-      <RightSidebar
-        isCollapsed={rightSidebarCollapsed}
-        onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
-        onCreatePost={() => setShowCreateModal(true)}
-      />
+      {!isMobile && (
+        <div className="flex-shrink-0">
+          <RightSidebar
+            isCollapsed={rightSidebarCollapsed}
+            onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+            onCreatePost={() => setShowCreateModal(true)}
+          />
+        </div>
+      )}
 
       {/* Desktop Profile FAB (only shown when right sidebar is collapsed) */}
       {!isMobile && rightSidebarCollapsed && (
@@ -125,7 +125,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       )}
 
       {/* Mobile Bottom Navbar */}
-      {isMobile && <BottomNavbar />}
+      {/* {isMobile && <BottomNavbar />} */}
 
       {/* Create Post Modal */}
       <CreatePostModal

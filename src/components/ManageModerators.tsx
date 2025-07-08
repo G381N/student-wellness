@@ -14,6 +14,7 @@ export default function ManageModerators() {
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const [newModeratorEmail, setNewModeratorEmail] = useState('');
+  const [newModeratorName, setNewModeratorName] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
@@ -36,16 +37,27 @@ export default function ManageModerators() {
 
   const handleAddModerator = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newModeratorEmail.trim() || !user) return;
+    if (!newModeratorEmail.trim() || !newModeratorName.trim() || !user) return;
 
     try {
       setAdding(true);
-      await addModerator(newModeratorEmail.trim(), user.uid);
+      
+      // Create the moderator object with all required fields
+      const moderatorData: Omit<Moderator, 'id'> = {
+        userId: '', // Will be set when user signs up or is found
+        email: newModeratorEmail.trim(),
+        name: newModeratorName.trim(),
+        assignedAt: new Date(), // Will be overridden by serverTimestamp in the function
+        isActive: true
+      };
+      
+      await addModerator(moderatorData);
       
       // Refresh the list
       await fetchModerators();
       
       setNewModeratorEmail('');
+      setNewModeratorName('');
       setShowAddForm(false);
       alert('Moderator added successfully!');
     } catch (error: any) {
@@ -66,11 +78,7 @@ export default function ManageModerators() {
       await removeModerator(moderatorId);
       
       // Update local state
-      setModerators(moderators.map(mod => 
-        mod.id === moderatorId 
-          ? { ...mod, isActive: false }
-          : mod
-      ));
+      setModerators(moderators.filter(mod => mod.id !== moderatorId));
       
       alert('Moderator removed successfully!');
     } catch (error: any) {
@@ -81,14 +89,22 @@ export default function ManageModerators() {
     }
   };
 
-  const formatTimestamp = (timestamp: any): string => {
-    if (!timestamp) return 'Date unknown';
+  const formatTimestamp = (timestamp: any) => {
+    if (!timestamp) return 'Unknown';
+    
     try {
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      let date;
+      if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+        date = timestamp.toDate();
+      } else if (timestamp instanceof Date) {
+        date = timestamp;
+      } else {
+        date = new Date(timestamp);
+      }
+      
       return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
-      console.error("Failed to format timestamp:", error);
-      return 'Invalid date';
+      return 'Unknown';
     }
   };
 
@@ -128,11 +144,11 @@ export default function ManageModerators() {
       <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-3 sm:mb-6">
         <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
           <div className="text-lg sm:text-2xl font-bold text-blue-400">{activeModerators.length}</div>
-          <div className="text-xs sm:text-sm text-gray-400 break-words">Total Moderators</div>
+          <div className="text-xs sm:text-sm text-gray-400 break-words">Active Moderators</div>
         </div>
         <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
-          <div className="text-lg sm:text-2xl font-bold text-green-400">{activeModerators.length}</div>
-          <div className="text-xs sm:text-sm text-gray-400 break-words">Active Moderators</div>
+          <div className="text-lg sm:text-2xl font-bold text-gray-400">{inactiveModerators.length}</div>
+          <div className="text-xs sm:text-sm text-gray-400 break-words">Inactive Moderators</div>
         </div>
       </div>
 
@@ -140,16 +156,29 @@ export default function ManageModerators() {
       <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800 mb-3 sm:mb-6">
         <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Add New Moderator</h3>
         <form onSubmit={handleAddModerator} className="space-y-3 sm:space-y-4">
-          <div>
-            <label className="text-gray-400 text-xs sm:text-sm block mb-2">Email Address</label>
-            <input
-              type="email"
-              value={newModeratorEmail}
-              onChange={(e) => setNewModeratorEmail(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
-              placeholder="Enter moderator's email"
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label className="text-gray-400 text-xs sm:text-sm block mb-2">Name</label>
+              <input
+                type="text"
+                value={newModeratorName}
+                onChange={(e) => setNewModeratorName(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
+                placeholder="Enter moderator's full name"
+                required
+              />
+            </div>
+            <div>
+              <label className="text-gray-400 text-xs sm:text-sm block mb-2">Email Address</label>
+              <input
+                type="email"
+                value={newModeratorEmail}
+                onChange={(e) => setNewModeratorEmail(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
+                placeholder="Enter moderator's email"
+                required
+              />
+            </div>
           </div>
           <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
             <button
@@ -162,7 +191,10 @@ export default function ManageModerators() {
             </button>
             <button
               type="button"
-              onClick={() => setNewModeratorEmail('')}
+              onClick={() => {
+                setNewModeratorEmail('');
+                setNewModeratorName('');
+              }}
               className="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold transition-colors text-sm sm:text-base w-full sm:w-auto"
             >
               Clear
@@ -190,32 +222,34 @@ export default function ManageModerators() {
               >
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center mb-2">
-                          <FiShield className="text-blue-400 text-lg sm:text-xl mr-2 sm:mr-3 flex-shrink-0" />
-                          <p className="text-sm sm:text-base font-bold text-white truncate">{moderator.email}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${moderator.isActive ? 'bg-green-500' : 'bg-gray-500'}`}></div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-white font-semibold text-sm sm:text-base break-words">{moderator.name}</h4>
+                          <p className="text-gray-400 text-xs sm:text-sm break-all">{moderator.email}</p>
+                        </div>
                       </div>
-                      <span className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded-full ${moderator.isActive ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                        {moderator.isActive ? 'Active' : 'Removed'}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2">
-                        <div className="flex items-center text-gray-400 text-xs sm:text-sm mb-2 sm:mb-0">
-                            <FiCalendar className="mr-2 flex-shrink-0" />
-                            <span>Added: {formatTimestamp(moderator.addedAt)}</span>
+                      
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="text-right">
+                          <p className="text-gray-400 text-xs">Added {formatTimestamp(moderator.assignedAt)}</p>
+                          <p className={`text-xs font-medium ${moderator.isActive ? 'text-green-400' : 'text-gray-500'}`}>
+                            {moderator.isActive ? 'Active' : 'Inactive'}
+                          </p>
                         </div>
                         
                         {moderator.isActive && (
-                            <button
-                                onClick={() => handleRemoveModerator(moderator.id)}
-                                disabled={removing === moderator.id}
-                                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-3 py-1 rounded-lg font-bold transition-colors flex items-center justify-center text-xs sm:text-sm w-full sm:w-auto"
-                            >
-                                <FiUserMinus className="mr-2 flex-shrink-0" />
-                                <span>{removing === moderator.id ? 'Removing...' : 'Remove'}</span>
-                            </button>
+                          <button
+                            onClick={() => handleRemoveModerator(moderator.id)}
+                            disabled={removing === moderator.id}
+                            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                          >
+                            <FiUserMinus className="flex-shrink-0" />
+                            <span className="hidden sm:inline">{removing === moderator.id ? 'Removing...' : 'Remove'}</span>
+                          </button>
                         )}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -145,9 +145,8 @@ export interface Moderator {
   userId: string;
   email: string;
   name: string;
-  addedAt: any; // FIX: Renamed from assignedAt
+  assignedAt: any;
   isActive: boolean;
-  addedBy?: string; // FIX: Added optional field
 }
 
 export interface Department {
@@ -745,53 +744,27 @@ export const deleteMindWallIssue = async (issueId: string): Promise<void> => {
 export const getModerators = async (): Promise<Moderator[]> => {
   try {
     const moderatorsQuery = query(
-      collection(db, 'moderators'),
-      orderBy('addedAt', 'desc') // FIX: Order by the correct field name
+      collection(db, 'moderators'), 
+      orderBy('assignedAt', 'desc')
     );
     const querySnapshot = await getDocs(moderatorsQuery);
-    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ // Explicitly type doc
       id: doc.id,
-      ...doc.data(),
-    })) as Moderator[];
+      ...doc.data()
+    }) as Moderator);
   } catch (error) {
     console.error('Error getting moderators:', error);
     return [];
   }
 };
 
-export const addModerator = async (email: string, addedBy: string): Promise<string> => {
+export const addModerator = async (moderatorData: Omit<Moderator, 'id'>): Promise<string> => {
   try {
-    // 1. Find the user by email
-    const usersRef = collection(db, 'users');
-    const userQuery = query(usersRef, where('email', '==', email), limit(1));
-    const userSnapshot = await getDocs(userQuery);
-
-    if (userSnapshot.empty) {
-      throw new Error(`User with email ${email} not found.`);
-    }
-
-    const userDoc = userSnapshot.docs[0];
-    const userId = userDoc.id;
-    const userData = userDoc.data();
-
-    if (userData.role === 'moderator') {
-      throw new Error('This user is already a moderator.');
-    }
-
-    // 2. Update user's role
-    await updateDoc(doc(db, 'users', userId), { role: 'moderator' });
-
-    // 3. Add to moderators collection
-    const moderatorData = {
-      userId: userId,
-      email: email,
-      name: userData.displayName || `${userData.firstName} ${userData.lastName}` || email,
-      addedAt: serverTimestamp(),
-      addedBy: addedBy,
-      isActive: true,
-    };
-
-    const docRef = await addDoc(collection(db, 'moderators'), moderatorData);
+    const docRef = await addDoc(collection(db, 'moderators'), {
+      ...moderatorData,
+      assignedAt: serverTimestamp(),
+      isActive: true
+    });
     return docRef.id;
   } catch (error) {
     console.error('Error adding moderator:', error);

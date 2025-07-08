@@ -72,7 +72,7 @@ export default function ConcernsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg">Loading concerns...</p>
         </div>
       </div>
@@ -94,7 +94,7 @@ export default function ConcernsPage() {
           className="text-center"
         >
           <div className="flex items-center justify-center mb-4">
-            <FiAlertCircle className="text-red-500 text-4xl mr-3" />
+            <FiAlertCircle className="text-gray-400 text-4xl mr-3" />
             <h1 className="text-3xl md:text-4xl font-bold text-white">
               Campus Concerns
             </h1>
@@ -128,7 +128,7 @@ export default function ConcernsPage() {
             <p className="text-gray-500 mb-6">Share your concerns to help improve campus life</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+              className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Share First Concern
             </button>

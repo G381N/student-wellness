@@ -136,7 +136,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg">Loading your dashboard...</p>
         </div>
       </div>

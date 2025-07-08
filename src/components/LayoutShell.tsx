@@ -99,7 +99,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
       {/* Main Content */}
       <motion.main
-        className={`transition-all duration-300 pt-20 p-4 sm:p-6 md:p-8`}
+        className={`transition-all duration-300 pt-24 p-4 sm:p-6 md:p-8`}
         style={{
           marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
           marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
@@ -129,7 +129,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       {!isMobile && rightSidebarCollapsed && (
         <button
           onClick={() => setRightSidebarCollapsed(false)}
-          className="fixed top-4 right-4 z-40 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors"
+          className="fixed top-4 right-4 z-40 w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-colors"
         >
           <FiUser className="text-white" />
         </button>
@@ -139,7 +139,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       {isMobile && (
         <button
           onClick={() => setShowCreateModal(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg z-40 transition-all duration-200"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center shadow-lg z-40 transition-all duration-200"
         >
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

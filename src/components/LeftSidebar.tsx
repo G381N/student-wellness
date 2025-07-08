@@ -128,7 +128,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
         <div className={`flex items-center ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} px-4 h-16 border-b border-gray-800 relative sticky top-0 bg-gray-900 z-10`}>
           {(!isCollapsed || isMobile) && (
             <Link href="/dashboard" className="flex items-center">
-              <div className="text-blue-500 text-2xl mr-2">💙</div>
+              <div className="text-white text-2xl mr-2">🤍</div>
               <span className="text-white font-bold text-xl">CampusWell</span>
             </Link>
           )}
@@ -178,7 +178,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
                     href={link.href}
                     className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
                       isActive
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-gray-700 text-white'
                         : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                     }`}
                   >
@@ -200,7 +200,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
               }}
               className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-gray-800 transition-colors"
             >
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
                 <FiUser className="w-5 h-5 text-white" />
               </div>
               <div className="ml-3 text-left">

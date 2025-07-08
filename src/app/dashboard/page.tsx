@@ -213,16 +213,16 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between text-xs text-gray-400">
                         <span>{issue.category}</span>
                         <span>{issue.count} voices</span>
-                  </div>
-              </div>
-                  ))}
+                      </div>
                     </div>
+                  ))}
+                </div>
               ) : (
                 <p className="text-gray-400">No results found for your search.</p>
               );
             })()}
           </motion.div>
-                  </div>
+        </div>
       )}
 
       {/* Main Feed */}
@@ -269,15 +269,14 @@ export default function DashboardPage() {
 
       {/* Refresh Button */}
       <div className="text-center pt-8">
-                  <button
-            onClick={handleRefresh}
-            className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"
-          >
-            <FiRefreshCw className="text-lg" />
-            <span>Refresh Feed</span>
-                  </button>
-                </div>
-              </div>
+        <button
+          onClick={handleRefresh}
+          className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"
+        >
+          <FiRefreshCw className="text-lg" />
+          <span>Refresh Feed</span>
+        </button>
+      </div>
 
       {/* Create Post Modal */}
       <CreatePostModal

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import SearchComponent from './SearchComponent';
+import { FiUser } from 'react-icons/fi';
 
 interface TopBarProps {
   leftSidebarCollapsed: boolean;
@@ -49,18 +50,30 @@ export default function TopBar({
 
   return (
     <motion.div
-      className="fixed top-0 h-16 z-30 backdrop-blur-custom border-b border-gray-800 flex items-center transition-all duration-300"
+      className="fixed top-0 h-16 z-30 bg-gray-900 bg-opacity-80 backdrop-blur-md border-b border-gray-800 flex items-center transition-all duration-300"
       style={getTopBarStyles()}
       layout
     >
-      <div className="w-full px-4">
-        <div className="max-w-3xl mx-auto relative">
-          {/* Only show search on desktop - mobile search is in sidebar */}
+      <div className="w-full px-4 sm:px-6">
+        <div className="flex items-center justify-between gap-4">
+          {/* Search Component taking available space */}
+          <div className="flex-1 min-w-0">
+            {!isMobile && (
+              <SearchComponent 
+                placeholder="Search CampusWell..."
+                onSearch={handleSearchResults}
+              />
+            )}
+          </div>
+
+          {/* Profile Icon Button */}
           {!isMobile && (
-            <SearchComponent 
-              placeholder="Search CampusWell..."
-              onSearch={handleSearchResults}
-            />
+            <button
+              onClick={onRightSidebarToggle}
+              className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-colors flex-shrink-0"
+            >
+              <FiUser className="text-white" />
+            </button>
           )}
         </div>
       </div>

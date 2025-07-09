@@ -109,23 +109,12 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         </motion.main>
       </div>
 
-
       {/* Right Sidebar */}
       <RightSidebar
         isCollapsed={rightSidebarCollapsed}
         onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
         onCreatePost={() => setShowCreateModal(true)}
       />
-
-      {/* Desktop Profile FAB (only shown when right sidebar is collapsed) */}
-      {!isMobile && rightSidebarCollapsed && (
-        <button
-          onClick={() => setRightSidebarCollapsed(false)}
-          className="fixed top-4 right-4 z-40 w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-colors"
-        >
-          <FiUser className="text-white" />
-        </button>
-      )}
 
       {/* Mobile Bottom Navbar */}
       {isMobile && <BottomNavbar />}

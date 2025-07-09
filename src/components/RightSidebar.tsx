@@ -64,7 +64,7 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
       <div className="p-6 border-b border-gray-800">
         {user ? (
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <FiUser className="text-white text-2xl" />
             </div>
             <h3 className="text-white font-bold text-lg">
@@ -77,21 +77,21 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
                 className="flex flex-col items-center justify-center p-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
                 onClick={() => router.push('/profile')}
               >
-                <FiUser className="text-blue-400 text-lg" />
+                <FiUser className="text-gray-400 text-lg" />
                 <span className="text-xs text-gray-300 mt-1">Profile</span>
               </button>
               <button 
                 className="flex flex-col items-center justify-center p-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
                 onClick={() => router.push('/settings')}
               >
-                <FiSettings className="text-blue-400 text-lg" />
+                <FiSettings className="text-gray-400 text-lg" />
                 <span className="text-xs text-gray-300 mt-1">Settings</span>
               </button>
               <button 
                 className="flex flex-col items-center justify-center p-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
                 onClick={() => signOut()}
               >
-                <FiLogOut className="text-blue-400 text-lg" />
+                <FiLogOut className="text-gray-400 text-lg" />
                 <span className="text-xs text-gray-300 mt-1">Logout</span>
               </button>
             </div>
@@ -100,7 +100,7 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
           <div className="flex flex-col items-center">
             <Link 
               href="/login"
-              className="w-full py-2 bg-blue-600 text-white rounded-lg text-center font-medium hover:bg-blue-700 transition-colors mb-2"
+              className="w-full py-2 bg-gray-700 text-white rounded-lg text-center font-medium hover:bg-gray-600 transition-colors mb-2"
             >
               Log In
             </Link>
@@ -125,7 +125,7 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
             </div>
           ))}
         </div>
-        <button className="text-blue-400 text-sm mt-4 hover:text-blue-300 transition-colors">
+        <button className="text-gray-400 text-sm mt-4 hover:text-white transition-colors">
           Show more
         </button>
       </div>
@@ -135,7 +135,7 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
         <h3 className="text-white font-bold text-lg mb-4">Quick actions</h3>
         <button
           onClick={onCreatePost}
-          className="w-full py-3 bg-blue-600 text-white rounded-xl flex items-center justify-center space-x-2 hover:bg-blue-700 transition-colors"
+          className="w-full py-3 bg-gray-700 text-white rounded-xl flex items-center justify-center space-x-2 hover:bg-gray-600 transition-colors"
         >
           <FiPlus className="text-lg" />
           <span>Create Post</span>

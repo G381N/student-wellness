@@ -91,6 +91,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         className="flex flex-col flex-grow relative transition-all duration-300"
         style={{
           marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
+          marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
         }}
       >
         {/* Top Bar */}
@@ -102,10 +103,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
         {/* Main Scrollable Content */}
         <motion.main
-          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8"
-          style={{
-            marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
-          }}
+          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pt-16 pb-20 md:pb-8"
         >
           {children}
         </motion.main>

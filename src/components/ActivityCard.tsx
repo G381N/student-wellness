@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight } from 'react-icons/fi';
+import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight, FiMessageSquare } from 'react-icons/fi';
 import { Post } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -99,7 +99,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {/* Category Tag - Small subtle style */}
           <div className="flex items-center mb-3">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal ${categoryStyle.bg} ${categoryStyle.text} border border-opacity-50 border-current`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${categoryStyle.text} border border-current`}>
               {activity.category}
             </span>
           </div>
@@ -151,14 +151,24 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
           </div>
         </div>
         
-        {/* Action Button */}
-        <button
-          onClick={handleOpenDetails}
-          className="w-full py-2 px-4 rounded-lg bg-bg-tertiary hover:bg-hover-bg text-text-primary transition-colors flex items-center justify-center space-x-2"
-        >
-          <span>View Details</span>
-          <FiArrowRight />
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex-1 py-2 px-4 rounded-lg bg-bg-tertiary hover:bg-hover-bg text-text-primary transition-colors flex items-center justify-center space-x-2"
+          >
+            <FiMessageSquare className="mr-1" />
+            <span>Comments</span>
+          </button>
+          
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex-1 py-2 px-4 rounded-lg bg-accent-blue hover:bg-accent-blue/90 text-white transition-colors flex items-center justify-center space-x-2"
+          >
+            <span>{isParticipating ? 'Joined' : 'Join'}</span>
+            <FiArrowRight />
+          </button>
+        </div>
       </div>
       
       {/* Modal */}

@@ -311,7 +311,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
 
   // Get visibility options based on user role
   const getVisibilityOptions = () => {
-    return [
+      return [
       {
         value: 'public',
         label: 'Public',
@@ -343,30 +343,30 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           />
           
           {/* Modal */}
-          <motion.div
+        <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             <div 
               className="bg-bg-primary border border-border-primary rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-app-lg"
               onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
+        >
+          {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border-primary">
                 <h2 className="text-text-primary text-lg font-semibold">
                   {submitted ? 'Success!' : 'Create New Post'}
-                </h2>
-                <button
-                  onClick={onClose}
+              </h2>
+            <button
+              onClick={onClose}
                   className="p-2 rounded-full hover:bg-hover-bg transition-colors"
-                >
+            >
                   <FiX className="text-text-secondary" />
-                </button>
-              </div>
-              
+            </button>
+          </div>
+
               {/* Success Message */}
               {submitted ? (
                 <div className="p-6 flex flex-col items-center justify-center">
@@ -438,53 +438,53 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                   <div className="p-4">
                     <div className="space-y-4">
                       {/* Title field for activities and anonymous complaints */}
-                      {(postType === 'activity' || postType === 'anonymous-complaint') && (
-                        <div>
+              {(postType === 'activity' || postType === 'anonymous-complaint') && (
+                <div>
                           <label htmlFor="title" className="block text-text-secondary text-sm mb-1">
                             Title {(postType === 'activity' || postType === 'anonymous-complaint') && <span className="text-error">*</span>}
-                          </label>
-                          <input
-                            type="text"
+                  </label>
+                  <input
+                    type="text"
                             id="title"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
                             placeholder={`Enter ${postType === 'activity' ? 'activity' : 'complaint'} title`}
                             required
                           />
-                        </div>
-                      )}
-                      
+                </div>
+              )}
+
                       {/* Content/Description */}
-                      <div>
+              <div>
                         <label htmlFor="content" className="block text-text-secondary text-sm mb-1">
                           {postType === 'anonymous-complaint' ? 'Description' : 'Content'} <span className="text-error">*</span>
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            ref={textareaRef}
+                </label>
+                <div className="relative">
+                  <textarea
+                    ref={textareaRef}
                             id="content"
-                            value={formData.content}
-                            onChange={handleContentChange}
+                    value={formData.content}
+                    onChange={handleContentChange}
                             className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-3 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue min-h-[100px]"
                             placeholder={getPromptText()}
                             required
                           />
                           <div className="absolute bottom-2 right-2 text-xs text-text-tertiary">
-                            {characterCount}/{getCharacterLimit()}
-                          </div>
-                        </div>
-                      </div>
-                      
+                      {characterCount}/{getCharacterLimit()}
+                  </div>
+                </div>
+              </div>
+
                       {/* Category selection */}
-                      <div>
+              <div>
                         <label htmlFor="category" className="block text-text-secondary text-sm mb-1">
                           Category <span className="text-error">*</span>
                         </label>
-                        <select
+                <select
                           id="category"
-                          value={formData.category}
-                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                           className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
                           required
                         >
@@ -492,40 +492,40 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                           {getCurrentCategories().map((cat) => (
                             <option key={cat} value={cat}>
                               {cat}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      
-                      {/* Activity-specific fields */}
-                      {postType === 'activity' && (
-                        <>
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Activity-specific fields */}
+              {postType === 'activity' && (
+                <>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
+                  <div>
                               <label htmlFor="date" className="block text-text-secondary text-sm mb-1">
                                 Date
                               </label>
-                              <input
-                                type="date"
+                        <input
+                          type="date"
                                 id="date"
-                                value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                          value={formData.date}
+                          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                 className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
-                              />
-                            </div>
-                            <div>
+                        />
+                      </div>
+                    <div>
                               <label htmlFor="time" className="block text-text-secondary text-sm mb-1">
                                 Time
                               </label>
-                              <input
-                                type="time"
+                        <input
+                          type="time"
                                 id="time"
-                                value={formData.time}
-                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                          value={formData.time}
+                          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                                 className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
-                              />
-                            </div>
-                          </div>
+                        />
+                      </div>
+                    </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <label htmlFor="location" className="block text-text-secondary text-sm mb-1">
@@ -539,34 +539,34 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
                                 placeholder="Enter location"
                               />
-                            </div>
-                            <div>
+                  </div>
+                  <div>
                               <label htmlFor="maxParticipants" className="block text-text-secondary text-sm mb-1">
                                 Max Participants
                               </label>
-                              <input
-                                type="number"
+                      <input
+                        type="number"
                                 id="maxParticipants"
-                                value={formData.maxParticipants}
-                                onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
+                        value={formData.maxParticipants}
+                        onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
                                 className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
-                                placeholder="Unlimited"
-                                min="1"
-                              />
-                            </div>
-                          </div>
-                        </>
-                      )}
-                      
+                        placeholder="Unlimited"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
                       {/* Anonymous complaint severity */}
                       {postType === 'anonymous-complaint' && (
-                        <div>
+                      <div>
                           <label htmlFor="severity" className="block text-text-secondary text-sm mb-1">
                             Severity
                           </label>
                           <div className="grid grid-cols-4 gap-2">
                             {COMPLAINT_SEVERITIES.map((sev) => (
-                              <button
+                    <button
                                 key={sev}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, severity: sev })}
@@ -583,12 +583,12 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 } transition-colors`}
                               >
                                 {sev}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
                       {/* Concern-specific fields */}
                       {postType === 'concern' && (
                         <div className="flex items-center space-x-4">
@@ -603,7 +603,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                             <label htmlFor="isAnonymous" className="text-text-secondary text-sm">
                               Post anonymously
                             </label>
-                          </div>
+                    </div>
                           <div className="flex items-center">
                             <input
                               type="checkbox"
@@ -615,10 +615,10 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                             <label htmlFor="isUrgent" className="text-text-secondary text-sm">
                               Mark as urgent
                             </label>
-                          </div>
-                        </div>
-                      )}
-                      
+                  </div>
+                </div>
+              )}
+
                       {/* Moderator visibility options */}
                       {(isModerator || isAdmin) && postType === 'general' && (
                         <div>
@@ -644,67 +644,67 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                               </div>
                             ))}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
+                </div>
+              )}
+            </div>
+          </div>
+
                   {/* Progress indicator */}
                   <div className="px-4 pb-2">
                     <div className="h-1 w-full bg-bg-tertiary rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-accent-blue transition-all duration-300"
-                        style={{ width: `${getProgress()}%` }}
-                      />
-                    </div>
-                  </div>
-                  
+                  style={{ width: `${getProgress()}%` }}
+                />
+              </div>
+            </div>
+
                   {/* Footer with actions */}
                   <div className="p-4 border-t border-border-primary flex justify-between items-center">
                     <div className="flex space-x-2">
                       {/* Image upload button (not for anonymous complaints) */}
-                      {postType !== 'anonymous-complaint' && (
-                        <button
+                {postType !== 'anonymous-complaint' && (
+                    <button
                           type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={uploadingImage}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
                           className="p-2 rounded-full hover:bg-hover-bg transition-colors text-text-secondary disabled:opacity-50"
                           title="Upload image"
                         >
                           <FiImage />
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
+                    <input 
+                      ref={fileInputRef}
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageUpload}
                             className="hidden"
-                          />
+                    />
                         </button>
-                      )}
-                    </div>
-                    
-                    <button
-                      onClick={handleCreatePost}
+                )}
+              </div>
+
+              <button
+                onClick={handleCreatePost}
                       disabled={loading || !isFormValid()}
                       className={`px-4 py-2 rounded-lg font-medium flex items-center ${
                         loading || !isFormValid()
                           ? 'bg-accent-blue-disabled text-text-secondary cursor-not-allowed'
                           : 'bg-accent-blue text-text-primary hover:bg-accent-blue-hover'
                       } transition-colors`}
-                    >
-                      {loading ? (
-                        <>
+              >
+                {loading ? (
+                  <>
                           <div className="w-4 h-4 border-2 border-text-primary border-t-transparent rounded-full animate-spin mr-2"></div>
                           <span>Posting...</span>
-                        </>
+                  </>
                       ) : (
-                        <>
-                          <FiSend className="mr-2" />
+                  <>
+                    <FiSend className="mr-2" />
                           <span>Post</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+                  </>
+                )}
+              </button>
+            </div>
                   
                   {/* Image preview */}
                   {imagePreview && (
@@ -728,8 +728,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                   )}
                 </>
               )}
-            </div>
-          </motion.div>
+          </div>
+        </motion.div>
         </>
       )}
     </AnimatePresence>

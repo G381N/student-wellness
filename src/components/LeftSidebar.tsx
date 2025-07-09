@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiHome, FiHeart, FiActivity, FiAlertCircle, FiBriefcase, FiUsers, FiUser, FiBell, FiMenu, FiX } from 'react-icons/fi';
+import { FiHome, FiHeart, FiActivity, FiAlertCircle, FiBriefcase, FiUsers, FiUser, FiBell, FiChevronLeft, FiChevronRight, FiMenu, FiX } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchComponent from './SearchComponent';
 
@@ -84,7 +84,11 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
               onClick={onToggle}
               className="p-1 rounded-full hover:bg-hover-bg transition-colors"
             >
-              <FiMenu className="text-text-secondary" />
+              {isCollapsed ? (
+                <FiChevronRight className="text-text-secondary" />
+              ) : (
+                <FiChevronLeft className="text-text-secondary" />
+              )}
             </button>
           )}
         </div>
@@ -98,7 +102,7 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
                   href={item.path}
                   className={`flex items-center px-3 py-2.5 rounded-xl transition-colors ${
                     isActive(item.path) 
-                      ? 'nav-item active' 
+                      ? 'border border-accent-blue bg-accent-blue/5 shadow-sm' 
                       : 'hover:bg-hover-bg'
                   }`}
                 >

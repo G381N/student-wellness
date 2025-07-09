@@ -9,12 +9,14 @@ interface TopBarProps {
   leftSidebarCollapsed: boolean;
   rightSidebarCollapsed: boolean;
   onRightSidebarToggle?: () => void;
+  hideProfileButton?: boolean;
 }
 
 export default function TopBar({ 
   leftSidebarCollapsed,
   rightSidebarCollapsed,
-  onRightSidebarToggle
+  onRightSidebarToggle,
+  hideProfileButton = false
 }: TopBarProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -67,7 +69,7 @@ export default function TopBar({
           </div>
 
           {/* Profile Icon Button */}
-          {!isMobile && (
+          {!isMobile && !hideProfileButton && (
             <button
               onClick={onRightSidebarToggle}
               className="w-10 h-10 bg-bg-tertiary rounded-full flex items-center justify-center shadow-app hover:bg-hover-bg transition-colors flex-shrink-0"

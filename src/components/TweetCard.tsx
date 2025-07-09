@@ -1,7 +1,6 @@
 'use client';
 
 import { FiMessageCircle, FiChevronUp, FiChevronDown, FiTrash2, FiUser, FiUserPlus, FiUserMinus } from 'react-icons/fi';
-import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -187,34 +186,50 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="bg-bg-secondary rounded-2xl p-6 border border-border-primary relative group"
-    >
-      <div className="flex items-start space-x-4">
-        <div className="p-2 bg-bg-tertiary rounded-full">
-          <FiUser className="text-text-secondary text-xl" />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-text-primary">{tweet.author || 'Anonymous'}</p>
-              <p className="text-sm text-text-tertiary">
-                {formatDistanceToNow(new Date(tweet.timestamp), { addSuffix: true })}
-              </p>
+    <>
+      <div 
+        className={`card rounded-xl overflow-hidden transition-all duration-300 ${
+          tweet.priority === 'urgent' ? 'border-error border-2' : ''
+        }`}
+      >
+        {/* Card Header */}
+        <div className="p-4 flex items-start justify-between">
+          <div className="flex items-center space-x-3">
+            {/* User Avatar */}
+            <div className="w-10 h-10 bg-bg-tertiary rounded-full flex items-center justify-center">
+              <FiUser className="text-text-secondary" />
             </div>
-            {canDelete && (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-text-tertiary hover:text-text-primary transition-colors duration-200 p-2 rounded-full hover:bg-hover-bg"
-              >
-                <FiTrash2 className="text-lg" />
-              </button>
-            )}
+            
+            {/* User Info & Tweet Time */}
+            <div>
+              <div className="flex items-center">
+                <span className="font-semibold text-text-primary">
+                  {tweet.isAnonymous ? 'Anonymous User' : tweet.author}
+                </span>
+                {tweet.priority === 'urgent' && (
+                  <span className="ml-2 px-2 py-0.5 bg-error bg-opacity-10 text-error text-xs rounded-full">
+                    Urgent
+                  </span>
+                )}
+              </div>
+              <span className="text-text-tertiary text-sm">
+                {formatDistanceToNow(new Date(tweet.timestamp), { addSuffix: true })}
+              </span>
+            </div>
           </div>
-          <p className="text-text-primary mt-2">{tweet.content}</p>
+          {canDelete && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="text-text-tertiary hover:text-text-primary transition-colors duration-200 p-2 rounded-full hover:bg-hover-bg"
+            >
+              <FiTrash2 className="text-lg" />
+            </button>
+          )}
+        </div>
+
+        {/* Tweet Content */}
+        <div className="p-4">
+          <p className="text-text-primary">{tweet.content}</p>
 
           {/* Activity Details */}
           {tweet.type === 'activity' && (
@@ -255,6 +270,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
             </div>
           )}
 
+          {/* Voting buttons */}
           <div className="flex items-center space-x-4 mt-4">
             {/* Comment button - always visible */}
             <button
@@ -314,62 +330,62 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
               </button>
             </div>
           </div>
-
-          {/* Comments section */}
-          {showComments && (
-            <div className="mt-4 space-y-4">
-              {/* Comment input */}
-              {user ? (
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Add a comment..."
-                    className="w-full bg-bg-tertiary border border-border-primary rounded-full py-3 px-5 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-accent-blue focus:bg-bg-tertiary transition-all duration-200"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleAddComment();
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={handleAddComment}
-                    disabled={!newComment.trim() || isCommenting}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-tertiary hover:text-text-primary disabled:text-text-tertiary transition-colors duration-200 px-2 py-1 rounded"
-                  >
-                    {isCommenting ? (
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <span className="font-semibold">Post</span>
-                    )}
-                  </button>
-                </div>
-              ) : (
-                <p className="text-text-tertiary text-sm">Please sign in to comment.</p>
-              )}
-
-              {/* Comments list */}
-              <div className="space-y-3">
-                {tweet.comments?.map((comment, index) => (
-                  <div key={index} className="flex items-start space-x-3 bg-bg-tertiary bg-opacity-50 p-4 rounded-xl">
-                    <div className="p-2 bg-bg-tertiary rounded-full">
-                      <FiUser className="text-text-tertiary text-lg" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-text-primary">{comment.author || 'Anonymous'}</p>
-                      <p className="text-text-secondary mt-1">{comment.content}</p>
-                      <p className="text-sm text-text-tertiary mt-1">
-                        {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Comments section */}
+        {showComments && (
+          <div className="p-4 border-t border-border-primary">
+            {/* Comment input */}
+            {user ? (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="w-full bg-bg-tertiary border border-border-primary rounded-full py-3 px-5 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-accent-blue focus:bg-bg-tertiary transition-all duration-200"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleAddComment();
+                    }
+                  }}
+                />
+                <button
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim() || isCommenting}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-tertiary hover:text-text-primary disabled:text-text-tertiary transition-colors duration-200 px-2 py-1 rounded"
+                >
+                  {isCommenting ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <span className="font-semibold">Post</span>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <p className="text-text-tertiary text-sm">Please sign in to comment.</p>
+            )}
+
+            {/* Comments list */}
+            <div className="space-y-3 mt-4">
+              {tweet.comments?.map((comment, index) => (
+                <div key={index} className="flex items-start space-x-3 bg-bg-tertiary bg-opacity-50 p-4 rounded-xl">
+                  <div className="p-2 bg-bg-tertiary rounded-full">
+                    <FiUser className="text-text-tertiary text-lg" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-text-primary">{comment.author || 'Anonymous'}</p>
+                    <p className="text-text-secondary mt-1">{comment.content}</p>
+                    <p className="text-sm text-text-tertiary mt-1">
+                      {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
@@ -397,6 +413,6 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
           </div>
         </div>
       )}
-    </motion.div>
+    </>
   );
 } 

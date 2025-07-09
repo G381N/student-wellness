@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FiHeart, FiUser, FiExternalLink, FiPhone, FiMail, FiClock } from 'react-icons/fi';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface WellnessResource {
   id: string;
@@ -23,6 +24,7 @@ interface WellnessCardProps {
 
 export default function WellnessCard({ resource }: WellnessCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { theme } = useTheme();
 
   const categoryStyles = {
     'Mental Health': { bg: 'bg-bg-tertiary', text: 'text-text-primary', border: 'border-border-primary' },
@@ -35,7 +37,7 @@ export default function WellnessCard({ resource }: WellnessCardProps) {
   const categoryStyle = categoryStyles[resource.category] || categoryStyles['Mental Health'];
 
   return (
-    <div className="p-6 hover:bg-hover-bg transition-all duration-300 cursor-pointer border-b border-border-primary card-hover">
+    <div className="card p-6 hover:bg-hover-bg transition-all duration-300 cursor-pointer rounded-xl mb-4">
       <div className="flex space-x-4">
         {/* Icon */}
         <div className={`w-12 h-12 ${categoryStyle.bg} rounded-full flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105`}>

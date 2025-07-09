@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import WhatsHappening from './WhatsHappening';
+import ThemeToggle from './ThemeToggle';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface RightSidebarProps {
   isCollapsed: boolean;
@@ -16,6 +18,7 @@ interface RightSidebarProps {
 
 export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: RightSidebarProps) {
   const { user, signOut, isAdmin, isModerator, isDepartmentHead } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   
@@ -66,6 +69,9 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
       <div className="p-6 border-b border-border-primary">
         {user ? (
           <div className="flex flex-col items-center">
+            <div className="relative w-full flex justify-end mb-2">
+              <ThemeToggle className="absolute top-0 right-0" />
+            </div>
             <div className="w-16 h-16 bg-bg-tertiary rounded-full flex items-center justify-center mb-4">
               <FiUser className="text-text-primary text-2xl" />
             </div>
@@ -116,6 +122,9 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
           </div>
         ) : (
           <div className="flex flex-col items-center">
+            <div className="relative w-full flex justify-end mb-2">
+              <ThemeToggle className="absolute top-0 right-0" />
+            </div>
             <Link 
               href="/login"
               className="w-full py-2 bg-accent-blue text-text-primary rounded-lg text-center font-medium hover:bg-accent-blue-hover transition-colors mb-2"

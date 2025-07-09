@@ -119,11 +119,12 @@ export default function LayoutShell({ children }: LayoutShellProps) {
           leftSidebarCollapsed={leftSidebarCollapsed}
           rightSidebarCollapsed={rightSidebarCollapsed}
           onRightSidebarToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+          hideProfileButton={!rightSidebarCollapsed}
         />
 
         {/* Main Scrollable Content */}
         <motion.main
-          className="flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 pt-20 pb-20 md:pb-8"
+          className={`flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 pt-20 pb-20 md:pb-8 ${!rightSidebarCollapsed ? 'overflow-hidden' : ''}`}
         >
           {children}
         </motion.main>
@@ -152,10 +153,12 @@ export default function LayoutShell({ children }: LayoutShellProps) {
         onClose={() => setShowProfileModal(false)}
       />
 
-      {/* Floating Action Button */}
-      <FloatingActionButton 
-        className={rightSidebarCollapsed ? '' : 'right-[336px]'} 
-      />
+      {/* Floating Action Button - Hide when right sidebar is open */}
+      {rightSidebarCollapsed && (
+        <FloatingActionButton 
+          className={rightSidebarCollapsed ? '' : 'right-[336px]'} 
+        />
+      )}
     </div>
   );
 } 

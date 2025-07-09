@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiHeart, FiSun, FiMoon, FiActivity, FiBookOpen, FiMusic } from 'react-icons/fi';
+import { FiHeart, FiSun, FiMoon, FiActivity, FiBookOpen, FiMusic, FiChevronRight } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import GuidedBreathing from '@/components/GuidedBreathing';
@@ -23,7 +23,7 @@ export default function WellnessPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg">Loading wellness center...</p>
         </div>
       </div>
@@ -40,7 +40,6 @@ export default function WellnessPage() {
       title: 'Guided Breathing',
       icon: FiHeart,
       description: 'Calm your mind with breathing exercises',
-      color: 'blue',
       component: <GuidedBreathing />
     },
     {
@@ -48,10 +47,9 @@ export default function WellnessPage() {
       title: 'Meditation',
       icon: FiSun,
       description: 'Find inner peace with meditation',
-      color: 'yellow',
       component: (
         <div className="text-center py-16">
-          <FiSun className="text-yellow-500 text-6xl mx-auto mb-4" />
+          <FiSun className="text-gray-500 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">Meditation Center</h3>
           <p className="text-gray-400 mb-6">Coming soon - guided meditation sessions</p>
         </div>
@@ -62,10 +60,9 @@ export default function WellnessPage() {
       title: 'Sleep Wellness',
       icon: FiMoon,
       description: 'Improve your sleep quality',
-      color: 'purple',
       component: (
         <div className="text-center py-16">
-          <FiMoon className="text-purple-500 text-6xl mx-auto mb-4" />
+          <FiMoon className="text-gray-500 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">Sleep Wellness</h3>
           <p className="text-gray-400 mb-6">Coming soon - sleep tracking and tips</p>
         </div>
@@ -76,10 +73,9 @@ export default function WellnessPage() {
       title: 'Fitness Tracker',
       icon: FiActivity,
       description: 'Track your physical wellness',
-      color: 'green',
       component: (
         <div className="text-center py-16">
-          <FiActivity className="text-green-500 text-6xl mx-auto mb-4" />
+          <FiActivity className="text-gray-500 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">Fitness Tracker</h3>
           <p className="text-gray-400 mb-6">Coming soon - activity tracking and goals</p>
         </div>
@@ -90,10 +86,9 @@ export default function WellnessPage() {
       title: 'Mood Journal',
       icon: FiBookOpen,
       description: 'Track your emotional wellbeing',
-      color: 'indigo',
       component: (
         <div className="text-center py-16">
-          <FiBookOpen className="text-indigo-500 text-6xl mx-auto mb-4" />
+          <FiBookOpen className="text-gray-500 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">Mood Journal</h3>
           <p className="text-gray-400 mb-6">Coming soon - daily mood tracking</p>
         </div>
@@ -104,28 +99,15 @@ export default function WellnessPage() {
       title: 'Relaxing Music',
       icon: FiMusic,
       description: 'Soothing sounds for relaxation',
-      color: 'pink',
       component: (
         <div className="text-center py-16">
-          <FiMusic className="text-pink-500 text-6xl mx-auto mb-4" />
+          <FiMusic className="text-gray-500 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">Relaxing Music</h3>
           <p className="text-gray-400 mb-6">Coming soon - curated relaxation playlists</p>
         </div>
       )
     }
   ];
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-      yellow: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20',
-      purple: 'text-purple-500 bg-purple-500/10 border-purple-500/20',
-      green: 'text-green-500 bg-green-500/10 border-green-500/20',
-      indigo: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
-      pink: 'text-pink-500 bg-pink-500/10 border-pink-500/20'
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
-  };
 
   const activeTabData = wellnessTools.find(tool => tool.id === activeTab);
 
@@ -140,7 +122,7 @@ export default function WellnessPage() {
           className="text-center"
         >
           <div className="flex items-center justify-center mb-4">
-            <FiHeart className="text-pink-500 text-4xl mr-3" />
+            <FiHeart className="text-gray-300 text-4xl mr-3" />
             <h1 className="text-3xl md:text-4xl font-bold text-white">
               Wellness Center
             </h1>
@@ -167,12 +149,12 @@ export default function WellnessPage() {
               onClick={() => setActiveTab(tool.id)}
               className={`p-4 rounded-xl border transition-all duration-200 ${
                 isActive
-                  ? getColorClasses(tool.color)
-                  : 'bg-gray-900 border-gray-700 hover:border-gray-600'
+                  ? 'bg-gray-700 border-gray-500 shadow-lg'
+                  : 'bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600'
               }`}
             >
               <Icon className={`text-2xl mx-auto mb-2 ${
-                isActive ? '' : 'text-gray-400'
+                isActive ? 'text-white' : 'text-gray-400'
               }`} />
               <h3 className={`font-semibold text-sm ${
                 isActive ? 'text-white' : 'text-gray-400'
@@ -205,19 +187,19 @@ export default function WellnessPage() {
         <h3 className="text-xl font-semibold text-white mb-4">Daily Wellness Tips</h3>
         <div className="space-y-3">
           <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
             <p className="text-gray-300">Take regular breaks from screens to rest your eyes</p>
           </div>
           <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
             <p className="text-gray-300">Practice deep breathing for 5 minutes daily</p>
           </div>
           <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
             <p className="text-gray-300">Stay hydrated throughout the day</p>
           </div>
           <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
             <p className="text-gray-300">Get adequate sleep (7-9 hours) for better mental health</p>
           </div>
         </div>

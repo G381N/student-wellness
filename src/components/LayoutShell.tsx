@@ -97,7 +97,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
         {/* Main Scrollable Content */}
         <motion.main
-          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8 pt-20"
+          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8"
           style={{
             marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
           }}

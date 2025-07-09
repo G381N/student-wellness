@@ -191,34 +191,34 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-800 relative group"
+      className="bg-gray-900 rounded-2xl p-6 border border-gray-700 relative group"
     >
       <div className="flex items-start space-x-4">
-        <div className="p-2 bg-gray-800 rounded-full mt-1">
+        <div className="p-2 bg-gray-800 rounded-full">
           <FiUser className="text-gray-400 text-xl" />
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-white">{tweet.author || 'Anonymous'}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 {formatDistanceToNow(new Date(tweet.timestamp), { addSuffix: true })}
               </p>
             </div>
             {canDelete && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-gray-500 hover:text-white transition-colors duration-200 p-2 rounded-full opacity-0 group-hover:opacity-100 -mr-2"
+                className="text-gray-400 hover:text-white transition-colors duration-200 p-2 rounded-full hover:bg-gray-700"
               >
                 <FiTrash2 className="text-lg" />
               </button>
             )}
           </div>
-          <p className="text-gray-300 mt-2">{tweet.content}</p>
+          <p className="text-white mt-2">{tweet.content}</p>
 
           {/* Activity Details */}
           {tweet.type === 'activity' && (
-            <div className="mt-4 bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <div className="mt-4 bg-gray-800 bg-opacity-50 rounded-xl p-4">
               <h3 className="font-semibold text-white mb-2">{tweet.title || tweet.content}</h3>
               <div className="space-y-2 text-sm text-gray-300">
                 {tweet.date && <p>📅 Date: {tweet.date}</p>}
@@ -229,16 +229,16 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
               <button
                 onClick={handleJoinActivity}
                 disabled={isJoining || (isFull && !isParticipating)}
-                className={`mt-4 w-full py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 text-sm font-semibold ${
+                className={`mt-4 w-full py-2 px-4 rounded-full flex items-center justify-center space-x-2 transition-all duration-200 ${
                   isParticipating
                     ? 'bg-gray-700 hover:bg-gray-600 text-white'
                     : isFull
                     ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                    : 'bg-white text-black hover:bg-gray-200'
+                    : 'bg-gray-600 hover:bg-gray-500 text-white'
                 }`}
               >
                 {isJoining ? (
-                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
                     {isParticipating ? (
@@ -255,92 +255,141 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
             </div>
           )}
 
-          <div className="flex items-center space-x-6 mt-4 text-gray-400">
+          <div className="flex items-center space-x-4 mt-4">
+            {/* Comment button - always visible */}
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center space-x-2 hover:text-white transition-colors duration-200"
+              className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 transition-all duration-200 group custom-cursor"
             >
-              <FiMessageCircle className="text-lg" />
+              <div className="p-2 rounded-full group-hover:bg-gray-800 transition-all duration-200 transform group-hover:scale-110">
+                <FiMessageCircle className="text-lg" />
+              </div>
               <span className="text-sm font-medium">{tweet.comments?.length || 0}</span>
             </button>
+
+            {/* Voting buttons */}
             <div className="flex items-center space-x-2">
               <button
                 onClick={handleUpvote}
                 disabled={isVoting}
-                className={`p-1.5 rounded-full transition-colors duration-200 ${hasUpvoted ? 'text-white bg-gray-700' : 'hover:bg-gray-800'}`}
+                className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
+                  hasUpvoted ? 'text-green-400' : 'text-gray-400 hover:text-gray-200'
+                }`}
+                data-upvote={tweet.id}
               >
-                <FiChevronUp className="text-lg" />
+                <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
+                  hasUpvoted 
+                    ? 'bg-green-900 bg-opacity-30' 
+                    : 'group-hover:bg-gray-800'
+                }`}>
+                  {isVoting ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <FiChevronUp className="text-lg" />
+                  )}
+                </div>
+                <span className="text-sm font-medium">{tweet.upvotes || 0}</span>
               </button>
-              <span className="text-sm font-semibold w-6 text-center text-white">{ (tweet.upvotes || 0) - (tweet.downvotes || 0) }</span>
+
               <button
                 onClick={handleDownvote}
                 disabled={isVoting}
-                className={`p-1.5 rounded-full transition-colors duration-200 ${hasDownvoted ? 'text-white bg-gray-700' : 'hover:bg-gray-800'}`}
+                className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
+                  hasDownvoted ? 'text-red-400' : 'text-gray-400 hover:text-gray-200'
+                }`}
+                data-downvote={tweet.id}
               >
-                <FiChevronDown className="text-lg" />
+                <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
+                  hasDownvoted 
+                    ? 'bg-red-900 bg-opacity-30' 
+                    : 'group-hover:bg-gray-800'
+                }`}>
+                  {isVoting ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <FiChevronDown className="text-lg" />
+                  )}
+                </div>
+                <span className="text-sm font-medium">{tweet.downvotes || 0}</span>
               </button>
             </div>
           </div>
+
+          {/* Comments section */}
+          {showComments && (
+            <div className="mt-4 space-y-4">
+              {/* Comment input */}
+              {user ? (
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    className="w-full bg-gray-900 border border-gray-700 rounded-full py-3 px-5 text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 focus:bg-gray-800 transition-all duration-200"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleAddComment();
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={handleAddComment}
+                    disabled={!newComment.trim() || isCommenting}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 disabled:text-gray-600 transition-colors duration-200 px-2 py-1 rounded"
+                  >
+                    {isCommenting ? (
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <span className="font-semibold">Post</span>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-gray-400 text-sm">Please sign in to comment.</p>
+              )}
+
+              {/* Comments list */}
+              <div className="space-y-3">
+                {tweet.comments?.map((comment, index) => (
+                  <div key={index} className="flex items-start space-x-3 bg-gray-800 bg-opacity-50 p-4 rounded-xl">
+                    <div className="p-2 bg-gray-700 rounded-full">
+                      <FiUser className="text-gray-400 text-lg" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">{comment.author || 'Anonymous'}</p>
+                      <p className="text-gray-300 mt-1">{comment.content}</p>
+                      <p className="text-sm text-gray-400 mt-1">
+                        {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {showComments && (
-        <div className="mt-4 pl-12">
-          <div className="space-y-4">
-            {tweet.comments && tweet.comments.map((comment) => (
-              <div key={comment.id} className="flex items-start space-x-3">
-                <div className="p-2 bg-gray-800 rounded-full mt-1">
-                  <FiUser className="text-gray-500 text-base" />
-                </div>
-                <div className="flex-1 bg-gray-800 rounded-xl p-3">
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold text-white text-sm">
-                      {comment.isAnonymous ? 'Anonymous' : comment.author}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
-                    </p>
-                  </div>
-                  <p className="text-gray-300 text-sm mt-1">{comment.content}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 flex space-x-3">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
-            />
-            <button
-              onClick={handleAddComment}
-              disabled={isCommenting}
-              className="bg-white text-black font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-gray-200 disabled:opacity-50"
-            >
-              {isCommenting ? '...' : 'Post'}
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-2xl">
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 shadow-lg text-center">
-            <h3 className="font-semibold text-white text-lg mb-2">Are you sure?</h3>
-            <p className="text-gray-400 mb-6">This action cannot be undone.</p>
-            <div className="flex gap-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-8 rounded-2xl border border-gray-700 max-w-md mx-4">
+            <h3 className="text-xl font-bold text-white mb-4">Delete Post</h3>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete this post? This action cannot be undone.
+            </p>
+            <div className="flex space-x-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors hover:bg-gray-600"
+                className="flex-1 px-6 py-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-all duration-200 font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteTweet}
-                className="flex-1 bg-gray-200 text-black font-semibold py-2 px-4 rounded-lg transition-colors hover:bg-white"
+                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-200 font-medium"
               >
                 Delete
               </button>

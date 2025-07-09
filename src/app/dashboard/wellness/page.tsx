@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiHeart, FiSun, FiMoon, FiActivity, FiBookOpen, FiMusic, FiChevronRight } from 'react-icons/fi';
+import { FiHeart, FiSun, FiMoon, FiActivity, FiBookOpen, FiMusic } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import GuidedBreathing from '@/components/GuidedBreathing';
@@ -109,6 +109,8 @@ export default function WellnessPage() {
     }
   ];
 
+  const getActiveClasses = () => 'bg-gray-700 border-gray-500';
+
   const activeTabData = wellnessTools.find(tool => tool.id === activeTab);
 
   return (
@@ -122,7 +124,7 @@ export default function WellnessPage() {
           className="text-center"
         >
           <div className="flex items-center justify-center mb-4">
-            <FiHeart className="text-gray-300 text-4xl mr-3" />
+            <FiHeart className="text-gray-400 text-4xl mr-3" />
             <h1 className="text-3xl md:text-4xl font-bold text-white">
               Wellness Center
             </h1>
@@ -149,15 +151,15 @@ export default function WellnessPage() {
               onClick={() => setActiveTab(tool.id)}
               className={`p-4 rounded-xl border transition-all duration-200 ${
                 isActive
-                  ? 'bg-gray-700 border-gray-500 shadow-lg'
-                  : 'bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600'
+                  ? getActiveClasses()
+                  : 'bg-gray-900 border-gray-700 hover:border-gray-600'
               }`}
             >
               <Icon className={`text-2xl mx-auto mb-2 ${
                 isActive ? 'text-white' : 'text-gray-400'
               }`} />
               <h3 className={`font-semibold text-sm ${
-                isActive ? 'text-white' : 'text-gray-400'
+                isActive ? 'text-white' : 'text-gray-300'
               }`}>
                 {tool.title}
               </h3>
@@ -187,19 +189,19 @@ export default function WellnessPage() {
         <h3 className="text-xl font-semibold text-white mb-4">Daily Wellness Tips</h3>
         <div className="space-y-3">
           <div className="flex items-start space-x-3">
-            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
+            <div className="w-2 h-2 bg-gray-600 rounded-full mt-2 flex-shrink-0"></div>
             <p className="text-gray-300">Take regular breaks from screens to rest your eyes</p>
           </div>
           <div className="flex items-start space-x-3">
-            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
+            <div className="w-2 h-2 bg-gray-600 rounded-full mt-2 flex-shrink-0"></div>
             <p className="text-gray-300">Practice deep breathing for 5 minutes daily</p>
           </div>
           <div className="flex items-start space-x-3">
-            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
+            <div className="w-2 h-2 bg-gray-600 rounded-full mt-2 flex-shrink-0"></div>
             <p className="text-gray-300">Stay hydrated throughout the day</p>
           </div>
           <div className="flex items-start space-x-3">
-            <FiChevronRight className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
+            <div className="w-2 h-2 bg-gray-600 rounded-full mt-2 flex-shrink-0"></div>
             <p className="text-gray-300">Get adequate sleep (7-9 hours) for better mental health</p>
           </div>
         </div>

@@ -136,7 +136,7 @@ export default function SearchComponent({
           placeholder={placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-gray-800 text-white rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+          className="w-full bg-gray-800 text-white rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-gray-500 placeholder-gray-500"
         />
         <div className="absolute left-3 top-2.5 text-gray-500">
           {isSearching ? (

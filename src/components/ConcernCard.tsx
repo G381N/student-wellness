@@ -6,7 +6,6 @@ import { FiThumbsUp, FiMessageCircle, FiSend, FiAlertCircle, FiUser, FiX, FiTras
 import { Post, upvotePost, downvotePost, addComment, processTimestamp, deletePost, deletePostAsModeratorOrAdmin } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserInfo } from '@/hooks/useUserInfo';
-import { formatDistanceToNow } from 'date-fns';
 
 // Fallback image if category doesn't match
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
@@ -47,8 +46,6 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
     comment: false,
     delete: false
   });
-  const [showComments, setShowComments] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const commentInputRef = useRef<HTMLInputElement>(null);
   
@@ -149,141 +146,191 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
     { bg: 'bg-gray-800', text: 'text-gray-300' };
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-800 relative group"
-    >
-      <div className="flex items-start space-x-4">
-        <div className="p-2 bg-gray-800 rounded-full mt-1">
-          <FiAlertCircle className="text-gray-400 text-xl" />
+    <div className="px-4 py-3 hover:bg-gray-950 hover:bg-opacity-40 transition-all duration-300 cursor-pointer border-b border-gray-800">
+      <div className="flex space-x-3">
+        {/* Profile Picture */}
+        <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+          <FiUser className="text-white text-base" />
         </div>
-        <div className="flex-1">
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          {/* Header */}
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-white">
-                {concern.isAnonymous ? 'Anonymous Concern' : (authorInfo?.displayName || 'Unknown User')}
-              </p>
-              <p className="text-sm text-gray-500">
-                {formatDistanceToNow(new Date(concern.timestamp), { addSuffix: true })}
-              </p>
+            <div className="flex items-center space-x-3 flex-wrap gap-y-1">
+              {authorLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-gray-600 rounded animate-pulse"></div>
+                  <div className="w-20 h-4 bg-gray-600 rounded animate-pulse"></div>
+                </div>
+              ) : (
+                <>
+                  <span className="font-bold text-white text-base">
+                    {concern.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || 'Unknown User')}
+                  </span>
+                  {!concern.isAnonymous && authorInfo?.realName && authorInfo.realName !== authorInfo.displayName && (
+                    <span className="text-gray-500 text-sm">
+                      @{authorInfo.realName}
+                    </span>
+                  )}
+                  {concern.isAnonymous && (
+                    <span className="text-gray-500 text-sm">
+                      @anonymous
+                    </span>
+                  )}
+                </>
+              )}
+              <span className="text-gray-500">·</span>
+              <span className="text-gray-500 text-sm bg-gray-800 bg-opacity-40 px-2 py-1 rounded border border-gray-700 border-opacity-30">
+                {concern.timestamp && (
+                  typeof concern.timestamp.toDate === 'function' 
+                    ? new Date(concern.timestamp.toDate()).toLocaleDateString()
+                    : new Date(concern.timestamp as any).toLocaleDateString()
+                )}
+              </span>
             </div>
+            
+            {/* Delete Button */}
             {canDelete && (
               <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-gray-500 hover:text-white transition-colors duration-200 p-2 rounded-full opacity-0 group-hover:opacity-100 -mr-2"
+                onClick={handleDeletePost}
+                disabled={loading.delete}
+                className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
+                title={isAuthor ? "Delete your concern" : "Delete as moderator"}
               >
-                <FiTrash2 className="text-lg" />
+                {loading.delete ? (
+                  <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <FiTrash2 className="text-sm" />
+                )}
               </button>
             )}
           </div>
-          <p className="text-gray-300 mt-2">{concern.content}</p>
 
-          <div className="flex flex-wrap gap-2 mt-4">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-gray-700">
+          {/* Content */}
+          <div className="mb-3">
+            <p className="text-white text-[15px] leading-normal">{concern.content}</p>
+          </div>
+
+          {/* Category and Status Tags - Subtle style */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-gray-800 bg-opacity-50 text-gray-400 border border-gray-700 border-opacity-50">
               {concern.category}
             </span>
             {concern.status && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-gray-700 capitalize">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-gray-800 bg-opacity-40 text-gray-500 border border-gray-600 border-opacity-40">
                 {concern.status}
               </span>
             )}
           </div>
 
-          <div className="flex items-center space-x-6 mt-4 text-gray-400">
+          {/* Action Buttons - Twitter style */}
+          <div className="flex items-center space-x-6 text-gray-500">
             <button
-              onClick={() => setShowComments(!showComments)}
-              className="flex items-center space-x-2 hover:text-white transition-colors duration-200"
+              onClick={handleToggleComment}
+              className="flex items-center space-x-2 hover:text-white transition-colors group"
             >
-              <FiMessageCircle className="text-lg" />
-              <span className="text-sm font-medium">{concern.comments?.length || 0}</span>
+              <div className="p-2 rounded-full group-hover:bg-gray-800 transition-colors">
+                <FiMessageCircle className="w-[18px] h-[18px]" />
+              </div>
+              <span className="text-sm">{concern.comments?.length || 0}</span>
             </button>
+
             <button
               onClick={handleEscalate}
               disabled={loading.upvote}
-              className={`flex items-center space-x-2 transition-colors duration-200 ${
+              className={`flex items-center space-x-2 transition-colors group ${
                 hasUpvoted ? 'text-white' : 'hover:text-white'
               }`}
             >
-              <div className={`p-1.5 rounded-full ${hasUpvoted ? 'bg-gray-700' : 'group-hover:bg-gray-800'}`}>
+              <div className={`p-2 rounded-full transition-colors ${
+                hasUpvoted 
+                  ? 'bg-gray-700' 
+                  : 'group-hover:bg-gray-800'
+              }`}>
                 {loading.upvote ? (
-                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <FiThumbsUp className="text-lg" />
+                  <FiThumbsUp className="w-[18px] h-[18px]" />
                 )}
               </div>
-              <span className="text-sm font-semibold">{concern.upvotes || 0}</span>
+              <span className="text-sm">{concern.upvotes || 0}</span>
             </button>
           </div>
+          
+          {/* Comments section */}
+          <AnimatePresence>
+            {isCommenting && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-3 pt-3 border-t border-gray-800"
+              >
+                {/* Comments list */}
+                {concern.comments && concern.comments.length > 0 && (
+                  <div className="space-y-3 mb-3 max-h-40 overflow-y-auto">
+                    {concern.comments.map((comment) => (
+                      <div key={comment.id} className="flex space-x-3">
+                        <div className="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                          <FiUser className="text-gray-400 text-xs" />
+                        </div>
+                        <div className="flex-grow min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="text-sm font-medium text-white">{comment.authorName}</span>
+                            <span className="text-xs text-gray-500">
+                              {comment.timestamp && (
+                                typeof comment.timestamp.toDate === 'function'
+                                  ? new Date(comment.timestamp.toDate()).toLocaleDateString()
+                                  : new Date(comment.timestamp as any).toLocaleDateString()
+                              )}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-300 leading-normal">{comment.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Add comment form */}
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                    <FiUser className="text-gray-400 text-xs" />
+                  </div>
+                  <div className="flex-grow relative">
+                    <input
+                      ref={commentInputRef}
+                      type="text"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="w-full bg-transparent border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddComment();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={handleAddComment}
+                      disabled={!comment.trim() || loading.comment}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 disabled:text-gray-600 text-sm font-medium"
+                    >
+                      {loading.comment ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        'Post'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-
-      {showComments && (
-        <div className="mt-4 pl-12">
-          <div className="space-y-4">
-            {concern.comments && concern.comments.map((comment) => (
-              <div key={comment.id} className="flex items-start space-x-3">
-                <div className="p-2 bg-gray-800 rounded-full mt-1">
-                  <FiUser className="text-gray-500 text-base" />
-                </div>
-                <div className="flex-1 bg-gray-800 rounded-xl p-3">
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold text-white text-sm">
-                      {comment.isAnonymous ? 'Anonymous' : comment.author}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
-                    </p>
-                  </div>
-                  <p className="text-gray-300 text-sm mt-1">{comment.content}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 flex space-x-3">
-            <input
-              ref={commentInputRef}
-              type="text"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add a comment..."
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
-            />
-            <button
-              onClick={handleAddComment}
-              disabled={loading.comment || !comment.trim()}
-              className="bg-white text-black font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-gray-200 disabled:opacity-50"
-            >
-              {loading.comment ? '...' : 'Post'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showDeleteConfirm && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-2xl">
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 shadow-lg text-center">
-            <h3 className="font-semibold text-white text-lg mb-2">Are you sure?</h3>
-            <p className="text-gray-400 mb-6">This action cannot be undone.</p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeletePost}
-                className="flex-1 bg-gray-200 text-black font-semibold py-2 px-4 rounded-lg transition-colors hover:bg-white"
-              >
-                {loading.delete ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </motion.div>
+    </div>
   );
 } 

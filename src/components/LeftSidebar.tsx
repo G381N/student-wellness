@@ -176,7 +176,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
                     href={link.href}
                     className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
                       isActive
-                        ? 'bg-gray-700 text-white'
+                        ? 'bg-gray-800 text-white'
                         : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                     }`}
                   >

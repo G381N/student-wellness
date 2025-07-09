@@ -184,26 +184,15 @@ export default function GuidedBreathing() {
     }
   };
 
-  const getPhaseStyles = () => {
-    switch(currentPhase) {
-      case 'inhale': return { color: '#FFFFFF', shadow: 'shadow-white' };
-      case 'hold': return { color: '#A0AEC0', shadow: 'shadow-gray-400' };
-      case 'exhale': return { color: '#718096', shadow: 'shadow-gray-600' };
-      case 'holdEmpty': return { color: '#4A5568', shadow: 'shadow-gray-800' };
-      default: return { color: '#FFFFFF', shadow: 'shadow-white' };
-    }
-  };
-
   const breathingAnim = getBreathingAnimation();
-  const phaseStyles = getPhaseStyles();
 
   return (
-    <div>
+    <div className="text-white">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-2">
-            <FiWind className="text-2xl text-gray-300 mr-3" />
+            <FiWind className="text-2xl text-gray-400 mr-2" />
             <h1 className="text-xl font-bold">Guided Breathing</h1>
           </div>
           <p className="text-gray-400 text-sm">
@@ -221,13 +210,13 @@ export default function GuidedBreathing() {
           >
             {/* Pattern Selection */}
             <div>
-              <h2 className="text-base font-medium mb-3 text-gray-300">Choose Pattern</h2>
+              <h2 className="text-base font-semibold mb-3 text-gray-300">Choose Pattern</h2>
               <div className="space-y-2">
                 {breathingPatterns.map((pattern) => (
                   <motion.div
                     key={pattern.name}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={() => setSelectedPattern(pattern)}
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
                       selectedPattern.name === pattern.name
@@ -238,7 +227,7 @@ export default function GuidedBreathing() {
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="font-medium text-white mb-1">{pattern.name}</h3>
-                        <p className="text-gray-400 text-xs mb-2">{pattern.description}</p>
+                        <p className="text-gray-400 text-sm mb-2">{pattern.description}</p>
                         <div className="text-xs text-gray-500">
                           {pattern.inhale}s in
                           {pattern.hold > 0 && ` • ${pattern.hold}s hold`}
@@ -248,10 +237,12 @@ export default function GuidedBreathing() {
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         selectedPattern.name === pattern.name
-                          ? 'border-white bg-white'
+                          ? 'border-white'
                           : 'border-gray-600'
                       }`}>
-                        {selectedPattern.name === pattern.name && <div className="w-2 h-2 rounded-full bg-black" />}
+                        {selectedPattern.name === pattern.name && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -261,13 +252,13 @@ export default function GuidedBreathing() {
 
             {/* Duration Selection */}
             <div>
-              <h2 className="text-base font-medium mb-3 text-gray-300">Duration</h2>
+              <h2 className="text-base font-semibold mb-3 text-gray-300">Duration</h2>
               <div className="flex gap-2">
                 {durations.map((duration) => (
                   <button
                     key={duration.value}
                     onClick={() => setSelectedDuration(duration.value)}
-                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                       selectedDuration === duration.value
                         ? 'bg-white text-black'
                         : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
@@ -280,73 +271,61 @@ export default function GuidedBreathing() {
             </div>
 
             {/* Start Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={startSession}
-              className="w-full bg-white text-black font-bold py-3 px-6 rounded-lg flex items-center justify-center text-lg gap-3"
-            >
-              <FiPlay />
-              <span>Start Session</span>
-            </motion.button>
+            <div className="pt-4">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={startSession}
+                className="w-full bg-white text-black font-bold py-3 px-6 rounded-lg flex items-center justify-center text-lg"
+              >
+                <FiPlay className="mr-2" />
+                Start Session
+              </motion.button>
+            </div>
           </motion.div>
         ) : (
           /* Active Session View */
-          <div className="flex flex-col items-center justify-center h-[500px]">
-            <motion.div
-              className="relative w-64 h-64 flex items-center justify-center"
-              animate={breathingAnim}
-              transition={{ type: 'spring', stiffness: 20, damping: 10 }}
-            >
+          <motion.div 
+            className="flex flex-col items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="relative w-64 h-64 flex items-center justify-center">
+              {/* Breathing Circle */}
               <motion.div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  boxShadow: `0 0 40px 10px ${phaseStyles.color}`,
-                  background: `radial-gradient(circle, ${phaseStyles.color} 0%, rgba(0,0,0,0) 70%)`,
-                }}
-                animate={{ opacity: [0.2, 0.4, 0.2] }}
-                transition={{ duration: selectedPattern.inhale + selectedPattern.exhale, repeat: Infinity }}
+                className="w-full h-full rounded-full bg-gray-800 border-4 border-gray-700"
+                animate={breathingAnim}
+                transition={{ duration: 1, ease: 'easeInOut' }}
               />
-              <div className="w-56 h-56 bg-gray-900 rounded-full border-4 border-gray-700" />
-            </motion.div>
-            
-            <div className="text-center mt-12">
-              <motion.h2 
-                key={currentPhase}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl font-semibold capitalize mb-2"
-                style={{ color: phaseStyles.color }}
-              >
-                {currentPhase === 'holdEmpty' ? 'Hold' : currentPhase}
-              </motion.h2>
-              <p className="text-5xl font-mono text-white">{phaseTimeLeft}</p>
-            </div>
-            
-            <div className="w-full mt-12">
-              <div className="flex justify-between text-sm text-gray-400 mb-1">
-                <span>Cycle: {cycleCount + 1}</span>
-                <span>Total Time: {formatTime(totalTimeLeft)}</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <motion.div
-                  className="bg-white h-2 rounded-full"
-                  initial={{ width: '100%' }}
-                  animate={{ width: `${(totalTimeLeft / (selectedDuration * 60)) * 100}%` }}
-                  transition={{ duration: 1, ease: 'linear' }}
-                />
+
+              {/* Text Indicators */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <p className="text-4xl font-bold text-white mb-2">{phaseTimeLeft}s</p>
+                <p className="text-lg text-gray-300 capitalize">{currentPhase.replace('holdEmpty', 'hold')}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-6 mt-8">
-              <button onClick={togglePause} className="text-gray-300 hover:text-white transition-colors p-3 bg-gray-800 rounded-full">
-                {isActive ? <FiPause size={24} /> : <FiPlay size={24} />}
+            <div className="mt-8 text-center">
+              <p className="text-gray-400">Total time remaining: {formatTime(totalTimeLeft)}</p>
+              <p className="text-gray-500 text-sm mt-1">Cycle: {cycleCount}</p>
+            </div>
+
+            <div className="flex gap-4 mt-8">
+              <button
+                onClick={togglePause}
+                className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-2xl text-white hover:bg-gray-700 transition-colors"
+              >
+                {isActive ? <FiPause /> : <FiPlay />}
               </button>
-              <button onClick={stopSession} className="text-gray-300 hover:text-white transition-colors p-4 bg-gray-800 hover:bg-gray-700 rounded-full">
-                <FiSquare size={28} />
+              <button
+                onClick={stopSession}
+                className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-2xl text-white hover:bg-gray-700 transition-colors"
+              >
+                <FiSquare />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

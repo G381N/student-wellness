@@ -41,11 +41,8 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
   }
 
   return (
-    <motion.div
-      className="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 z-40 overflow-y-auto scrollbar-hide"
-      initial={{ x: 320 }}
-      animate={{ x: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    <div
+      className="h-full w-80 bg-gray-900 border-l border-gray-800 z-40 overflow-y-auto scrollbar-hide"
     >
       {/* Header with Toggle Button */}
       <div className="flex items-center justify-between p-4 h-16 border-b border-gray-800 relative">
@@ -141,6 +138,6 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
           <span>Create Post</span>
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 } 

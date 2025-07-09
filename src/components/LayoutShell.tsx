@@ -87,7 +87,12 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-col flex-grow relative">
+      <div 
+        className="flex flex-col flex-grow relative transition-all duration-300"
+        style={{
+          marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
+        }}
+      >
         {/* Top Bar */}
         <TopBar
           leftSidebarCollapsed={leftSidebarCollapsed}

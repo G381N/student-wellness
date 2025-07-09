@@ -42,57 +42,57 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
 
   return (
     <motion.div
-      className="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 z-40 overflow-y-auto scrollbar-hide"
+      className="fixed top-0 right-0 h-full w-80 bg-bg-secondary border-l border-border-primary z-40 overflow-y-auto scrollbar-hide"
       initial={{ x: 320 }}
       animate={{ x: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       {/* Header with Toggle Button */}
-      <div className="flex items-center justify-between p-4 h-16 border-b border-gray-800 relative">
+      <div className="flex items-center justify-between p-4 h-16 border-b border-border-primary relative">
         {/* Collapse/Expand Toggle Button */}
         <button
           onClick={onToggle}
-          className="p-2 rounded-full hover:bg-gray-800 transition-colors bg-gray-800"
+          className="p-2 rounded-full hover:bg-hover-bg transition-colors bg-bg-tertiary"
         >
-          <FiChevronLeft className="text-gray-400" />
+          <FiChevronLeft className="text-text-secondary" />
         </button>
         
-        <h2 className="text-white font-semibold">Profile & Updates</h2>
+        <h2 className="text-text-primary font-semibold">Profile & Updates</h2>
       </div>
       
       {/* Profile Section */}
-      <div className="p-6 border-b border-gray-800">
+      <div className="p-6 border-b border-border-primary">
         {user ? (
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <FiUser className="text-white text-2xl" />
+            <div className="w-16 h-16 bg-bg-tertiary rounded-full flex items-center justify-center mb-4">
+              <FiUser className="text-text-primary text-2xl" />
             </div>
-            <h3 className="text-white font-bold text-lg">
+            <h3 className="text-text-primary font-bold text-lg">
               {user.displayName || user.email?.split('@')[0]}
             </h3>
-            <p className="text-gray-400 text-sm mb-4">{user.email}</p>
+            <p className="text-text-tertiary text-sm mb-4">{user.email}</p>
             
             <div className="grid grid-cols-3 gap-2 w-full">
               <button 
-                className="flex flex-col items-center justify-center p-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
+                className="flex flex-col items-center justify-center p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
                 onClick={() => router.push('/profile')}
               >
-                <FiUser className="text-gray-400 text-lg" />
-                <span className="text-xs text-gray-300 mt-1">Profile</span>
+                <FiUser className="text-text-secondary text-lg" />
+                <span className="text-xs text-text-secondary mt-1">Profile</span>
               </button>
               <button 
-                className="flex flex-col items-center justify-center p-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
+                className="flex flex-col items-center justify-center p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
                 onClick={() => router.push('/settings')}
               >
-                <FiSettings className="text-gray-400 text-lg" />
-                <span className="text-xs text-gray-300 mt-1">Settings</span>
+                <FiSettings className="text-text-secondary text-lg" />
+                <span className="text-xs text-text-secondary mt-1">Settings</span>
               </button>
               <button 
-                className="flex flex-col items-center justify-center p-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
+                className="flex flex-col items-center justify-center p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
                 onClick={() => signOut()}
               >
-                <FiLogOut className="text-gray-400 text-lg" />
-                <span className="text-xs text-gray-300 mt-1">Logout</span>
+                <FiLogOut className="text-text-secondary text-lg" />
+                <span className="text-xs text-text-secondary mt-1">Logout</span>
               </button>
             </div>
           </div>
@@ -100,13 +100,13 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
           <div className="flex flex-col items-center">
             <Link 
               href="/login"
-              className="w-full py-2 bg-gray-700 text-white rounded-lg text-center font-medium hover:bg-gray-600 transition-colors mb-2"
+              className="w-full py-2 bg-accent-blue text-text-primary rounded-lg text-center font-medium hover:bg-accent-blue-hover transition-colors mb-2"
             >
               Log In
             </Link>
             <Link 
               href="/signup"
-              className="w-full py-2 bg-gray-800 text-white rounded-lg text-center font-medium hover:bg-gray-700 transition-colors"
+              className="w-full py-2 bg-bg-tertiary text-text-primary rounded-lg text-center font-medium hover:bg-hover-bg transition-colors"
             >
               Sign Up
             </Link>
@@ -115,27 +115,27 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
       </div>
       
       {/* What's happening section */}
-      <div className="p-6 border-b border-gray-800">
-        <h3 className="text-white font-bold text-lg mb-4">What's happening</h3>
+      <div className="p-6 border-b border-border-primary">
+        <h3 className="text-text-primary font-bold text-lg mb-4">What's happening</h3>
         <div className="space-y-4">
           {whatsHappeningData.map((item, index) => (
-            <div key={index} className="bg-gray-800 rounded-xl p-3 hover:bg-gray-700 transition-colors cursor-pointer">
-              <span className="text-xs text-gray-400">{item.category} · {item.time}</span>
-              <p className="text-white text-sm font-medium mt-1">{item.title}</p>
+            <div key={index} className="bg-bg-tertiary rounded-xl p-3 hover:bg-hover-bg transition-colors cursor-pointer">
+              <span className="text-xs text-text-tertiary">{item.category} · {item.time}</span>
+              <p className="text-text-primary text-sm font-medium mt-1">{item.title}</p>
             </div>
           ))}
         </div>
-        <button className="text-gray-400 text-sm mt-4 hover:text-white transition-colors">
+        <button className="text-text-tertiary text-sm mt-4 hover:text-accent-blue transition-colors">
           Show more
         </button>
       </div>
       
       {/* Quick actions */}
       <div className="p-6">
-        <h3 className="text-white font-bold text-lg mb-4">Quick actions</h3>
+        <h3 className="text-text-primary font-bold text-lg mb-4">Quick actions</h3>
         <button
           onClick={onCreatePost}
-          className="w-full py-3 bg-gray-700 text-white rounded-xl flex items-center justify-center space-x-2 hover:bg-gray-600 transition-colors"
+          className="w-full py-3 bg-accent-blue text-text-primary rounded-xl flex items-center justify-center space-x-2 hover:bg-accent-blue-hover transition-colors"
         >
           <FiPlus className="text-lg" />
           <span>Create Post</span>

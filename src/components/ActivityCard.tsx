@@ -26,17 +26,17 @@ const DEFAULT_IMAGES = {
 // Fallback image if category doesn't match
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
 
-// Categories mapping (colors removed)
+// Categories mapping (monochrome theme)
 const CATEGORIES = {
-  'Academic': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Sports': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Cultural': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Social': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Wellness': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Professional': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Volunteer': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Entertainment': { bg: 'bg-gray-800', text: 'text-gray-300' },
-  'Other': { bg: 'bg-gray-800', text: 'text-gray-300' }
+  'Academic': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Sports': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Cultural': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Social': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Wellness': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Professional': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Volunteer': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Entertainment': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
+  'Other': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' }
 };
 
 interface ActivityCardProps {
@@ -172,7 +172,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
   };
 
   const categoryStyle = CATEGORIES[activity.category as keyof typeof CATEGORIES] || 
-    { bg: 'bg-gray-800', text: 'text-gray-300' };
+    { bg: 'bg-bg-tertiary', text: 'text-text-secondary' };
 
   return (
     <>
@@ -180,11 +180,11 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         .custom-cursor { cursor: pointer; }
         .custom-cursor:hover { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="%23ffffff" opacity="0.8"/></svg>'), auto; }
       `}</style>
-      <div className="px-4 py-3 hover:bg-gray-950 hover:bg-opacity-40 transition-all duration-300 cursor-pointer border-b border-gray-800">
+      <div className="px-4 py-3 hover:bg-hover-bg transition-all duration-300 cursor-pointer border-b border-border-primary">
         <div className="flex space-x-3">
           {/* Profile Picture */}
-          <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-            <FiUser className="text-white text-base" />
+          <div className="w-10 h-10 bg-bg-tertiary rounded-full flex items-center justify-center flex-shrink-0">
+            <FiUser className="text-text-primary text-base" />
           </div>
 
           {/* Main Content */}
@@ -194,23 +194,23 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
               <div className="flex items-center space-x-3 flex-wrap gap-y-1">
                 {authorLoading ? (
                   <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-gray-600 rounded animate-pulse"></div>
-                    <div className="w-20 h-4 bg-gray-600 rounded animate-pulse"></div>
+                    <div className="w-4 h-4 bg-bg-tertiary rounded animate-pulse"></div>
+                    <div className="w-20 h-4 bg-bg-tertiary rounded animate-pulse"></div>
                   </div>
                 ) : (
                   <>
-                    <span className="font-bold text-white text-base">
+                    <span className="font-bold text-text-primary text-base">
                       {activity.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || 'Unknown User')}
                     </span>
                     {!activity.isAnonymous && authorInfo?.realName && authorInfo.realName !== authorInfo.displayName && (
-                      <span className="text-gray-500 text-sm">
+                      <span className="text-text-tertiary text-sm">
                         @{authorInfo.realName}
                       </span>
                     )}
                   </>
                 )}
-                <span className="text-gray-500">·</span>
-                <span className="text-gray-500 text-sm bg-gray-800 bg-opacity-40 px-2 py-1 rounded border border-gray-700 border-opacity-30">
+                <span className="text-text-tertiary">·</span>
+                <span className="text-text-tertiary text-sm bg-bg-tertiary bg-opacity-40 px-2 py-1 rounded border border-border-primary border-opacity-30">
                   {activity.timestamp && (
                     typeof activity.timestamp.toDate === 'function' 
                       ? new Date(activity.timestamp.toDate()).toLocaleDateString()
@@ -224,11 +224,11 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
                 <button
                   onClick={handleDeletePost}
                   disabled={loading.delete}
-                  className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
+                  className="p-2 text-text-tertiary hover:text-text-primary hover:bg-hover-bg rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
                   title={isAuthor ? "Delete your activity" : "Delete as moderator"}
                 >
                   {loading.delete ? (
-                    <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-text-tertiary border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <FiTrash2 className="text-sm" />
                   )}
@@ -238,19 +238,19 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
 
             {/* Content */}
             <div className="mb-3">
-              <p className="text-white text-[15px] leading-normal">{activity.content}</p>
+              <p className="text-text-primary text-[15px] leading-normal">{activity.content}</p>
             </div>
 
             {/* Category Tag - Small subtle style */}
             <div className="flex items-center mb-3">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-gray-800 bg-opacity-50 text-gray-400 border border-gray-700 border-opacity-50">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-bg-tertiary bg-opacity-50 text-text-tertiary border border-border-primary border-opacity-50">
                 {activity.category}
               </span>
             </div>
 
             {/* Activity Details - Compact Twitter style */}
             {(activity.location || activity.date || activity.time) && (
-              <div className="flex flex-wrap gap-2 mb-3 text-sm text-gray-400">
+              <div className="flex flex-wrap gap-2 mb-3 text-sm text-text-tertiary">
                 {activity.location && (
                   <div className="flex items-center gap-1">
                     <FiMapPin className="w-4 h-4" />
@@ -274,7 +274,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
 
             {/* Image */}
             {(activity.imageURL || activity.category) && (
-              <div className="rounded-2xl overflow-hidden border border-gray-800 mb-3">
+              <div className="rounded-2xl overflow-hidden border border-border-primary mb-3">
                 <Image
                   src={getImageSource()}
                   alt={activity.content}
@@ -288,11 +288,11 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
             )}
 
             {/* Action Buttons */}
-            <div className="flex items-center text-gray-400 mt-4 space-x-6">
+            <div className="flex items-center text-text-tertiary mt-4 space-x-6">
               {/* Comment Button */}
               <button
                 onClick={() => setIsCommenting(!isCommenting)}
-                className="flex items-center space-x-2 hover:text-white transition-all duration-200 custom-cursor"
+                className="flex items-center space-x-2 hover:text-text-primary transition-all duration-200 custom-cursor"
               >
                 <FiMessageCircle className="w-5 h-5" />
                 <span className="text-xs">{activity.comments?.length || 0}</span>
@@ -303,10 +303,10 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
                 <button
                   onClick={handleLeaveActivity}
                   disabled={loading.join}
-                  className="flex items-center space-x-2 text-green-500 hover:text-green-400 transition-all duration-200 custom-cursor"
+                  className="flex items-center space-x-2 text-text-primary hover:text-accent-blue transition-all duration-200 custom-cursor"
                 >
                   {loading.join ? (
-                    <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-text-tertiary border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <>
                       <FiUserMinus className="w-5 h-5" />
@@ -318,10 +318,10 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
                 <button
                   onClick={handleJoinActivity}
                   disabled={loading.join}
-                  className="flex items-center space-x-2 hover:text-white transition-all duration-200 custom-cursor"
+                  className="flex items-center space-x-2 hover:text-text-primary transition-all duration-200 custom-cursor"
                 >
                   {loading.join ? (
-                    <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-text-tertiary border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <>
                       <FiUserPlus className="w-5 h-5" />

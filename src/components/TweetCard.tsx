@@ -191,36 +191,36 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-gray-900 rounded-2xl p-6 border border-gray-700 relative group"
+      className="bg-bg-secondary rounded-2xl p-6 border border-border-primary relative group"
     >
       <div className="flex items-start space-x-4">
-        <div className="p-2 bg-gray-800 rounded-full">
-          <FiUser className="text-gray-400 text-xl" />
+        <div className="p-2 bg-bg-tertiary rounded-full">
+          <FiUser className="text-text-secondary text-xl" />
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-white">{tweet.author || 'Anonymous'}</p>
-              <p className="text-sm text-gray-400">
+              <p className="font-semibold text-text-primary">{tweet.author || 'Anonymous'}</p>
+              <p className="text-sm text-text-tertiary">
                 {formatDistanceToNow(new Date(tweet.timestamp), { addSuffix: true })}
               </p>
             </div>
             {canDelete && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-gray-400 hover:text-white transition-colors duration-200 p-2 rounded-full hover:bg-gray-700"
+                className="text-text-tertiary hover:text-text-primary transition-colors duration-200 p-2 rounded-full hover:bg-hover-bg"
               >
                 <FiTrash2 className="text-lg" />
               </button>
             )}
           </div>
-          <p className="text-white mt-2">{tweet.content}</p>
+          <p className="text-text-primary mt-2">{tweet.content}</p>
 
           {/* Activity Details */}
           {tweet.type === 'activity' && (
-            <div className="mt-4 bg-gray-800 bg-opacity-50 rounded-xl p-4">
-              <h3 className="font-semibold text-white mb-2">{tweet.title || tweet.content}</h3>
-              <div className="space-y-2 text-sm text-gray-300">
+            <div className="mt-4 bg-bg-tertiary bg-opacity-50 rounded-xl p-4">
+              <h3 className="font-semibold text-text-primary mb-2">{tweet.title || tweet.content}</h3>
+              <div className="space-y-2 text-sm text-text-secondary">
                 {tweet.date && <p>📅 Date: {tweet.date}</p>}
                 {tweet.time && <p>⏰ Time: {tweet.time}</p>}
                 {tweet.location && <p>📍 Location: {tweet.location}</p>}
@@ -231,14 +231,14 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 disabled={isJoining || (isFull && !isParticipating)}
                 className={`mt-4 w-full py-2 px-4 rounded-full flex items-center justify-center space-x-2 transition-all duration-200 ${
                   isParticipating
-                    ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                    ? 'bg-bg-tertiary hover:bg-hover-bg text-text-primary'
                     : isFull
-                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-600 hover:bg-gray-500 text-white'
+                    ? 'bg-bg-tertiary text-text-tertiary cursor-not-allowed'
+                    : 'bg-accent-blue hover:bg-accent-blue-hover text-text-primary'
                 }`}
               >
                 {isJoining ? (
-                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-text-secondary border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
                     {isParticipating ? (
@@ -259,9 +259,9 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
             {/* Comment button - always visible */}
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 transition-all duration-200 group custom-cursor"
+              className="flex items-center space-x-2 text-text-tertiary hover:text-text-secondary transition-all duration-200 group custom-cursor"
             >
-              <div className="p-2 rounded-full group-hover:bg-gray-800 transition-all duration-200 transform group-hover:scale-110">
+              <div className="p-2 rounded-full group-hover:bg-hover-bg transition-all duration-200 transform group-hover:scale-110">
                 <FiMessageCircle className="text-lg" />
               </div>
               <span className="text-sm font-medium">{tweet.comments?.length || 0}</span>
@@ -273,14 +273,14 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 onClick={handleUpvote}
                 disabled={isVoting}
                 className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
-                  hasUpvoted ? 'text-green-400' : 'text-gray-400 hover:text-gray-200'
+                  hasUpvoted ? 'text-text-primary' : 'text-text-tertiary hover:text-text-secondary'
                 }`}
                 data-upvote={tweet.id}
               >
                 <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
                   hasUpvoted 
-                    ? 'bg-green-900 bg-opacity-30' 
-                    : 'group-hover:bg-gray-800'
+                    ? 'bg-accent-blue bg-opacity-30' 
+                    : 'group-hover:bg-hover-bg'
                 }`}>
                   {isVoting ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
@@ -295,14 +295,14 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 onClick={handleDownvote}
                 disabled={isVoting}
                 className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
-                  hasDownvoted ? 'text-red-400' : 'text-gray-400 hover:text-gray-200'
+                  hasDownvoted ? 'text-text-primary' : 'text-text-tertiary hover:text-text-secondary'
                 }`}
                 data-downvote={tweet.id}
               >
                 <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
                   hasDownvoted 
-                    ? 'bg-red-900 bg-opacity-30' 
-                    : 'group-hover:bg-gray-800'
+                    ? 'bg-bg-tertiary bg-opacity-30' 
+                    : 'group-hover:bg-hover-bg'
                 }`}>
                   {isVoting ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
@@ -326,7 +326,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Add a comment..."
-                    className="w-full bg-gray-900 border border-gray-700 rounded-full py-3 px-5 text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 focus:bg-gray-800 transition-all duration-200"
+                    className="w-full bg-bg-tertiary border border-border-primary rounded-full py-3 px-5 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-accent-blue focus:bg-bg-tertiary transition-all duration-200"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -337,7 +337,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                   <button
                     onClick={handleAddComment}
                     disabled={!newComment.trim() || isCommenting}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 disabled:text-gray-600 transition-colors duration-200 px-2 py-1 rounded"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-tertiary hover:text-text-primary disabled:text-text-tertiary transition-colors duration-200 px-2 py-1 rounded"
                   >
                     {isCommenting ? (
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
@@ -347,20 +347,20 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                   </button>
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm">Please sign in to comment.</p>
+                <p className="text-text-tertiary text-sm">Please sign in to comment.</p>
               )}
 
               {/* Comments list */}
               <div className="space-y-3">
                 {tweet.comments?.map((comment, index) => (
-                  <div key={index} className="flex items-start space-x-3 bg-gray-800 bg-opacity-50 p-4 rounded-xl">
-                    <div className="p-2 bg-gray-700 rounded-full">
-                      <FiUser className="text-gray-400 text-lg" />
+                  <div key={index} className="flex items-start space-x-3 bg-bg-tertiary bg-opacity-50 p-4 rounded-xl">
+                    <div className="p-2 bg-bg-tertiary rounded-full">
+                      <FiUser className="text-text-tertiary text-lg" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">{comment.author || 'Anonymous'}</p>
-                      <p className="text-gray-300 mt-1">{comment.content}</p>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="font-medium text-text-primary">{comment.author || 'Anonymous'}</p>
+                      <p className="text-text-secondary mt-1">{comment.content}</p>
+                      <p className="text-sm text-text-tertiary mt-1">
                         {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
                       </p>
                     </div>
@@ -374,22 +374,22 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-8 rounded-2xl border border-gray-700 max-w-md mx-4">
-            <h3 className="text-xl font-bold text-white mb-4">Delete Post</h3>
-            <p className="text-gray-300 mb-6">
+        <div className="fixed inset-0 bg-bg-overlay flex items-center justify-center z-50">
+          <div className="bg-bg-secondary p-8 rounded-2xl border border-border-primary max-w-md mx-4">
+            <h3 className="text-xl font-bold text-text-primary mb-4">Delete Post</h3>
+            <p className="text-text-secondary mb-6">
               Are you sure you want to delete this post? This action cannot be undone.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-6 py-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-all duration-200 font-medium"
+                className="flex-1 px-6 py-3 bg-bg-tertiary text-text-primary rounded-full hover:bg-hover-bg transition-all duration-200 font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteTweet}
-                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-200 font-medium"
+                className="flex-1 px-6 py-3 bg-accent-blue text-text-primary rounded-full hover:bg-accent-blue-hover transition-all duration-200 font-medium"
               >
                 Delete
               </button>

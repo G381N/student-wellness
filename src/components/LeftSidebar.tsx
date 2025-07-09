@@ -93,7 +93,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
     return (
       <button
         onClick={onToggle}
-        className="fixed top-4 left-4 z-50 p-3 bg-gray-900 text-white rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors shadow-lg"
+        className="fixed top-4 left-4 z-50 p-3 bg-bg-secondary text-text-primary rounded-lg border border-border-primary hover:bg-hover-bg transition-colors shadow-app"
         aria-label="Open menu"
       >
         <FiMenu className="w-6 h-6" />
@@ -106,7 +106,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
       {/* Mobile overlay */}
       {isMobile && !isCollapsed && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-70 z-30"
+          className="fixed inset-0 bg-bg-overlay z-30"
           onClick={onToggle}
         />
       )}
@@ -115,7 +115,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
       <motion.div
         className={`fixed top-0 left-0 h-full z-40 flex flex-col ${
           isCollapsed && !isMobile ? 'w-16' : 'w-64'
-        } bg-gray-900 border-r border-gray-800 transition-all duration-300`}
+        } bg-bg-secondary border-r border-border-primary transition-all duration-300`}
         initial={false}
         animate={{ 
           width: isCollapsed && !isMobile ? 64 : 256,
@@ -123,11 +123,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
         }}
       >
         {/* Header with Logo - Fixed */}
-        <div className={`flex items-center ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} px-4 h-16 border-b border-gray-800 relative sticky top-0 bg-gray-900 z-10`}>
+        <div className={`flex items-center ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} px-4 h-16 border-b border-border-primary relative sticky top-0 bg-bg-secondary z-10`}>
           {(!isCollapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center">
-              <div className="text-white text-2xl mr-2">🤍</div>
-              <span className="text-white font-bold text-xl">CampusWell</span>
+              <div className="text-accent-blue text-2xl mr-2">🤍</div>
+              <span className="text-text-primary font-bold text-xl">CampusWell</span>
             </Link>
             )}
           
@@ -135,7 +135,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
           {!isMobile && (
             <button
               onClick={onToggle}
-              className="p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors z-10"
+              className="p-2 rounded-full bg-bg-tertiary text-text-primary hover:bg-hover-bg transition-colors z-10"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <FiChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} />
@@ -146,7 +146,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
           {isMobile && (
             <button
               onClick={onToggle}
-              className="p-2 text-gray-400 hover:text-white"
+              className="p-2 text-text-secondary hover:text-text-primary"
               aria-label="Close sidebar"
             >
               <FiX className="w-5 h-5" />
@@ -156,7 +156,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
 
         {/* Search Bar (mobile only) */}
         {isMobile && (
-          <div className="px-3 py-3 border-b border-gray-800">
+          <div className="px-3 py-3 border-b border-border-primary">
             <SearchComponent 
               placeholder="Search..."
               onSearch={(results) => console.log('Mobile search results:', results)}
@@ -176,11 +176,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
                     href={link.href}
                     className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
                       isActive
-                        ? 'bg-gray-800 text-white'
-                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                        ? 'bg-hover-bg text-accent-blue font-medium'
+                        : 'text-text-secondary hover:bg-hover-bg hover:text-text-primary'
                     }`}
                   >
-                    <link.icon className={`${isCollapsed && !isMobile ? 'mx-auto' : 'mr-3'} text-xl`} />
+                    <link.icon className={`${isCollapsed && !isMobile ? 'mx-auto' : 'mr-3'} text-xl ${isActive ? 'text-accent-blue' : ''}`} />
                     {(!isCollapsed || isMobile) && <span>{link.label}</span>}
                   </Link>
                 </li>
@@ -191,21 +191,21 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
         
         {/* Profile Button - Fixed at bottom (mobile only) */}
         {isMobile && (
-          <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
+          <div className="p-4 border-t border-border-primary sticky bottom-0 bg-bg-secondary">
             <button
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('openProfileModal'));
               }}
-              className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+              className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-hover-bg transition-colors"
             >
-              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                <FiUser className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-bg-tertiary rounded-full flex items-center justify-center flex-shrink-0">
+                <FiUser className="w-5 h-5 text-text-primary" />
               </div>
               <div className="ml-3 text-left">
-                <span className="text-white font-medium block truncate">
+                <span className="text-text-primary font-medium block truncate">
                   {user?.displayName || 'Profile'}
                 </span>
-                <span className="text-gray-400 text-xs truncate block">
+                <span className="text-text-tertiary text-xs truncate block">
                   {user?.email || 'View profile'}
                 </span>
               </div>

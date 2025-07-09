@@ -2,13 +2,13 @@
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  color?: 'blue' | 'green' | 'red' | 'gray' | 'white';
+  color?: 'accent' | 'gray' | 'white';
   className?: string;
 }
 
 export default function LoadingSpinner({ 
   size = 'md', 
-  color = 'blue', 
+  color = 'accent', 
   className = '' 
 }: LoadingSpinnerProps) {
   const sizeClasses = {
@@ -18,11 +18,9 @@ export default function LoadingSpinner({
   };
 
   const colorClasses = {
-    blue: 'border-blue-500',
-    green: 'border-green-500',
-    red: 'border-red-500',
-    gray: 'border-gray-500',
-    white: 'border-white'
+    accent: 'border-accent-blue',
+    gray: 'border-border-primary',
+    white: 'border-text-primary'
   };
 
   return (

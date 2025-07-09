@@ -187,15 +187,15 @@ export default function GuidedBreathing() {
   const breathingAnim = getBreathingAnimation();
 
   return (
-    <div className="text-white">
+    <div className="text-text-primary">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-2">
-            <FiWind className="text-2xl text-gray-400 mr-2" />
+            <FiWind className="text-2xl text-text-secondary mr-2" />
             <h1 className="text-xl font-bold">Guided Breathing</h1>
           </div>
-          <p className="text-gray-400 text-sm">
+          <p className="text-text-tertiary text-sm">
             Practice mindful breathing to reduce stress and improve focus
           </p>
         </div>
@@ -210,7 +210,7 @@ export default function GuidedBreathing() {
           >
             {/* Pattern Selection */}
             <div>
-              <h2 className="text-base font-semibold mb-3 text-gray-300">Choose Pattern</h2>
+              <h2 className="text-base font-semibold mb-3 text-text-secondary">Choose Pattern</h2>
               <div className="space-y-2">
                 {breathingPatterns.map((pattern) => (
                   <motion.div
@@ -220,15 +220,15 @@ export default function GuidedBreathing() {
                     onClick={() => setSelectedPattern(pattern)}
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
                       selectedPattern.name === pattern.name
-                        ? 'border-gray-400 bg-gray-800'
-                        : 'border-gray-700 hover:border-gray-600'
+                        ? 'border-border-secondary bg-bg-tertiary'
+                        : 'border-border-primary hover:border-border-secondary'
                     }`}
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-medium text-white mb-1">{pattern.name}</h3>
-                        <p className="text-gray-400 text-sm mb-2">{pattern.description}</p>
-                        <div className="text-xs text-gray-500">
+                        <h3 className="font-medium text-text-primary mb-1">{pattern.name}</h3>
+                        <p className="text-text-secondary text-sm mb-2">{pattern.description}</p>
+                        <div className="text-xs text-text-tertiary">
                           {pattern.inhale}s in
                           {pattern.hold > 0 && ` • ${pattern.hold}s hold`}
                           • {pattern.exhale}s out
@@ -237,11 +237,11 @@ export default function GuidedBreathing() {
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         selectedPattern.name === pattern.name
-                          ? 'border-white'
-                          : 'border-gray-600'
+                          ? 'border-text-primary'
+                          : 'border-border-primary'
                       }`}>
                         {selectedPattern.name === pattern.name && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-text-primary" />
                         )}
                       </div>
                     </div>
@@ -252,7 +252,7 @@ export default function GuidedBreathing() {
 
             {/* Duration Selection */}
             <div>
-              <h2 className="text-base font-semibold mb-3 text-gray-300">Duration</h2>
+              <h2 className="text-base font-semibold mb-3 text-text-secondary">Duration</h2>
               <div className="flex gap-2">
                 {durations.map((duration) => (
                   <button
@@ -260,8 +260,8 @@ export default function GuidedBreathing() {
                     onClick={() => setSelectedDuration(duration.value)}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                       selectedDuration === duration.value
-                        ? 'bg-white text-black'
-                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        ? 'bg-accent-blue text-text-primary'
+                        : 'bg-bg-tertiary text-text-secondary hover:bg-hover-bg'
                     }`}
                   >
                     {duration.label}
@@ -276,7 +276,7 @@ export default function GuidedBreathing() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={startSession}
-                className="w-full bg-white text-black font-bold py-3 px-6 rounded-lg flex items-center justify-center text-lg"
+                className="w-full bg-accent-blue text-text-primary font-bold py-3 px-6 rounded-lg flex items-center justify-center text-lg hover:bg-accent-blue-hover transition-colors"
               >
                 <FiPlay className="mr-2" />
                 Start Session
@@ -294,33 +294,33 @@ export default function GuidedBreathing() {
             <div className="relative w-64 h-64 flex items-center justify-center">
               {/* Breathing Circle */}
               <motion.div
-                className="w-full h-full rounded-full bg-gray-800 border-4 border-gray-700"
+                className="w-full h-full rounded-full bg-bg-tertiary border-4 border-border-primary"
                 animate={breathingAnim}
                 transition={{ duration: 1, ease: 'easeInOut' }}
               />
 
               {/* Text Indicators */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <p className="text-4xl font-bold text-white mb-2">{phaseTimeLeft}s</p>
-                <p className="text-lg text-gray-300 capitalize">{currentPhase.replace('holdEmpty', 'hold')}</p>
+                <p className="text-4xl font-bold text-text-primary mb-2">{phaseTimeLeft}s</p>
+                <p className="text-lg text-text-secondary capitalize">{currentPhase.replace('holdEmpty', 'hold')}</p>
               </div>
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-gray-400">Total time remaining: {formatTime(totalTimeLeft)}</p>
-              <p className="text-gray-500 text-sm mt-1">Cycle: {cycleCount}</p>
+              <p className="text-text-secondary">Total time remaining: {formatTime(totalTimeLeft)}</p>
+              <p className="text-text-tertiary text-sm mt-1">Cycle: {cycleCount}</p>
             </div>
 
             <div className="flex gap-4 mt-8">
               <button
                 onClick={togglePause}
-                className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-2xl text-white hover:bg-gray-700 transition-colors"
+                className="w-16 h-16 bg-bg-tertiary rounded-full flex items-center justify-center text-2xl text-text-primary hover:bg-hover-bg transition-colors"
               >
                 {isActive ? <FiPause /> : <FiPlay />}
               </button>
               <button
                 onClick={stopSession}
-                className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-2xl text-white hover:bg-gray-700 transition-colors"
+                className="w-16 h-16 bg-bg-tertiary rounded-full flex items-center justify-center text-2xl text-text-primary hover:bg-hover-bg transition-colors"
               >
                 <FiSquare />
               </button>

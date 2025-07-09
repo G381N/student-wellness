@@ -77,7 +77,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-950 text-white">
+    <div className="flex h-screen bg-bg-primary text-text-primary">
       {/* Left Sidebar - Desktop Only */}
       {!isMobile && (
         <LeftSidebar

@@ -3,8 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #ffffff;
+  /* Base colors */
   --background: #000000;
+  --foreground: #ffffff;
+  
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #6e767d;
+  
+  /* UI element colors */
+  --accent-blue: #1d9bf0;
+  --accent-blue-hover: #1a8cd8;
+  --accent-blue-disabled: #1a5e8a;
+  
+  /* Background colors */
+  --bg-primary: #000000;
+  --bg-secondary: #16181c;
+  --bg-tertiary: #202327;
+  --bg-overlay: rgba(0, 0, 0, 0.8);
+  
+  /* Border colors */
+  --border-primary: #2f3336;
+  --border-secondary: #333639;
+  
+  /* Button colors */
+  --button-primary: #1d9bf0;
+  --button-primary-hover: #1a8cd8;
+  --button-secondary: transparent;
+  --button-secondary-hover: rgba(29, 155, 240, 0.1);
+  
+  /* Status colors */
+  --success: #00ba7c;
+  --error: #f4212e;
+  --warning: #ffd400;
+  
+  /* Interaction colors */
+  --hover-bg: rgba(255, 255, 255, 0.03);
+  --active-bg: rgba(255, 255, 255, 0.06);
+  
+  /* Shadow colors */
+  --shadow-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Custom scrollbar */
@@ -26,6 +65,7 @@ html {
 .backdrop-blur-custom {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 /* Improved mobile touch targets */
@@ -60,7 +100,7 @@ html {
 
 /* Better focus styles */
 .focus-visible:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--accent-blue);
   outline-offset: 2px;
 }
 
@@ -90,7 +130,7 @@ html {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-primary);
 }
 
 /* Better mobile spacing */
@@ -111,7 +151,7 @@ html {
 
 /* Enhanced shadow effects */
 .shadow-glow {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 20px rgba(29, 155, 240, 0.2);
 }
 
 /* Improved transition timing */
@@ -150,6 +190,8 @@ html {
 /* Custom loading spinner */
 .loading-spinner {
   animation: spin 1s linear infinite;
+  border: 2px solid var(--border-primary);
+  border-top-color: var(--accent-blue);
 }
 
 @keyframes spin {
@@ -168,10 +210,55 @@ html {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: var(--bg-overlay);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-primary);
     padding: 1rem;
     z-index: 50;
   }
+}
+
+/* Theme-specific utility classes */
+.bg-app-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-app-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-app-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.text-app-primary {
+  color: var(--text-primary);
+}
+
+.text-app-secondary {
+  color: var(--text-secondary);
+}
+
+.text-app-tertiary {
+  color: var(--text-tertiary);
+}
+
+.border-app-primary {
+  border-color: var(--border-primary);
+}
+
+.accent-app-blue {
+  color: var(--accent-blue);
+}
+
+.bg-accent-app-blue {
+  background-color: var(--accent-blue);
+}
+
+.hover-bg-app:hover {
+  background-color: var(--hover-bg);
+}
+
+.active-bg-app:active {
+  background-color: var(--active-bg);
 }

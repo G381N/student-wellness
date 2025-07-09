@@ -50,7 +50,7 @@ export default function TopBar({
 
   return (
     <motion.div
-      className="fixed top-0 h-16 z-30 bg-gray-900 bg-opacity-80 backdrop-blur-md border-b border-gray-800 flex items-center transition-all duration-300"
+      className="fixed top-0 h-16 z-30 bg-bg-secondary bg-opacity-80 backdrop-blur-md border-b border-border-primary flex items-center transition-all duration-300"
       style={getTopBarStyles()}
       layout
     >
@@ -70,9 +70,9 @@ export default function TopBar({
           {!isMobile && (
             <button
               onClick={onRightSidebarToggle}
-              className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-colors flex-shrink-0"
+              className="w-10 h-10 bg-bg-tertiary rounded-full flex items-center justify-center shadow-app hover:bg-hover-bg transition-colors flex-shrink-0"
             >
-              <FiUser className="text-white" />
+              <FiUser className="text-text-primary" />
             </button>
           )}
         </div>

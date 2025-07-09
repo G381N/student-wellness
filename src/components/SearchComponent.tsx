@@ -109,9 +109,9 @@ export default function SearchComponent({
           placeholder={placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-gray-800 text-white rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-gray-500 placeholder-gray-500"
+          className="w-full bg-bg-tertiary text-text-primary rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue placeholder-text-tertiary"
         />
-        <div className="absolute left-3 top-2.5 text-gray-500">
+        <div className="absolute left-3 top-2.5 text-text-tertiary">
           {isSearching ? (
             <FiLoader className="animate-spin" />
           ) : (
@@ -124,7 +124,7 @@ export default function SearchComponent({
           <button
             type="button"
             onClick={handleClearSearch}
-            className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-300"
+            className="absolute right-3 top-2.5 text-text-tertiary hover:text-text-secondary"
           >
             <FiX />
           </button>
@@ -132,14 +132,14 @@ export default function SearchComponent({
       </form>
       
       {results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-bg-secondary border border-border-primary rounded-lg shadow-app-lg z-50 max-h-80 overflow-y-auto">
           <ul className="py-2">
-            <li className="px-4 py-2 text-xs text-gray-500 border-b border-gray-700">Posts</li>
+            <li className="px-4 py-2 text-xs text-text-tertiary border-b border-border-primary">Posts</li>
             {results.map(result => (
               <li key={result.id} 
                   onClick={() => handleResultClick(result.link)}
-                  className="px-4 py-2 hover:bg-gray-800 cursor-pointer">
-                <div className="font-medium text-white">{result.title}</div>
+                  className="px-4 py-2 hover:bg-hover-bg cursor-pointer">
+                <div className="font-medium text-text-primary">{result.title}</div>
               </li>
             ))}
           </ul>

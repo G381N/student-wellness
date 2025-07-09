@@ -8,8 +8,58 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Base colors
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        
+        // Text colors
+        'text': {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+        },
+        
+        // UI element colors
+        'accent': {
+          blue: 'var(--accent-blue)',
+          'blue-hover': 'var(--accent-blue-hover)',
+          'blue-disabled': 'var(--accent-blue-disabled)',
+        },
+        
+        // Background colors
+        'bg': {
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          tertiary: 'var(--bg-tertiary)',
+          overlay: 'var(--bg-overlay)',
+        },
+        
+        // Border colors
+        'border': {
+          primary: 'var(--border-primary)',
+          secondary: 'var(--border-secondary)',
+        },
+        
+        // Button colors
+        'button': {
+          primary: 'var(--button-primary)',
+          'primary-hover': 'var(--button-primary-hover)',
+          secondary: 'var(--button-secondary)',
+          'secondary-hover': 'var(--button-secondary-hover)',
+        },
+        
+        // Status colors
+        success: 'var(--success)',
+        error: 'var(--error)',
+        warning: 'var(--warning)',
+        
+        // Interaction colors
+        'hover': {
+          bg: 'var(--hover-bg)',
+        },
+        'active': {
+          bg: 'var(--active-bg)',
+        },
       },
       animation: {
         'fadeInUp': 'fadeInUp 0.6s ease-out',
@@ -29,6 +79,10 @@ module.exports = {
           '0%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(0)' },
         },
+      },
+      boxShadow: {
+        'app': '0 2px 8px var(--shadow-color)',
+        'app-lg': '0 4px 12px var(--shadow-color)',
       },
     },
   },

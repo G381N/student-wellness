@@ -26,17 +26,17 @@ const DEFAULT_IMAGES = {
 // Fallback image if category doesn't match
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
 
-// Categories mapping (monochrome theme)
+// Categories mapping (with vibrant colors)
 const CATEGORIES = {
-  'Academic': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Sports': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Cultural': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Social': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Wellness': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Professional': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Volunteer': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Entertainment': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' },
-  'Other': { bg: 'bg-bg-tertiary', text: 'text-text-secondary' }
+  'Academic': { bg: 'bg-category-academic bg-opacity-20', text: 'text-category-academic' },
+  'Sports': { bg: 'bg-category-sports bg-opacity-20', text: 'text-category-sports' },
+  'Cultural': { bg: 'bg-category-cultural bg-opacity-20', text: 'text-category-cultural' },
+  'Social': { bg: 'bg-category-social bg-opacity-20', text: 'text-category-social' },
+  'Wellness': { bg: 'bg-category-wellness bg-opacity-20', text: 'text-category-wellness' },
+  'Professional': { bg: 'bg-category-professional bg-opacity-20', text: 'text-category-professional' },
+  'Volunteer': { bg: 'bg-category-volunteer bg-opacity-20', text: 'text-category-volunteer' },
+  'Entertainment': { bg: 'bg-category-entertainment bg-opacity-20', text: 'text-category-entertainment' },
+  'Other': { bg: 'bg-category-other bg-opacity-20', text: 'text-category-other' }
 };
 
 interface ActivityCardProps {
@@ -243,7 +243,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
 
             {/* Category Tag - Small subtle style */}
             <div className="flex items-center mb-3">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-bg-tertiary bg-opacity-50 text-text-tertiary border border-border-primary border-opacity-50">
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal ${categoryStyle.bg} ${categoryStyle.text} border border-opacity-50 border-current`}>
                 {activity.category}
               </span>
             </div>

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiUser, FiSettings, FiLogOut, FiChevronLeft, FiPlus } from 'react-icons/fi';
+import { FiUser, FiSettings, FiLogOut, FiChevronLeft, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import WhatsHappening from './WhatsHappening';
 
 interface RightSidebarProps {
   isCollapsed: boolean;
@@ -13,15 +14,8 @@ interface RightSidebarProps {
   onCreatePost?: () => void;
 }
 
-// Sample "What's happening" data
-const whatsHappeningData = [
-  { title: "Mental Health Awareness Week", category: "Events", time: "Next week" },
-  { title: "New campus counseling services available", category: "Resources", time: "Today" },
-  { title: "Stress management workshop", category: "Workshop", time: "Tomorrow" },
-];
-
 export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: RightSidebarProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin, isModerator, isDepartmentHead } = useAuth();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   
@@ -34,6 +28,14 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Get user role text
+  const getUserRole = () => {
+    if (isAdmin) return 'Administrator';
+    if (isModerator) return 'Moderator';
+    if (isDepartmentHead) return 'Department Head';
+    return 'Student';
+  };
 
   // Don't render on mobile or when collapsed
   if (isMobile || isCollapsed) {
@@ -70,29 +72,45 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
             <h3 className="text-text-primary font-bold text-lg">
               {user.displayName || user.email?.split('@')[0]}
             </h3>
-            <p className="text-text-tertiary text-sm mb-4">{user.email}</p>
+            <p className="text-text-tertiary text-sm mb-1">{user.email}</p>
+            <span className="px-3 py-1 rounded-full text-xs bg-bg-tertiary text-text-secondary mb-4">
+              {getUserRole()}
+            </span>
             
-            <div className="grid grid-cols-3 gap-2 w-full">
+            <div className="w-full space-y-2">
               <button 
-                className="flex flex-col items-center justify-center p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
+                className="flex items-center justify-between w-full p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
                 onClick={() => router.push('/profile')}
               >
-                <FiUser className="text-text-secondary text-lg" />
-                <span className="text-xs text-text-secondary mt-1">Profile</span>
+                <div className="flex items-center">
+                  <FiEdit className="text-text-secondary text-lg mr-3" />
+                  <span className="text-text-secondary">Edit Profile</span>
+                </div>
               </button>
+              
               <button 
-                className="flex flex-col items-center justify-center p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
-                onClick={() => router.push('/settings')}
-              >
-                <FiSettings className="text-text-secondary text-lg" />
-                <span className="text-xs text-text-secondary mt-1">Settings</span>
-              </button>
-              <button 
-                className="flex flex-col items-center justify-center p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
+                className="flex items-center justify-between w-full p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
                 onClick={() => signOut()}
               >
-                <FiLogOut className="text-text-secondary text-lg" />
-                <span className="text-xs text-text-secondary mt-1">Logout</span>
+                <div className="flex items-center">
+                  <FiLogOut className="text-text-secondary text-lg mr-3" />
+                  <span className="text-text-secondary">Logout</span>
+                </div>
+              </button>
+              
+              <button 
+                className="flex items-center justify-between w-full p-3 bg-bg-tertiary rounded-xl hover:bg-hover-bg transition-colors"
+                onClick={() => {
+                  if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                    // TODO: Implement account deletion
+                    alert('Account deletion is not yet implemented.');
+                  }
+                }}
+              >
+                <div className="flex items-center">
+                  <FiTrash2 className="text-error text-lg mr-3" />
+                  <span className="text-error">Delete Account</span>
+                </div>
               </button>
             </div>
           </div>
@@ -116,18 +134,7 @@ export default function RightSidebar({ isCollapsed, onToggle, onCreatePost }: Ri
       
       {/* What's happening section */}
       <div className="p-6 border-b border-border-primary">
-        <h3 className="text-text-primary font-bold text-lg mb-4">What's happening</h3>
-        <div className="space-y-4">
-          {whatsHappeningData.map((item, index) => (
-            <div key={index} className="bg-bg-tertiary rounded-xl p-3 hover:bg-hover-bg transition-colors cursor-pointer">
-              <span className="text-xs text-text-tertiary">{item.category} · {item.time}</span>
-              <p className="text-text-primary text-sm font-medium mt-1">{item.title}</p>
-            </div>
-          ))}
-        </div>
-        <button className="text-text-tertiary text-sm mt-4 hover:text-accent-blue transition-colors">
-          Show more
-        </button>
+        <WhatsHappening />
       </div>
       
       {/* Quick actions */}

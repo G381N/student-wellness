@@ -17,10 +17,15 @@
   --accent-blue-hover: #1a8cd8;
   --accent-blue-disabled: #1a5e8a;
   
+  /* Status colors */
+  --success: #00ba7c;
+  --error: #f4212e;
+  --warning: #ffd400;
+  
   /* Background colors */
   --bg-primary: #000000;
-  --bg-secondary: #16181c;
-  --bg-tertiary: #202327;
+  --bg-secondary: #000000;
+  --bg-tertiary: #16181c;
   --bg-overlay: rgba(0, 0, 0, 0.8);
   
   /* Border colors */
@@ -31,12 +36,24 @@
   --button-primary: #1d9bf0;
   --button-primary-hover: #1a8cd8;
   --button-secondary: transparent;
-  --button-secondary-hover: rgba(29, 155, 240, 0.1);
+  --button-secondary-hover: rgba(255, 255, 255, 0.1);
   
-  /* Status colors */
-  --success: #00ba7c;
-  --error: #f4212e;
-  --warning: #ffd400;
+  /* Vote colors */
+  --upvote: #00ba7c;
+  --upvote-hover: #00a06a;
+  --downvote: #f4212e;
+  --downvote-hover: #e01222;
+  
+  /* Category colors */
+  --category-academic: #5a67d8;
+  --category-sports: #f6ad55;
+  --category-cultural: #fc8181;
+  --category-social: #4fd1c5;
+  --category-wellness: #68d391;
+  --category-professional: #a3bffa;
+  --category-volunteer: #f687b3;
+  --category-entertainment: #b794f4;
+  --category-other: #cbd5e0;
   
   /* Interaction colors */
   --hover-bg: rgba(255, 255, 255, 0.03);
@@ -44,6 +61,35 @@
   
   /* Shadow colors */
   --shadow-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Light mode variables */
+.light-mode {
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #000000;
+  
+  /* Text colors */
+  --text-primary: #000000;
+  --text-secondary: #536471;
+  --text-tertiary: #8899a6;
+  
+  /* Background colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f9fa;
+  --bg-tertiary: #eff3f4;
+  --bg-overlay: rgba(255, 255, 255, 0.8);
+  
+  /* Border colors */
+  --border-primary: #e1e8ed;
+  --border-secondary: #ccd6dd;
+  
+  /* Interaction colors */
+  --hover-bg: rgba(0, 0, 0, 0.03);
+  --active-bg: rgba(0, 0, 0, 0.06);
+  
+  /* Shadow colors */
+  --shadow-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Custom scrollbar */

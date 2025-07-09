@@ -8,6 +8,7 @@ import TopBar from './TopBar';
 import ProfileModal from './ProfileModal';
 import CreatePostModal from './CreatePostModal';
 import BottomNavbar from './BottomNavbar';
+import FloatingActionButton from './FloatingActionButton';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -48,6 +49,19 @@ export default function LayoutShell({ children }: LayoutShellProps) {
     };
   }, []);
 
+  // Apply overflow-hidden to body when right sidebar is open
+  useEffect(() => {
+    if (!rightSidebarCollapsed) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [rightSidebarCollapsed]);
+
   const getMainContentStyles = () => {
     if (isMobile) {
       return {
@@ -64,8 +78,14 @@ export default function LayoutShell({ children }: LayoutShellProps) {
     };
   };
 
+  // Handle post creation from the floating action button
+  const handleOpenCreateModal = () => {
+    setShowCreateModal(true);
+  };
+
   const handlePostCreated = (post: any) => {
     // Handle post creation - you can add refresh logic here
+    setShowCreateModal(false);
     console.log('Post created:', post);
   };
 
@@ -130,6 +150,11 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       <ProfileModal 
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
+      />
+
+      {/* Floating Action Button */}
+      <FloatingActionButton 
+        className={rightSidebarCollapsed ? '' : 'right-[336px]'} 
       />
     </div>
   );

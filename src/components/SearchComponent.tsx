@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiSearch, FiX, FiLoader } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getPosts } from '@/lib/firebase-utils';
 import type { Post } from '@/lib/firebase-utils';
+import { debounce } from 'lodash';
 
 interface SearchResult {
   id: string;
@@ -30,70 +31,86 @@ export default function SearchComponent({
   const [results, setResults] = useState<SearchResult[]>([]);
   const { user, isAdmin, isModerator, isDepartmentHead, userData } = useAuth();
   const router = useRouter();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const performSearch = async () => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
-    
-    setIsSearching(true);
-    
-    try {
-      const allPosts = await getPosts();
-      const query = searchQuery.toLowerCase();
-      
-      const filteredResults = allPosts.filter(post => {
-        // Keyword match
-        const titleMatch = post.title?.toLowerCase().includes(query) || false;
-        const contentMatch = post.content.toLowerCase().includes(query);
-        if (!titleMatch && !contentMatch) {
-          return false;
-        }
-        
-        // Permission check
-        if (post.visibility === 'moderators' && !(isAdmin || isModerator)) {
-          return false;
-        }
-        // Check if post is for a specific department by matching post category with user's department
-        if (post.type === 'activity' && post.category) {
-            if(isDepartmentHead && userData?.department !== post.category && !isAdmin) {
-                return false;
-            }
-        }
-        
-        return true;
-      });
-
-      const searchResults: SearchResult[] = filteredResults.map(post => ({
-        id: post.id,
-        title: post.title || post.content.substring(0, 70) + '...',
-        type: 'Post',
-        link: `/dashboard` // All posts are on the main feed
-      }));
-      
-      setResults(searchResults);
-      
-      if (onSearch) {
-        onSearch(searchResults);
+  // Debounced search function
+  const debouncedSearch = useRef(
+    debounce(async (query: string) => {
+      if (!query.trim()) {
+        setResults([]);
+        return;
       }
       
-    } catch (error) {
-      console.error('Search error:', error);
-      setResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
+      setIsSearching(true);
+      
+      try {
+        const allPosts = await getPosts();
+        const queryLower = query.toLowerCase();
+        
+        const filteredResults = allPosts.filter(post => {
+          // Keyword match
+          const titleMatch = post.title?.toLowerCase().includes(queryLower) || false;
+          const contentMatch = post.content.toLowerCase().includes(queryLower);
+          if (!titleMatch && !contentMatch) {
+            return false;
+          }
+          
+          // Permission check
+          if (post.visibility === 'moderators' && !(isAdmin || isModerator)) {
+            return false;
+          }
+          // Check if post is for a specific department by matching post category with user's department
+          if (post.type === 'activity' && post.category) {
+            if(isDepartmentHead && userData?.department !== post.category && !isAdmin) {
+              return false;
+            }
+          }
+          
+          return true;
+        });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    performSearch();
+        const searchResults: SearchResult[] = filteredResults.map(post => ({
+          id: post.id,
+          title: post.title || post.content.substring(0, 70) + '...',
+          type: 'Post',
+          link: `/dashboard` // All posts are on the main feed
+        }));
+        
+        setResults(searchResults);
+        
+        if (onSearch) {
+          onSearch(searchResults);
+        }
+        
+      } catch (error) {
+        console.error('Search error:', error);
+        setResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300)
+  ).current;
+
+  // Effect to trigger search when query changes
+  useEffect(() => {
+    debouncedSearch(searchQuery);
+    
+    // Cleanup
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchQuery, debouncedSearch]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
   
   const handleClearSearch = () => {
     setSearchQuery('');
     setResults([]);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
   };
 
   const handleResultClick = (link: string) => {
@@ -103,21 +120,20 @@ export default function SearchComponent({
 
   return (
     <div className={`relative ${className}`}>
-      <form onSubmit={handleSearch} className="relative">
+      <div className="relative">
         <input
+          ref={searchInputRef}
           type="text"
           placeholder={placeholder}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className="w-full bg-bg-tertiary text-text-primary rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue placeholder-text-tertiary"
         />
         <div className="absolute left-3 top-2.5 text-text-tertiary">
           {isSearching ? (
             <FiLoader className="animate-spin" />
           ) : (
-            <button type="submit" aria-label="Search">
-              <FiSearch />
-            </button>
+            <FiSearch />
           )}
         </div>
         {searchQuery && (
@@ -129,7 +145,7 @@ export default function SearchComponent({
             <FiX />
           </button>
         )}
-      </form>
+      </div>
       
       {results.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-bg-secondary border border-border-primary rounded-lg shadow-app-lg z-50 max-h-80 overflow-y-auto">

@@ -48,6 +48,27 @@ module.exports = {
           'secondary-hover': 'var(--button-secondary-hover)',
         },
         
+        // Vote colors
+        'vote': {
+          up: 'var(--upvote)',
+          'up-hover': 'var(--upvote-hover)',
+          down: 'var(--downvote)',
+          'down-hover': 'var(--downvote-hover)',
+        },
+        
+        // Category colors
+        'category': {
+          academic: 'var(--category-academic)',
+          sports: 'var(--category-sports)',
+          cultural: 'var(--category-cultural)',
+          social: 'var(--category-social)',
+          wellness: 'var(--category-wellness)',
+          professional: 'var(--category-professional)',
+          volunteer: 'var(--category-volunteer)',
+          entertainment: 'var(--category-entertainment)',
+          other: 'var(--category-other)',
+        },
+        
         // Status colors
         success: 'var(--success)',
         error: 'var(--error)',
@@ -86,5 +107,6 @@ module.exports = {
       },
     },
   },
+  darkMode: 'class',
   plugins: [],
 } 

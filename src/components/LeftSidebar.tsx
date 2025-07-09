@@ -29,6 +29,7 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchComponent from './SearchComponent';
+import ThemeToggle from './ThemeToggle';
 
 interface LeftSidebarProps {
   isCollapsed: boolean;
@@ -210,6 +211,18 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ isCollapsed, onToggle }) => {
                 </span>
               </div>
             </button>
+            
+            {/* Theme Toggle */}
+            <div className="mt-4 px-4">
+              <ThemeToggle />
+            </div>
+          </div>
+        )}
+        
+        {/* Theme Toggle (desktop only) - Only visible when sidebar is expanded */}
+        {!isMobile && !isCollapsed && (
+          <div className="p-4 border-t border-border-primary mt-auto">
+            <ThemeToggle />
           </div>
         )}
       </motion.div>

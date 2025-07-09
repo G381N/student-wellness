@@ -273,13 +273,13 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 onClick={handleUpvote}
                 disabled={isVoting}
                 className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
-                  hasUpvoted ? 'text-text-primary' : 'text-text-tertiary hover:text-text-secondary'
+                  hasUpvoted ? 'text-vote-up' : 'text-text-tertiary hover:text-text-secondary'
                 }`}
                 data-upvote={tweet.id}
               >
                 <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
                   hasUpvoted 
-                    ? 'bg-accent-blue bg-opacity-30' 
+                    ? 'bg-vote-up bg-opacity-10' 
                     : 'group-hover:bg-hover-bg'
                 }`}>
                   {isVoting ? (
@@ -295,13 +295,13 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 onClick={handleDownvote}
                 disabled={isVoting}
                 className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
-                  hasDownvoted ? 'text-text-primary' : 'text-text-tertiary hover:text-text-secondary'
+                  hasDownvoted ? 'text-vote-down' : 'text-text-tertiary hover:text-text-secondary'
                 }`}
                 data-downvote={tweet.id}
               >
                 <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
                   hasDownvoted 
-                    ? 'bg-bg-tertiary bg-opacity-30' 
+                    ? 'bg-vote-down bg-opacity-10' 
                     : 'group-hover:bg-hover-bg'
                 }`}>
                   {isVoting ? (

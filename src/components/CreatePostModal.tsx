@@ -311,443 +311,427 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
 
   // Get visibility options based on user role
   const getVisibilityOptions = () => {
-    if (isModerator || isAdmin) {
-      return [
-        { value: 'public', label: 'Public', icon: FiGlobe, desc: 'Everyone can see' },
-        { value: 'mods', label: 'Moderators Only', icon: FiLock, desc: 'Only moderators can see' }
-      ];
-    }
-    return []; // Regular users don't see visibility options (auto-public)
+    return [
+      {
+        value: 'public',
+        label: 'Public',
+        desc: 'Everyone can see this post',
+        icon: <FiGlobe className="text-text-secondary" />
+      },
+      {
+        value: 'moderators',
+        label: 'Moderators Only',
+        desc: 'Only moderators and admins can see this post',
+        icon: <FiLock className="text-text-secondary" />
+      }
+    ];
   };
 
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-black border border-gray-800 rounded-2xl w-full max-w-lg md:max-w-[520px] max-h-[85vh] overflow-hidden shadow-2xl"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
-            <div>
-              <h2 className="text-lg font-semibold text-white">
-                {postType === 'anonymous-complaint' ? 'Anonymous Complaint' : "What's happening?"}
-              </h2>
-              <p className="text-gray-400 text-xs mt-0.5">{getPromptText()}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0 bg-bg-overlay backdrop-blur-sm z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+          />
+          
+          {/* Modal */}
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          >
+            <div 
+              className="bg-bg-primary border border-border-primary rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-app-lg"
+              onClick={(e) => e.stopPropagation()}
             >
-              <FiX className="text-white text-base" />
-            </button>
-          </div>
-
-          <div className="overflow-y-auto max-h-[calc(85vh-160px)] scrollbar-hide">
-            {/* Success Message for Anonymous Complaints */}
-            <AnimatePresence>
-              {submitted && postType === 'anonymous-complaint' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="m-4 p-4 bg-gray-900 border border-gray-700 rounded-lg"
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b border-border-primary">
+                <h2 className="text-text-primary text-lg font-semibold">
+                  {submitted ? 'Success!' : 'Create New Post'}
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-full hover:bg-hover-bg transition-colors"
                 >
-                  <div className="flex items-center">
-                    <FiShield className="text-white mr-3" />
-                    <div>
-                      <h3 className="text-white font-semibold">Complaint Submitted Successfully</h3>
-                      <p className="text-gray-400 text-sm">Your complaint has been sent to administrators.</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Segmented Control */}
-            <div className="px-4 py-3">
-              <div className="flex bg-gray-800 rounded-xl p-0.5">
-                {[
-                  { key: 'activity', label: 'Activity' },
-                  { key: 'concern', label: 'Concern' },
-                  { key: 'general', label: 'General' },
-                  { key: 'anonymous-complaint', label: 'Complaint' }
-                ].map((type) => (
-                  <button
-                    key={type.key}
-                    onClick={() => setPostType(type.key as PostType)}
-                    className={`flex-1 py-2 px-2 rounded-lg font-medium text-xs transition-all duration-200 ${
-                      postType === type.key
-                        ? 'bg-white text-black shadow-sm'
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    {type.label}
-                  </button>
-                ))}
+                  <FiX className="text-text-secondary" />
+                </button>
               </div>
-            </div>
-
-            <div className="px-4 space-y-4">
-              {/* Title (for activities and complaints) */}
-              {(postType === 'activity' || postType === 'anonymous-complaint') && (
-                <div>
-                  <label className="block text-white text-xs font-medium mb-1.5">
-                    {postType === 'activity' ? 'Activity Title *' : 'Complaint Title *'}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-white transition-all"
-                    placeholder={
-                      postType === 'activity' 
-                        ? "Give your activity a catchy title..." 
-                        : "Brief description of the issue..."
-                    }
-                    maxLength={100}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {postType === 'activity' ? 'Make it clear and engaging' : `${formData.title.length}/100 characters`}
+              
+              {/* Success Message */}
+              {submitted ? (
+                <div className="p-6 flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 bg-success bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+                    <FiSend className="text-success text-2xl" />
+                  </div>
+                  <p className="text-text-primary text-lg font-medium mb-2">
+                    Your post has been submitted!
+                  </p>
+                  <p className="text-text-secondary text-center">
+                    {postType === 'anonymous-complaint' 
+                      ? 'Your anonymous complaint has been received and will be reviewed by moderators.'
+                      : 'Your post is now live on the platform.'}
                   </p>
                 </div>
-              )}
-
-              {/* Main Content */}
-              <div>
-                <label className="block text-white text-xs font-medium mb-1.5">
-                  {postType === 'activity' ? 'Description' : 
-                   postType === 'concern' ? 'What\'s the issue?' : 
-                   postType === 'anonymous-complaint' ? 'Detailed Description' :
-                   'Your message'} *
-                </label>
-                <div className="relative">
-                  <textarea
-                    ref={textareaRef}
-                    value={formData.content}
-                    onChange={handleContentChange}
-                    rows={postType === 'anonymous-complaint' ? 6 : 3}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-white transition-all resize-none leading-relaxed"
-                    placeholder={
-                      postType === 'activity' ? "Tell everyone what's happening..." :
-                      postType === 'concern' ? "Describe the issue you're facing..." :
-                      postType === 'anonymous-complaint' ? "Provide detailed information about the issue, including when and where it occurred..." :
-                      "What's on your mind?"
-                    }
-                  />
-                  
-                  {/* Character Counter */}
-                  <div className="absolute bottom-2 right-2 text-xs">
-                    <span className={`${
-                      characterCount > getCharacterLimit() * 0.9 ? 'text-yellow-400' :
-                      characterCount > getCharacterLimit() * 0.95 ? 'text-red-400' :
-                      'text-gray-500'
-                    }`}>
-                      {characterCount}/{getCharacterLimit()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-white text-xs font-medium mb-1.5">Category *</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-white transition-all"
-                >
-                  <option value="" className="bg-gray-900 text-gray-500">Choose category...</option>
-                  {getCurrentCategories().map(category => (
-                    <option key={category} value={category} className="bg-gray-900 text-white">
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Severity (for complaints) */}
-              {postType === 'anonymous-complaint' && (
-                <div>
-                  <label className="block text-white text-xs font-medium mb-1.5">Severity Level</label>
-                  <select
-                    value={formData.severity}
-                    onChange={(e) => setFormData({ ...formData, severity: e.target.value as any })}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-white transition-all"
-                  >
-                    {COMPLAINT_SEVERITIES.map(severity => (
-                      <option key={severity} value={severity} className="bg-gray-900 text-white">
-                        {severity}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Activity-specific fields */}
-              {postType === 'activity' && (
+              ) : (
                 <>
-                  <div>
-                    <label className="block text-white text-xs font-medium mb-1.5">Location</label>
-                    <div className="relative">
-                      <FiMapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" />
-                      <input
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-white transition-all"
-                        placeholder="Where? (e.g., Library, Block A)"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-white text-xs font-medium mb-1.5">Date</label>
-                      <div className="relative">
-                        <FiCalendar className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" />
-                        <input
-                          type="date"
-                          value={formData.date}
-                          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-white text-sm focus:outline-none focus:border-white transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-white text-xs font-medium mb-1.5">Time</label>
-                      <div className="relative">
-                        <FiClock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" />
-                        <input
-                          type="time"
-                          value={formData.time}
-                          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-white text-sm focus:outline-none focus:border-white transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white text-xs font-medium mb-1.5">Max Participants</label>
-                    <div className="relative">
-                      <FiUsers className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" />
-                      <input
-                        type="number"
-                        value={formData.maxParticipants}
-                        onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-white transition-all"
-                        placeholder="Unlimited"
-                        min="1"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Concern-specific fields */}
-              {postType === 'concern' && (
-                <>
-                  {/* Urgency Toggle */}
-                  <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
-                    <div className="flex items-center space-x-2">
-                      <FiAlertTriangle className="text-orange-400 text-sm" />
-                      <div>
-                        <span className="text-white font-medium text-sm">Mark as Urgent</span>
-                        <p className="text-gray-400 text-xs">Faster response</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setFormData({ ...formData, isUrgent: !formData.isUrgent })}
-                      className={`w-10 h-5 rounded-full transition-colors ${
-                        formData.isUrgent ? 'bg-orange-500' : 'bg-gray-600'
-                      }`}
-                    >
-                      <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
-                        formData.isUrgent ? 'translate-x-5' : 'translate-x-0.5'
-                      }`} />
-                    </button>
-                  </div>
-
-                  {/* Anonymous Toggle */}
-                  <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
-                    <div className="flex items-center space-x-2">
-                      <FiEyeOff className="text-gray-400 text-sm" />
-                      <div>
-                        <span className="text-white font-medium text-sm">Post Anonymously</span>
-                        <p className="text-gray-400 text-xs">Hide your identity</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setFormData({ ...formData, isAnonymous: !formData.isAnonymous })}
-                      className={`w-10 h-5 rounded-full transition-colors ${
-                        formData.isAnonymous ? 'bg-white' : 'bg-gray-600'
-                      }`}
-                    >
-                      <div className={`w-4 h-4 rounded-full transition-transform ${
-                        formData.isAnonymous ? 'translate-x-5 bg-black' : 'translate-x-0.5 bg-white'
-                      }`} />
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {/* Visibility options for general posts (moderators only) */}
-              {postType === 'general' && (isModerator || isAdmin) && (
-                <div>
-                  <label className="block text-white text-xs font-medium mb-1.5">Visibility</label>
-                  <div className="space-y-1.5">
-                    {getVisibilityOptions().map((option) => (
+                  {/* Post Type Selector */}
+                  <div className="p-4 border-b border-border-primary">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <button
-                        key={option.value}
-                        onClick={() => setFormData({ ...formData, visibility: option.value })}
-                        className={`w-full flex items-center space-x-2 p-2.5 rounded-lg border transition-all ${
-                          formData.visibility === option.value
-                            ? 'border-white bg-gray-700'
-                            : 'border-gray-700 bg-gray-800 hover:border-gray-600 hover:bg-gray-700'
-                        }`}
+                        className={`p-2 rounded-lg flex flex-col items-center justify-center text-sm ${
+                          postType === 'activity' 
+                            ? 'bg-accent-blue bg-opacity-10 text-accent-blue' 
+                            : 'bg-bg-tertiary text-text-secondary hover:bg-hover-bg'
+                        } transition-colors`}
+                        onClick={() => setPostType('activity')}
                       >
-                        <option.icon className={`text-sm ${
-                          formData.visibility === option.value ? 'text-white' : 'text-gray-400'
-                        }`} />
-                        <div className="flex-1 text-left">
-                          <div className={`font-medium text-sm ${
-                            formData.visibility === option.value ? 'text-white' : 'text-gray-300'
-                          }`}>
-                            {option.label}
-                          </div>
-                          <div className="text-gray-400 text-xs">{option.desc}</div>
-                        </div>
+                        <FiCalendar className="text-lg mb-1" />
+                        Activity
                       </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Privacy Notice for Anonymous Complaints */}
-              {postType === 'anonymous-complaint' && (
-                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600">
-                  <div className="flex items-start">
-                    <FiAlertTriangle className="text-yellow-400 mr-3 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h4 className="text-yellow-300 font-medium text-sm mb-1">Privacy & Confidentiality</h4>
-                      <ul className="text-gray-400 text-xs space-y-1">
-                        <li>• Your identity will remain completely anonymous</li>
-                        <li>• Only university administrators can access these complaints</li>
-                        <li>• Complaints are used to improve campus conditions</li>
-                        <li>• False or malicious reports may be investigated</li>
-                      </ul>
+                      <button
+                        className={`p-2 rounded-lg flex flex-col items-center justify-center text-sm ${
+                          postType === 'concern' 
+                            ? 'bg-accent-blue bg-opacity-10 text-accent-blue' 
+                            : 'bg-bg-tertiary text-text-secondary hover:bg-hover-bg'
+                        } transition-colors`}
+                        onClick={() => setPostType('concern')}
+                      >
+                        <FiAlertTriangle className="text-lg mb-1" />
+                        Concern
+                      </button>
+                      <button
+                        className={`p-2 rounded-lg flex flex-col items-center justify-center text-sm ${
+                          postType === 'general' 
+                            ? 'bg-accent-blue bg-opacity-10 text-accent-blue' 
+                            : 'bg-bg-tertiary text-text-secondary hover:bg-hover-bg'
+                        } transition-colors`}
+                        onClick={() => setPostType('general')}
+                      >
+                        <FiGlobe className="text-lg mb-1" />
+                        General
+                      </button>
+                      <button
+                        className={`p-2 rounded-lg flex flex-col items-center justify-center text-sm ${
+                          postType === 'anonymous-complaint' 
+                            ? 'bg-accent-blue bg-opacity-10 text-accent-blue' 
+                            : 'bg-bg-tertiary text-text-secondary hover:bg-hover-bg'
+                        } transition-colors`}
+                        onClick={() => setPostType('anonymous-complaint')}
+                      >
+                        <FiEyeOff className="text-lg mb-1" />
+                        Anonymous
+                      </button>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Image Preview */}
-              {imagePreview && postType !== 'anonymous-complaint' && (
-                <div className="relative">
-                  <Image 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    width={400}
-                    height={200}
-                    className="rounded-lg w-full h-40 object-cover border border-gray-700"
-                  />
-                  <button 
-                    onClick={removeImage}
-                    className="absolute top-1.5 right-1.5 bg-black bg-opacity-80 text-white p-1.5 rounded-full hover:bg-opacity-100 transition-all"
-                  >
-                    <FiX className="text-xs" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-800 bg-black">
-            {/* Progress Bar */}
-            <div className="mb-3">
-              <div className="w-full bg-gray-800 rounded-full h-0.5">
-                <div 
-                  className="bg-white h-0.5 rounded-full transition-all duration-300"
-                  style={{ width: `${getProgress()}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              {/* Left: Media Upload (not for complaints) */}
-              <div className="flex items-center space-x-2">
-                {postType !== 'anonymous-complaint' && (
-                  <>
+                  
+                  {/* Form Content */}
+                  <div className="p-4">
+                    <div className="space-y-4">
+                      {/* Title field for activities and anonymous complaints */}
+                      {(postType === 'activity' || postType === 'anonymous-complaint') && (
+                        <div>
+                          <label htmlFor="title" className="block text-text-secondary text-sm mb-1">
+                            Title {(postType === 'activity' || postType === 'anonymous-complaint') && <span className="text-error">*</span>}
+                          </label>
+                          <input
+                            type="text"
+                            id="title"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                            placeholder={`Enter ${postType === 'activity' ? 'activity' : 'complaint'} title`}
+                            required
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Content/Description */}
+                      <div>
+                        <label htmlFor="content" className="block text-text-secondary text-sm mb-1">
+                          {postType === 'anonymous-complaint' ? 'Description' : 'Content'} <span className="text-error">*</span>
+                        </label>
+                        <div className="relative">
+                          <textarea
+                            ref={textareaRef}
+                            id="content"
+                            value={formData.content}
+                            onChange={handleContentChange}
+                            className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-3 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue min-h-[100px]"
+                            placeholder={getPromptText()}
+                            required
+                          />
+                          <div className="absolute bottom-2 right-2 text-xs text-text-tertiary">
+                            {characterCount}/{getCharacterLimit()}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Category selection */}
+                      <div>
+                        <label htmlFor="category" className="block text-text-secondary text-sm mb-1">
+                          Category <span className="text-error">*</span>
+                        </label>
+                        <select
+                          id="category"
+                          value={formData.category}
+                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                          className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                          required
+                        >
+                          <option value="">Select a category</option>
+                          {getCurrentCategories().map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      {/* Activity-specific fields */}
+                      {postType === 'activity' && (
+                        <>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label htmlFor="date" className="block text-text-secondary text-sm mb-1">
+                                Date
+                              </label>
+                              <input
+                                type="date"
+                                id="date"
+                                value={formData.date}
+                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="time" className="block text-text-secondary text-sm mb-1">
+                                Time
+                              </label>
+                              <input
+                                type="time"
+                                id="time"
+                                value={formData.time}
+                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label htmlFor="location" className="block text-text-secondary text-sm mb-1">
+                                Location
+                              </label>
+                              <input
+                                type="text"
+                                id="location"
+                                value={formData.location}
+                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                                placeholder="Enter location"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="maxParticipants" className="block text-text-secondary text-sm mb-1">
+                                Max Participants
+                              </label>
+                              <input
+                                type="number"
+                                id="maxParticipants"
+                                value={formData.maxParticipants}
+                                onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
+                                className="w-full bg-bg-tertiary border border-border-primary rounded-lg p-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                                placeholder="Unlimited"
+                                min="1"
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      
+                      {/* Anonymous complaint severity */}
+                      {postType === 'anonymous-complaint' && (
+                        <div>
+                          <label htmlFor="severity" className="block text-text-secondary text-sm mb-1">
+                            Severity
+                          </label>
+                          <div className="grid grid-cols-4 gap-2">
+                            {COMPLAINT_SEVERITIES.map((sev) => (
+                              <button
+                                key={sev}
+                                type="button"
+                                onClick={() => setFormData({ ...formData, severity: sev })}
+                                className={`p-2 rounded-lg text-sm ${
+                                  formData.severity === sev
+                                    ? sev === 'Critical' 
+                                      ? 'bg-error bg-opacity-10 text-error' 
+                                      : sev === 'High'
+                                        ? 'bg-warning bg-opacity-10 text-warning'
+                                        : sev === 'Medium'
+                                          ? 'bg-accent-blue bg-opacity-10 text-accent-blue'
+                                          : 'bg-success bg-opacity-10 text-success'
+                                    : 'bg-bg-tertiary text-text-secondary hover:bg-hover-bg'
+                                } transition-colors`}
+                              >
+                                {sev}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Concern-specific fields */}
+                      {postType === 'concern' && (
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id="isAnonymous"
+                              checked={formData.isAnonymous}
+                              onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
+                              className="mr-2 h-4 w-4 accent-accent-blue"
+                            />
+                            <label htmlFor="isAnonymous" className="text-text-secondary text-sm">
+                              Post anonymously
+                            </label>
+                          </div>
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id="isUrgent"
+                              checked={formData.isUrgent}
+                              onChange={(e) => setFormData({ ...formData, isUrgent: e.target.checked })}
+                              className="mr-2 h-4 w-4 accent-error"
+                            />
+                            <label htmlFor="isUrgent" className="text-text-secondary text-sm">
+                              Mark as urgent
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Moderator visibility options */}
+                      {(isModerator || isAdmin) && postType === 'general' && (
+                        <div>
+                          <label className="block text-text-secondary text-sm mb-1">
+                            Visibility
+                          </label>
+                          <div className="flex space-x-4">
+                            {getVisibilityOptions().map((option) => (
+                              <div key={option.value} className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id={option.value}
+                                  name="visibility"
+                                  value={option.value}
+                                  checked={formData.visibility === option.value}
+                                  onChange={() => setFormData({ ...formData, visibility: option.value })}
+                                  className="mr-2 h-4 w-4 accent-accent-blue"
+                                />
+                                <label htmlFor={option.value} className="text-text-secondary text-sm flex items-center">
+                                  {option.icon}
+                                  <span className="ml-1">{option.label}</span>
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Progress indicator */}
+                  <div className="px-4 pb-2">
+                    <div className="h-1 w-full bg-bg-tertiary rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-accent-blue transition-all duration-300"
+                        style={{ width: `${getProgress()}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Footer with actions */}
+                  <div className="p-4 border-t border-border-primary flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      {/* Image upload button (not for anonymous complaints) */}
+                      {postType !== 'anonymous-complaint' && (
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingImage}
+                          className="p-2 rounded-full hover:bg-hover-bg transition-colors text-text-secondary disabled:opacity-50"
+                          title="Upload image"
+                        >
+                          <FiImage />
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </button>
+                      )}
+                    </div>
+                    
                     <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors border border-gray-600"
-                      disabled={uploadingImage}
-                      title="Add image"
+                      onClick={handleCreatePost}
+                      disabled={loading || !isFormValid()}
+                      className={`px-4 py-2 rounded-lg font-medium flex items-center ${
+                        loading || !isFormValid()
+                          ? 'bg-accent-blue-disabled text-text-secondary cursor-not-allowed'
+                          : 'bg-accent-blue text-text-primary hover:bg-accent-blue-hover'
+                      } transition-colors`}
                     >
-                      {uploadingImage ? (
-                        <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                      {loading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-text-primary border-t-transparent rounded-full animate-spin mr-2"></div>
+                          <span>Posting...</span>
+                        </>
                       ) : (
-                        <FiImage className="text-gray-400 text-sm" />
+                        <>
+                          <FiSend className="mr-2" />
+                          <span>Post</span>
+                        </>
                       )}
                     </button>
-                    
-                    {postType === 'general' && (
-                      <button
-                        className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors border border-gray-600"
-                        title="Add emoji"
-                      >
-                        <FiSmile className="text-gray-400 text-sm" />
-                      </button>
-                    )}
-
-                    <input 
-                      ref={fileInputRef}
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                  </>
-                )}
-              </div>
-
-              {/* Right: Submit Button */}
-              <button
-                onClick={handleCreatePost}
-                disabled={!isFormValid() || loading || submitted}
-                className={`font-semibold py-2 px-6 rounded-full transition-all text-sm flex items-center ${
-                  !isFormValid() || loading || submitted
-                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                    : postType === 'anonymous-complaint'
-                    ? 'bg-white text-black hover:bg-gray-200'
-                    : 'bg-white text-black hover:bg-gray-200'
-                }`}
-              >
-                {loading ? (
-                  <>
-                    <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin mr-1.5" />
-                    {postType === 'anonymous-complaint' ? 'Submitting...' : 'Sharing...'}
-                  </>
-                ) : postType === 'anonymous-complaint' ? (
-                  <>
-                    <FiSend className="mr-2" />
-                    Submit Complaint
-                  </>
-                ) : (
-                  'Share'
-                )}
-              </button>
+                  </div>
+                  
+                  {/* Image preview */}
+                  {imagePreview && (
+                    <div className="p-4 pt-0">
+                      <div className="relative rounded-lg overflow-hidden">
+                        <Image
+                          src={imagePreview}
+                          alt="Preview"
+                          width={500}
+                          height={300}
+                          className="w-full h-auto object-cover rounded-lg"
+                        />
+                        <button
+                          onClick={removeImage}
+                          className="absolute top-2 right-2 p-1 rounded-full bg-bg-overlay hover:bg-error text-text-primary"
+                        >
+                          <FiX />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </>
+      )}
     </AnimatePresence>
   );
 }

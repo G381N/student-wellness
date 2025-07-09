@@ -103,7 +103,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
         {/* Main Scrollable Content */}
         <motion.main
-          className="flex-grow overflow-y-auto p-4 sm:p-6 md:p-8 pt-16 pb-20 md:pb-8"
+          className="flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 pt-20 pb-20 md:pb-8"
         >
           {children}
         </motion.main>

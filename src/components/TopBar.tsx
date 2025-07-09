@@ -49,7 +49,8 @@ export default function TopBar({
 
   return (
     <motion.div
-      className="h-16 flex-shrink-0 z-30 bg-gray-950 border-b border-gray-800 flex items-center"
+      className="fixed top-0 h-16 z-30 backdrop-blur-custom border-b border-gray-800 flex items-center transition-all duration-300"
+      style={getTopBarStyles()}
       layout
     >
       <div className="w-full px-4">

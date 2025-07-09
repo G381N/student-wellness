@@ -1,185 +1,187 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight, FiMessageSquare } from 'react-icons/fi';
-import { Post } from '@/lib/firebase-utils';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import { FiMessageSquare, FiCalendar, FiMapPin, FiClock, FiUsers } from 'react-icons/fi';
 import Image from 'next/image';
-import ActivityDetailsModal from './ActivityDetailsModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ActivityCardProps {
-  activity: Post;
-  onUpdate: (updatedActivity: Post) => void;
-  onDelete?: (postId: string) => void;
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  time: string;
+  location: string;
+  imageUrl: string;
+  organizer: string;
+  maxParticipants?: number;
+  currentParticipants?: number;
 }
 
-// Default activity images by category
-const DEFAULT_IMAGES = {
-  'Academic': '/images/academic.jpg',
-  'Sports': '/images/sports.jpg',
-  'Cultural': '/images/cultural.jpg',
-  'Social': '/images/social.jpg',
-  'Wellness': '/images/wellness.jpg',
-  'Professional': '/images/professional.jpg',
-  'Volunteer': '/images/volunteer.jpg',
-  'Entertainment': '/images/entertainment.jpg',
-  'Other': '/images/other.jpg'
+const getCategoryColor = (category: string): string => {
+  const colors: { [key: string]: string } = {
+    'academic': 'border-yellow-500',
+    'cultural': 'border-purple-500',
+    'sports': 'border-green-500',
+    'professional': 'border-blue-500',
+    'social': 'border-pink-500',
+    'volunteer': 'border-orange-500',
+    'entertainment': 'border-red-500',
+    'wellness': 'border-teal-500',
+    'other': 'border-gray-500'
+  };
+  return colors[category.toLowerCase()] || colors['other'];
 };
 
-// Fallback image if category doesn't match
-const FALLBACK_IMAGE = '/images/activity-default.jpg';
-
-// Category styling
-const CATEGORIES = {
-  'Academic': { bg: 'bg-category-academic bg-opacity-20', text: 'text-category-academic' },
-  'Sports': { bg: 'bg-category-sports bg-opacity-20', text: 'text-category-sports' },
-  'Cultural': { bg: 'bg-category-cultural bg-opacity-20', text: 'text-category-cultural' },
-  'Social': { bg: 'bg-category-social bg-opacity-20', text: 'text-category-social' },
-  'Wellness': { bg: 'bg-category-wellness bg-opacity-20', text: 'text-category-wellness' },
-  'Professional': { bg: 'bg-category-professional bg-opacity-20', text: 'text-category-professional' },
-  'Volunteer': { bg: 'bg-category-volunteer bg-opacity-20', text: 'text-category-volunteer' },
-  'Entertainment': { bg: 'bg-category-entertainment bg-opacity-20', text: 'text-category-entertainment' },
-  'Other': { bg: 'bg-category-other bg-opacity-20', text: 'text-category-other' }
+const getCategoryTextColor = (category: string): string => {
+  const colors: { [key: string]: string } = {
+    'academic': 'text-yellow-500',
+    'cultural': 'text-purple-500',
+    'sports': 'text-green-500',
+    'professional': 'text-blue-500',
+    'social': 'text-pink-500',
+    'volunteer': 'text-orange-500',
+    'entertainment': 'text-red-500',
+    'wellness': 'text-teal-500',
+    'other': 'text-gray-500'
+  };
+  return colors[category.toLowerCase()] || colors['other'];
 };
 
-export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityCardProps) {
+export default function ActivityCard({
+  id,
+  title,
+  description,
+  category,
+  date,
+  time,
+  location,
+  imageUrl,
+  organizer,
+  maxParticipants = 0,
+  currentParticipants = 0
+}: ActivityCardProps) {
+  const [isJoined, setIsJoined] = useState(false);
+  const [showCommentModal, setShowCommentModal] = useState(false);
   const { user } = useAuth();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [loading, setLoading] = useState({
-    join: false,
-    delete: false,
-    comment: false
-  });
 
-  // Determine image source (custom or default based on category)
-  const getCategoryImage = (category: string) => {
-    return DEFAULT_IMAGES[category as keyof typeof DEFAULT_IMAGES] || FALLBACK_IMAGE;
+  const handleJoin = () => {
+    // TODO: Implement join functionality
+    setIsJoined(!isJoined);
   };
 
-  const handleOpenDetails = () => {
-    setIsModalOpen(true);
+  const handleComment = () => {
+    setShowCommentModal(true);
   };
 
-  // Check if user is already participating
-  const isParticipating = activity.participants?.some(p => p.uid === user?.uid);
-  
-  // Handle join activity
-  const handleJoinActivity = async () => {
-    // Implementation will be handled in the modal
-    console.log('Join activity handled in modal');
-  };
-  
-  // Handle leave activity
-  const handleLeaveActivity = async () => {
-    // Implementation will be handled in the modal
-    console.log('Leave activity handled in modal');
-  };
-
-  const categoryStyle = CATEGORIES[activity.category as keyof typeof CATEGORIES] || 
-    { bg: 'bg-bg-tertiary', text: 'text-text-secondary' };
+  const categoryColorClass = getCategoryColor(category);
+  const categoryTextClass = getCategoryTextColor(category);
 
   return (
-    <div className="card rounded-xl overflow-hidden transition-all duration-300">
-      {/* Header with Image */}
-      <div className="relative">
-        {/* Activity Image */}
-        <div className="h-48 w-full relative overflow-hidden">
-          <Image
-            src={activity.imageURL || getCategoryImage(activity.category)}
-            alt={activity.title || activity.category}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        </div>
-        
-        {/* Overlay Content */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* Category Tag - Small subtle style */}
-          <div className="flex items-center mb-3">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${categoryStyle.text} border border-current`}>
-              {activity.category}
-            </span>
-          </div>
-          
-          {/* Title */}
-          <h3 className="text-white font-bold text-xl mb-1 line-clamp-2">
-            {activity.title || activity.content.substring(0, 50)}
-          </h3>
-          
-          {/* Date & Time */}
-          <div className="flex items-center space-x-4 text-white/80 text-sm">
-            {activity.date && (
-              <div className="flex items-center">
-                <FiCalendar className="mr-1" />
-                <span>{activity.date}</span>
-              </div>
-            )}
-            {activity.time && (
-              <div className="flex items-center">
-                <FiClock className="mr-1" />
-                <span>{activity.time}</span>
-              </div>
-            )}
-          </div>
-        </div>
+    <div className="bg-bg-secondary rounded-xl border border-border-primary p-4 shadow-app hover:shadow-app-lg transition-shadow duration-300">
+      {/* Image */}
+      <div className="relative w-full h-48 rounded-lg overflow-hidden mb-4">
+        <Image
+          src={imageUrl || '/images/activity-default.jpg'}
+          alt={title}
+          fill
+          className="object-cover"
+        />
       </div>
-      
-      {/* Body Content */}
-      <div className="p-4">
-        {/* Description */}
-        <p className="text-text-primary mb-4 line-clamp-3">
-          {activity.content}
-        </p>
-        
-        {/* Location & Participants */}
-        <div className="flex flex-wrap items-center justify-between mb-4 text-sm">
-          {activity.location && (
-            <div className="flex items-center text-text-secondary mb-2 sm:mb-0">
-              <FiMapPin className="mr-1" />
-              <span>{activity.location}</span>
-            </div>
+
+      {/* Content */}
+      <div className="space-y-3">
+        {/* Category Tag */}
+        <div className="flex items-center justify-between">
+          <span className={`px-3 py-1 rounded-full text-sm border ${categoryColorClass} ${categoryTextClass}`}>
+            {category}
+          </span>
+          {maxParticipants > 0 && (
+            <span className="text-sm text-text-tertiary">
+              {currentParticipants}/{maxParticipants} participants
+            </span>
           )}
-          
-          <div className="flex items-center text-text-secondary">
-            <FiUsers className="mr-1" />
-            <span>
-              {activity.participants?.length || 0}/{activity.maxParticipants || '∞'}
-            </span>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
+
+        {/* Description */}
+        <p className="text-text-secondary text-sm line-clamp-2">{description}</p>
+
+        {/* Details */}
+        <div className="space-y-2">
+          <div className="flex items-center text-text-tertiary text-sm">
+            <FiCalendar className="mr-2" />
+            <span>{date}</span>
+          </div>
+          <div className="flex items-center text-text-tertiary text-sm">
+            <FiClock className="mr-2" />
+            <span>{time}</span>
+          </div>
+          <div className="flex items-center text-text-tertiary text-sm">
+            <FiMapPin className="mr-2" />
+            <span>{location}</span>
+          </div>
+          <div className="flex items-center text-text-tertiary text-sm">
+            <FiUsers className="mr-2" />
+            <span>{organizer}</span>
           </div>
         </div>
-        
+
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between pt-4 border-t border-border-primary">
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex-1 py-2 px-4 rounded-lg bg-bg-tertiary hover:bg-hover-bg text-text-primary transition-colors flex items-center justify-center space-x-2"
+            onClick={handleComment}
+            className="flex items-center text-text-secondary hover:text-text-primary transition-colors"
           >
-            <FiMessageSquare className="mr-1" />
-            <span>Comments</span>
+            <FiMessageSquare className="mr-2" />
+            <span>Comment</span>
           </button>
           
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex-1 py-2 px-4 rounded-lg bg-accent-blue hover:bg-accent-blue/90 text-white transition-colors flex items-center justify-center space-x-2"
+            onClick={handleJoin}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              isJoined
+                ? 'bg-bg-tertiary text-text-secondary'
+                : 'bg-accent-blue text-white hover:bg-accent-blue-hover'
+            }`}
           >
-            <span>{isParticipating ? 'Joined' : 'Join'}</span>
-            <FiArrowRight />
+            {isJoined ? 'Joined' : 'Join Activity'}
           </button>
         </div>
       </div>
-      
-      {/* Modal */}
-      <ActivityDetailsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        activity={activity}
-        onJoin={handleJoinActivity}
-        onLeave={handleLeaveActivity}
-        isParticipating={!!isParticipating}
-      />
+
+      {/* Comment Modal */}
+      {showCommentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-bg-secondary rounded-xl p-6 w-full max-w-lg mx-4">
+            <h3 className="text-lg font-semibold mb-4">Ask a Question</h3>
+            <textarea
+              className="w-full h-32 bg-bg-tertiary border border-border-primary rounded-lg p-3 text-text-primary resize-none focus:outline-none focus:ring-2 focus:ring-accent-blue"
+              placeholder="Type your question here..."
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setShowCommentModal(false)}
+                className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary hover:bg-hover-bg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Implement comment submission
+                  setShowCommentModal(false);
+                }}
+                className="px-4 py-2 rounded-lg bg-accent-blue text-white hover:bg-accent-blue-hover transition-colors"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

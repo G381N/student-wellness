@@ -6,9 +6,10 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 interface ThemeToggleProps {
   className?: string;
+  showLabel?: boolean;
 }
 
-export default function ThemeToggle({ className = '' }: ThemeToggleProps) {
+export default function ThemeToggle({ className = '', showLabel = false }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -22,17 +23,19 @@ export default function ThemeToggle({ className = '' }: ThemeToggleProps) {
   }
 
   return (
-    <div className={`flex items-center justify-between ${className}`}>
-      <span className="text-text-secondary font-medium">Theme</span>
+    <div className={`flex items-center gap-3 ${className}`}>
+      {showLabel && (
+        <span className="text-text-secondary font-medium">Theme</span>
+      )}
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-full bg-bg-tertiary hover:bg-hover-bg transition-colors"
+        className="p-2 rounded-full bg-bg-tertiary hover:bg-hover-bg transition-colors flex items-center justify-center"
         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
       >
         {theme === 'dark' ? (
-          <FiSun className="text-text-primary" />
+          <FiSun className="text-text-primary w-5 h-5" />
         ) : (
-          <FiMoon className="text-text-primary" />
+          <FiMoon className="text-text-primary w-5 h-5" />
         )}
       </button>
     </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiHome, FiHeart, FiActivity, FiAlertCircle, FiBriefcase, FiUsers, FiUser, FiBell, FiChevronLeft, FiChevronRight, FiMenu, FiX } from 'react-icons/fi';
+import { FiHome, FiHeart, FiActivity, FiAlertCircle, FiBriefcase, FiUsers, FiUser, FiBell, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchComponent from './SearchComponent';
 
@@ -59,22 +59,29 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
           className="fixed top-4 left-4 z-40 p-2 bg-bg-tertiary rounded-full shadow-app"
           onClick={() => setShowMobileMenu(!showMobileMenu)}
         >
-          {showMobileMenu ? <FiX /> : <FiMenu />}
+          {showMobileMenu ? <FiChevronLeft /> : <FiChevronRight />}
         </button>
       )}
       
       {/* Sidebar */}
       <motion.div
-        className={`fixed top-0 left-0 h-full bg-bg-secondary border-r border-border-primary z-30 transition-all duration-300 ${
+        className={`fixed top-0 left-0 h-full bg-bg-secondary border-r border-border-primary z-30 ${
           isMobile ? 'w-64' : isCollapsed ? 'w-16' : 'w-64'
         } ${isMobile && !showMobileMenu ? '-translate-x-full' : 'translate-x-0'}`}
-        animate={{ width: isMobile ? 256 : (isCollapsed ? 64 : 256) }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        animate={{ 
+          width: isMobile ? 256 : (isCollapsed ? 64 : 256),
+          transition: {
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+            duration: 0.3
+          }
+        }}
       >
         {/* Logo and Toggle */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border-primary">
           <Link href="/dashboard" className="flex items-center">
-            <span className="text-text-primary font-bold text-xl">
+            <span className={`text-text-primary font-bold text-xl transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
               {!isCollapsed && 'CampusWell'}
             </span>
           </Link>
@@ -82,7 +89,7 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
           {!isMobile && (
             <button
               onClick={onToggle}
-              className="p-1 rounded-full hover:bg-hover-bg transition-colors"
+              className="p-1.5 rounded-full hover:bg-hover-bg transition-colors"
             >
               {isCollapsed ? (
                 <FiChevronRight className="text-text-secondary" />
@@ -100,9 +107,9 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`flex items-center px-3 py-2.5 rounded-xl transition-colors ${
+                  className={`flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 ${
                     isActive(item.path) 
-                      ? 'border border-accent-blue bg-accent-blue/5 shadow-sm' 
+                      ? 'border-2 border-accent-blue shadow-sm' 
                       : 'hover:bg-hover-bg'
                   }`}
                 >
@@ -110,7 +117,9 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
                     {item.icon}
                   </span>
                   {(!isCollapsed || isMobile) && (
-                    <span className={`ml-3 ${isActive(item.path) ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
+                    <span className={`ml-3 transition-opacity duration-300 ${
+                      isCollapsed ? 'opacity-0' : 'opacity-100'
+                    } ${isActive(item.path) ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
                       {item.label}
                     </span>
                   )}
@@ -153,4 +162,4 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
       </motion.div>
     </>
   );
-}; 
+} 

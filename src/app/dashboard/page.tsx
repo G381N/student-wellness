@@ -222,14 +222,14 @@ export default function DashboardPage() {
                   <ActivityCard
                     activity={post}
                     onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
+                    onDelete={() => handleDeletePost(post.id)}
                   />
                 )}
                 {post.type === 'concern' && (
                   <ConcernCard
                     concern={post}
                     onUpdate={handleUpdatePost}
-                    onDelete={handleDeletePost}
+                    onDelete={() => handleDeletePost(post.id)}
                   />
                 )}
                 {(post.type === 'general' || post.type === 'post') && (

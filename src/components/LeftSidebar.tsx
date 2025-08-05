@@ -96,17 +96,17 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`flex items-center px-3 py-2.5 rounded-xl transition-colors ${
+                  className={`flex items-center px-3 py-2.5 rounded-xl transition-colors relative ${
                     isActive(item.path) 
-                      ? 'nav-item active' 
-                      : 'hover:bg-hover-bg'
+                      ? 'bg-accent-blue/10 text-accent-blue before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-8 before:bg-accent-blue before:rounded-r' 
+                      : 'hover:bg-hover-bg text-text-secondary'
                   }`}
                 >
-                  <span className={`text-xl ${isActive(item.path) ? 'text-accent-blue' : 'text-text-secondary'}`}>
+                  <span className="text-xl">
                     {item.icon}
                   </span>
                   {(!isCollapsed || isMobile) && (
-                    <span className={`ml-3 ${isActive(item.path) ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
+                    <span className="ml-3 font-medium">
                       {item.label}
                     </span>
                   )}

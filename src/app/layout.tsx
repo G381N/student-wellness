@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased bg-black text-white min-h-screen">
+      <body className="antialiased bg-bg-primary text-text-primary min-h-screen">
         <AppProvider>
           <ConditionalLayoutShell>
             {children}

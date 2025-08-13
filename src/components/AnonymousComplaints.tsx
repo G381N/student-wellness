@@ -113,11 +113,11 @@ export default function AnonymousComplaints() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white p-3 sm:p-6">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white p-3 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">Anonymous Complaints</h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">Manage and review anonymous complaints from students</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-2">Anonymous Complaints</h1>
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-400">Manage and review anonymous complaints from students</p>
         </div>
 
         {complaints.length === 0 ? (

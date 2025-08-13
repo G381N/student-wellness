@@ -122,22 +122,22 @@ export default function DepartmentComplaints() {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'Low': return 'text-green-400 bg-green-900/50';
-      case 'Medium': return 'text-yellow-400 bg-yellow-900/50';
-      case 'High': return 'text-orange-400 bg-orange-900/50';
-      case 'Critical': return 'text-red-400 bg-red-900/50';
-      default: return 'text-gray-400 bg-gray-900/50';
+      case 'Low': return 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-800';
+      case 'Medium': return 'text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-800';
+      case 'High': return 'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/50 border border-orange-200 dark:border-orange-800';
+      case 'Critical': return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800';
+      default: return 'text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'submitted': return 'text-purple-400 bg-purple-900/50';
-      case 'Pending': return 'text-blue-400 bg-blue-900/50';
-      case 'In Progress': return 'text-yellow-400 bg-yellow-900/50';
-      case 'Resolved': return 'text-green-400 bg-green-900/50';
-      case 'Closed': return 'text-gray-400 bg-gray-900/50';
-      default: return 'text-gray-400 bg-gray-900/50';
+      case 'submitted': return 'text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-800';
+      case 'Pending': return 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800';
+      case 'In Progress': return 'text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-800';
+      case 'Resolved': return 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-800';
+      case 'Closed': return 'text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800';
+      default: return 'text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800';
     }
   };
 
@@ -165,14 +165,14 @@ export default function DepartmentComplaints() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-3 sm:p-6">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white p-3 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <FiBriefcase className="text-2xl text-blue-400" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Department Complaints</h1>
+            <FiBriefcase className="text-2xl text-blue-600 dark:text-blue-400" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Department Complaints</h1>
           </div>
-          <p className="text-sm sm:text-base text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             {isAdmin 
               ? 'Reviewing complaints from all departments.' 
               : `Reviewing complaints for the ${departmentInfo?.name || '...'} department.`
@@ -193,22 +193,22 @@ export default function DepartmentComplaints() {
                 key={complaint.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gray-900 border border-gray-700 rounded-lg p-6 hover:border-blue-500 transition-colors"
+                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-blue-500 transition-colors shadow-sm dark:shadow-none"
               >
                 <div className="flex flex-col sm:flex-row justify-between gap-4">
                   <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-semibold text-white">{complaint.title}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{complaint.title}</h3>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(complaint.urgency)}`}>{complaint.urgency}</span>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(complaint.status)}`}>{complaint.status}</span>
                         </div>
-                         <p className="text-sm text-gray-400 mb-1">
-                            <span className="font-semibold text-gray-300">Department:</span> {complaint.department}
+                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">Department:</span> {complaint.department}
                         </p>
-                        <p className="text-sm text-gray-400 mb-4">
-                            <span className="font-semibold text-gray-300">Category:</span> {complaint.category}
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">Category:</span> {complaint.category}
                         </p>
-                        <p className="text-gray-300 mb-4">{complaint.description}</p>
+                        <p className="text-gray-700 dark:text-gray-300 mb-4">{complaint.description}</p>
                         <div className="flex items-center text-xs text-gray-500">
                             <FiClock className="mr-1.5" />
                             Submitted: {formatTimestamp(complaint.createdAt)}
@@ -240,7 +240,7 @@ export default function DepartmentComplaints() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
                 <div className="flex items-start justify-between mb-6">
                 <div>

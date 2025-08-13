@@ -313,18 +313,18 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
 
   // Get visibility options based on user role
   const getVisibilityOptions = () => {
-    return [
+      return [
       {
         value: 'public',
         label: 'Public',
         desc: 'Everyone can see this post',
-        icon: <FiGlobe className="text-app-secondary" />
+        icon: <FiGlobe className="text-text-secondary" />
       },
       {
         value: 'moderators',
         label: 'Moderators Only',
         desc: 'Only moderators and admins can see this post',
-        icon: <FiLock className="text-app-secondary" />
+        icon: <FiLock className="text-text-secondary" />
       }
     ];
   };
@@ -345,29 +345,29 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
           />
           
           {/* Modal */}
-          <motion.div
+        <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             <div 
               className="bg-app-primary border border-app-primary rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl"
               onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
+        >
+          {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-app-primary flex-shrink-0">
                 <h2 className="text-app-primary text-lg font-semibold">
                   {submitted ? 'Success!' : 'Create New Post'}
-                </h2>
-                <button
-                  onClick={onClose}
+              </h2>
+            <button
+              onClick={onClose}
                   className="p-2 rounded-full hover-bg-app transition-colors"
-                >
+            >
                   <FiX className="text-app-secondary" />
-                </button>
-              </div>
+            </button>
+          </div>
 
               {/* Success Message */}
               {submitted ? (
@@ -392,45 +392,45 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'activity' 
-                            ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('activity')}
                       >
-                        <FiCalendar className={`text-lg mb-1 ${postType === 'activity' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : ''}`} />
+                        <FiCalendar className={`text-lg mb-1 ${postType === 'activity' ? 'text-blue-600' : ''}`} />
                         <span className={postType === 'activity' ? 'font-medium' : ''}>Activity</span>
                       </button>
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'concern' 
-                            ? theme === 'dark' ? 'border-orange-500 bg-orange-900 bg-opacity-20 text-orange-400' : 'border-orange-500 bg-orange-50 text-orange-600'
+                            ? 'border-orange-500 bg-orange-50 text-orange-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('concern')}
                       >
-                        <FiAlertTriangle className={`text-lg mb-1 ${postType === 'concern' ? (theme === 'dark' ? 'text-orange-400' : 'text-orange-600') : ''}`} />
+                        <FiAlertTriangle className={`text-lg mb-1 ${postType === 'concern' ? 'text-orange-600' : ''}`} />
                         <span className={postType === 'concern' ? 'font-medium' : ''}>Concern</span>
                       </button>
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'general' 
-                            ? theme === 'dark' ? 'border-green-500 bg-green-900 bg-opacity-20 text-green-400' : 'border-green-500 bg-green-50 text-green-600'
+                            ? 'border-green-500 bg-green-50 text-green-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('general')}
                       >
-                        <FiGlobe className={`text-lg mb-1 ${postType === 'general' ? (theme === 'dark' ? 'text-green-400' : 'text-green-600') : ''}`} />
+                        <FiGlobe className={`text-lg mb-1 ${postType === 'general' ? 'text-green-600' : ''}`} />
                         <span className={postType === 'general' ? 'font-medium' : ''}>General</span>
                       </button>
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'anonymous-complaint' 
-                            ? theme === 'dark' ? 'border-purple-500 bg-purple-900 bg-opacity-20 text-purple-400' : 'border-purple-500 bg-purple-50 text-purple-600'
+                            ? 'border-purple-500 bg-purple-50 text-purple-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('anonymous-complaint')}
                       >
-                        <FiEyeOff className={`text-lg mb-1 ${postType === 'anonymous-complaint' ? (theme === 'dark' ? 'text-purple-400' : 'text-purple-600') : ''}`} />
+                        <FiEyeOff className={`text-lg mb-1 ${postType === 'anonymous-complaint' ? 'text-purple-600' : ''}`} />
                         <span className={postType === 'anonymous-complaint' ? 'font-medium' : ''}>Anonymous</span>
                       </button>
                     </div>
@@ -440,53 +440,53 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                   <div className="p-4">
                     <div className="space-y-4">
                       {/* Title field for activities and anonymous complaints */}
-                      {(postType === 'activity' || postType === 'anonymous-complaint') && (
-                        <div>
+              {(postType === 'activity' || postType === 'anonymous-complaint') && (
+                <div>
                           <label htmlFor="title" className="block text-app-secondary text-sm font-medium mb-2">
-                            Title <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
+                            Title {(postType === 'activity' || postType === 'anonymous-complaint') && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="text"
                             id="title"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             placeholder={`Enter ${postType === 'activity' ? 'activity' : 'complaint'} title`}
                             required
                           />
-                        </div>
-                      )}
+                </div>
+              )}
 
                       {/* Content/Description */}
-                      <div>
+              <div>
                         <label htmlFor="content" className="block text-app-secondary text-sm font-medium mb-2">
                           {postType === 'anonymous-complaint' ? 'Description' : 'Content'} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            ref={textareaRef}
+                </label>
+                <div className="relative">
+                  <textarea
+                    ref={textareaRef}
                             id="content"
-                            value={formData.content}
-                            onChange={handleContentChange}
+                    value={formData.content}
+                    onChange={handleContentChange}
                             className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px] transition-colors"
                             placeholder={getPromptText()}
                             required
                           />
                           <div className="absolute bottom-2 right-2 text-xs text-app-tertiary">
-                            {characterCount}/{getCharacterLimit()}
-                          </div>
-                        </div>
-                      </div>
+                      {characterCount}/{getCharacterLimit()}
+                  </div>
+                </div>
+              </div>
 
                       {/* Category selection */}
-                      <div>
+              <div>
                         <label htmlFor="category" className="block text-app-secondary text-sm font-medium mb-2">
                           Category <span className="text-red-500">*</span>
                         </label>
-                        <select
+                <select
                           id="category"
-                          value={formData.category}
-                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                           className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           required
                         >
@@ -494,40 +494,40 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                           {getCurrentCategories().map((cat) => (
                             <option key={cat} value={cat}>
                               {cat}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                      {/* Activity-specific fields */}
-                      {postType === 'activity' && (
-                        <>
+              {/* Activity-specific fields */}
+              {postType === 'activity' && (
+                <>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
+                  <div>
                               <label htmlFor="date" className="block text-app-secondary text-sm font-medium mb-2">
                                 Date
                               </label>
-                              <input
-                                type="date"
+                        <input
+                          type="date"
                                 id="date"
-                                value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                          value={formData.date}
+                          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                 className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                              />
-                            </div>
-                            <div>
+                        />
+                      </div>
+                    <div>
                               <label htmlFor="time" className="block text-app-secondary text-sm font-medium mb-2">
                                 Time
                               </label>
-                              <input
-                                type="time"
+                        <input
+                          type="time"
                                 id="time"
-                                value={formData.time}
-                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                          value={formData.time}
+                          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                                 className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                              />
-                            </div>
-                          </div>
+                        />
+                      </div>
+                    </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <label htmlFor="location" className="block text-app-secondary text-sm font-medium mb-2">
@@ -541,55 +541,55 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 placeholder="Enter location"
                               />
-                            </div>
-                            <div>
+                  </div>
+                  <div>
                               <label htmlFor="maxParticipants" className="block text-app-secondary text-sm font-medium mb-2">
                                 Max Participants
                               </label>
-                              <input
-                                type="number"
+                      <input
+                        type="number"
                                 id="maxParticipants"
-                                value={formData.maxParticipants}
-                                onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
+                        value={formData.maxParticipants}
+                        onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
                                 className="w-full bg-app-secondary border border-app-primary rounded-lg p-3 text-app-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                placeholder="Unlimited"
-                                min="1"
-                              />
-                            </div>
-                          </div>
-                        </>
-                      )}
+                        placeholder="Unlimited"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
                       {/* Anonymous complaint severity */}
                       {postType === 'anonymous-complaint' && (
-                        <div>
+                      <div>
                           <label htmlFor="severity" className="block text-app-secondary text-sm font-medium mb-2">
                             Severity
                           </label>
                           <div className="grid grid-cols-4 gap-2">
                             {COMPLAINT_SEVERITIES.map((sev) => (
-                              <button
+                    <button
                                 key={sev}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, severity: sev })}
                                 className={`p-3 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
                                   formData.severity === sev
                                     ? sev === 'Critical' 
-                                      ? theme === 'dark' ? 'border-red-500 bg-red-900 bg-opacity-20 text-red-400' : 'border-red-500 bg-red-50 text-red-600'
+                                      ? 'border-red-500 bg-red-50 text-red-600' 
                                       : sev === 'High'
-                                        ? theme === 'dark' ? 'border-yellow-500 bg-yellow-900 bg-opacity-20 text-yellow-400' : 'border-yellow-500 bg-yellow-50 text-yellow-600'
+                                        ? 'border-yellow-500 bg-yellow-50 text-yellow-600'
                                         : sev === 'Medium'
-                                          ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
-                                          : theme === 'dark' ? 'border-green-500 bg-green-900 bg-opacity-20 text-green-400' : 'border-green-500 bg-green-50 text-green-600'
+                                          ? 'border-blue-500 bg-blue-50 text-blue-600'
+                                          : 'border-green-500 bg-green-50 text-green-600'
                                     : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                                 }`}
                               >
                                 {sev}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
                       {/* Concern-specific fields */}
                       {postType === 'concern' && (
@@ -605,7 +605,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                             <label htmlFor="isAnonymous" className="text-app-secondary text-sm font-medium">
                               Post anonymously
                             </label>
-                          </div>
+                    </div>
                           <div className="flex items-center">
                             <input
                               type="checkbox"
@@ -617,11 +617,11 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                             <label htmlFor="isUrgent" className="text-app-secondary text-sm font-medium">
                               Mark as urgent
                             </label>
-                          </div>
-                        </div>
-                      )}
+                  </div>
+                </div>
+              )}
 
-                      {/* Moderator visibility options */}
+                                            {/* Moderator visibility options */}
                       {(isModerator || isAdmin) && postType === 'general' && (
                         <div>
                           <label className="block text-app-secondary text-sm font-medium mb-2">
@@ -635,7 +635,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 onClick={() => setFormData({ ...formData, visibility: option.value })}
                                 className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                                   formData.visibility === option.value
-                                    ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
+                                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                                     : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                                 }`}
                               >
@@ -730,8 +730,89 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                   )}
                 </div>
               )}
+          </div>
+
+                  {/* Progress indicator */}
+                  <div className="px-4 pb-2">
+                    <div className="h-1 w-full bg-bg-tertiary rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-accent-blue transition-all duration-300"
+                  style={{ width: `${getProgress()}%` }}
+                />
+              </div>
             </div>
-          </motion.div>
+
+                  {/* Footer with actions */}
+                  <div className="p-4 border-t border-border-primary flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      {/* Image upload button (not for anonymous complaints) */}
+                {postType !== 'anonymous-complaint' && (
+                    <button
+                          type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                          className="p-2 rounded-full hover:bg-hover-bg transition-colors text-text-secondary disabled:opacity-50"
+                          title="Upload image"
+                        >
+                          <FiImage />
+                    <input 
+                      ref={fileInputRef}
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                            className="hidden"
+                    />
+                        </button>
+                )}
+              </div>
+
+              <button
+                onClick={handleCreatePost}
+                      disabled={loading || !isFormValid()}
+                      className={`px-4 py-2 rounded-lg font-medium flex items-center ${
+                        loading || !isFormValid()
+                          ? 'bg-accent-blue-disabled text-text-secondary cursor-not-allowed'
+                          : 'bg-accent-blue text-text-primary hover:bg-accent-blue-hover'
+                      } transition-colors`}
+              >
+                {loading ? (
+                  <>
+                          <div className="w-4 h-4 border-2 border-text-primary border-t-transparent rounded-full animate-spin mr-2"></div>
+                          <span>Posting...</span>
+                  </>
+                      ) : (
+                  <>
+                    <FiSend className="mr-2" />
+                          <span>Post</span>
+                  </>
+                )}
+              </button>
+            </div>
+                  
+                  {/* Image preview */}
+                  {imagePreview && (
+                    <div className="p-4 pt-0">
+                      <div className="relative rounded-lg overflow-hidden">
+                        <Image
+                          src={imagePreview}
+                          alt="Preview"
+                          width={500}
+                          height={300}
+                          className="w-full h-auto object-cover rounded-lg"
+                        />
+                        <button
+                          onClick={removeImage}
+                          className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors"
+                        >
+                          <FiX className="text-sm" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+          </div>
+        </motion.div>
         </>
       )}
     </AnimatePresence>

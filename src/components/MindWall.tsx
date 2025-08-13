@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlus, FiX, FiChevronUp, FiTrash2, FiShare, FiBarChart, FiTrendingUp, FiUsers, FiMessageSquare } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { MindWallIssue, addMindWallIssue, getMindWallIssues, voteMindWallIssue, deleteMindWallIssue } from '@/lib/firebase-utils';
 
 interface MindWallProps {
@@ -12,6 +13,7 @@ interface MindWallProps {
 
 export default function MindWall({ searchQuery = '' }: MindWallProps) {
   const { user, userData, isModerator, isAdmin } = useAuth();
+  const { theme } = useTheme();
   const [issues, setIssues] = useState<MindWallIssue[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -175,29 +177,33 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-6 h-6 border-2 border-app-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-app-primary text-app-primary">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-black bg-opacity-90 backdrop-blur-sm border-b border-gray-800">
+        <div className="sticky top-0 z-10 bg-app-primary bg-opacity-90 backdrop-blur-sm border-b border-app-primary">
           <div className="flex items-center justify-between p-4">
             <h1 className="text-xl font-bold">Mind Wall</h1>
             <div className="flex items-center space-x-2">
             <button
                 onClick={() => setShowAnalytics(true)}
-                className="px-3 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors flex items-center space-x-2"
+                className="px-3 py-2 bg-app-secondary text-app-primary rounded-full hover-bg-app transition-colors flex items-center space-x-2"
               >
                 <FiBarChart className="text-lg" />
                 <span className="hidden sm:inline">Analytics</span>
                       </button>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors flex items-center space-x-2"
+                className={`px-4 py-2 rounded-full transition-colors flex items-center space-x-2 ${
+                  theme === 'dark' 
+                    ? 'bg-white text-black hover:bg-gray-200' 
+                    : 'bg-black text-white hover:bg-gray-800'
+                }`}
               >
                 <FiPlus className="text-lg" />
                 <span>Share Thought</span>
@@ -207,23 +213,23 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
         </div>
 
         {/* Issues List */}
-        <div className="divide-y divide-gray-800">
+        <div className="divide-y border-app-primary">
           {filteredIssues.map((issue) => (
-            <div key={issue.id} className="p-4 hover:bg-gray-900 transition-colors">
+            <div key={issue.id} className="p-4 hover-bg-app transition-colors">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   {/* Title and Category */}
                   <div className="flex items-center space-x-2 mb-2">
                     <h2 className="text-lg font-bold">{issue.title}</h2>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-400 mb-3">
-                    <span className="px-2 py-1 bg-gray-800 rounded-full">{issue.category}</span>
+                  <div className="flex items-center space-x-2 text-sm text-app-secondary mb-3">
+                    <span className="px-2 py-1 bg-app-secondary rounded-full">{issue.category}</span>
                     <span>•</span>
                     <span>{new Date(issue.timestamp).toLocaleDateString()}</span>
                   </div>
                   
                   {/* Description */}
-                  <p className="text-gray-300 mb-4">{issue.description}</p>
+                  <p className="text-app-secondary mb-4">{issue.description}</p>
                   
                   {/* Actions */}
                     <div className="flex items-center space-x-4">
@@ -233,13 +239,13 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                       className={`flex items-center space-x-2 transition-colors ${
                         issue.votedBy.includes(user?.uid || '') 
                           ? 'text-green-400' 
-                          : 'text-gray-400 hover:text-gray-200'
+                          : 'text-app-secondary hover:text-app-primary'
                       }`}
                     >
                       <div className={`p-2 rounded-full transition-colors ${
                         issue.votedBy.includes(user?.uid || '')
                           ? 'bg-green-900 bg-opacity-20'
-                          : 'hover:bg-gray-800'
+                          : 'hover-bg-app'
                       }`}>
                         {votingStates[issue.id] ? (
                           <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -253,7 +259,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleShare(issue)}
-                        className="p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-full transition-colors"
+                        className="p-2 text-app-secondary hover:text-app-primary hover-bg-app rounded-full transition-colors"
                       >
                         <FiShare className="w-5 h-5" />
                       </button>
@@ -262,7 +268,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                         <button
                           onClick={() => handleDeleteIssue(issue.id)}
                           disabled={deleting === issue.id}
-                          className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-full transition-colors"
+                          className="p-2 text-app-secondary hover:text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-full transition-colors"
                         >
                           {deleting === issue.id ? (
                             <div className="w-5 h-5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
@@ -286,13 +292,13 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-app-overlay flex items-center justify-center p-4 z-50"
             >
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-gray-900 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                className="bg-app-secondary rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold flex items-center space-x-2">
@@ -301,7 +307,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   </h2>
                   <button
                     onClick={() => setShowAnalytics(false)}
-                    className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                    className="p-2 hover-bg-app rounded-full transition-colors"
                   >
                     <FiX />
                   </button>
@@ -310,25 +316,25 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                 <div className="space-y-6">
                   {/* Overview Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                    <div className="bg-app-tertiary rounded-lg p-4 text-center">
                       <FiMessageSquare className="text-blue-400 text-2xl mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{analytics.totalPosts}</div>
-                      <div className="text-sm text-gray-400">Total Posts</div>
+                      <div className="text-2xl font-bold text-app-primary">{analytics.totalPosts}</div>
+                      <div className="text-sm text-app-secondary">Total Posts</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                    <div className="bg-app-tertiary rounded-lg p-4 text-center">
                       <FiTrendingUp className="text-green-400 text-2xl mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{analytics.totalVotes}</div>
-                      <div className="text-sm text-gray-400">Total Votes</div>
+                      <div className="text-2xl font-bold text-app-primary">{analytics.totalVotes}</div>
+                      <div className="text-sm text-app-secondary">Total Votes</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                    <div className="bg-app-tertiary rounded-lg p-4 text-center">
                       <FiUsers className="text-purple-400 text-2xl mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{analytics.totalUsers}</div>
-                      <div className="text-sm text-gray-400">Contributors</div>
+                      <div className="text-2xl font-bold text-app-primary">{analytics.totalUsers}</div>
+                      <div className="text-sm text-app-secondary">Contributors</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
+                    <div className="bg-app-tertiary rounded-lg p-4 text-center">
                       <FiChevronUp className="text-yellow-400 text-2xl mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{analytics.recentActivity}</div>
-                      <div className="text-sm text-gray-400">Recent (24h)</div>
+                      <div className="text-2xl font-bold text-app-primary">{analytics.recentActivity}</div>
+                      <div className="text-sm text-app-secondary">Recent (24h)</div>
                     </div>
                   </div>
 
@@ -337,16 +343,16 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                     <h3 className="text-lg font-semibold mb-4">Category Breakdown</h3>
                     <div className="space-y-3">
                       {analytics.categoryStats.map((stat, index) => (
-                        <div key={stat.category} className="flex items-center justify-between bg-gray-800 rounded-lg p-3">
+                        <div key={stat.category} className="flex items-center justify-between bg-app-tertiary rounded-lg p-3">
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {index + 1}
                             </div>
-                            <span className="text-white font-medium">{stat.category}</span>
+                            <span className="text-app-primary font-medium">{stat.category}</span>
                           </div>
                           <div className="text-right">
-                            <div className="text-white font-bold">{stat.votes} votes</div>
-                            <div className="text-sm text-gray-400">{stat.count} posts</div>
+                            <div className="text-app-primary font-bold">{stat.votes} votes</div>
+                            <div className="text-sm text-app-secondary">{stat.count} posts</div>
                           </div>
                         </div>
                       ))}
@@ -358,17 +364,17 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                     <h3 className="text-lg font-semibold mb-4">Top Issues</h3>
                     <div className="space-y-3">
                       {analytics.topIssues.map((issue, index) => (
-                        <div key={issue.id} className="bg-gray-800 rounded-lg p-4">
+                        <div key={issue.id} className="bg-app-tertiary rounded-lg p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 mb-2">
                                 <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
                                   {index + 1}
                                 </div>
-                                <h4 className="font-medium text-white">{issue.title}</h4>
+                                <h4 className="font-medium text-app-primary">{issue.title}</h4>
                               </div>
-                              <div className="flex items-center space-x-2 text-sm text-gray-400">
-                                <span className="px-2 py-1 bg-gray-700 rounded-full">{issue.category}</span>
+                              <div className="flex items-center space-x-2 text-sm text-app-secondary">
+                                <span className="px-2 py-1 bg-app-secondary rounded-full">{issue.category}</span>
                                 <span>•</span>
                                 <span>{issue.count} votes</span>
                               </div>
@@ -391,19 +397,19 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-app-overlay flex items-center justify-center p-4 z-50"
             >
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-gray-900 rounded-xl p-6 w-full max-w-lg"
+                className="bg-app-secondary rounded-xl p-6 w-full max-w-lg"
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Share your thoughts</h2>
                   <button
                     onClick={() => setShowAddForm(false)}
-                    className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                    className="p-2 hover-bg-app rounded-full transition-colors"
                   >
                     <FiX />
                   </button>
@@ -417,7 +423,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                       type="text"
                       value={newIssue.title}
                       onChange={(e) => setNewIssue({ ...newIssue, title: e.target.value })}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-white"
+                      className="w-full bg-app-tertiary border border-app-primary rounded-lg px-4 py-2 focus:outline-none focus:border-app-primary text-app-primary"
                       placeholder="What's on your mind?"
                     />
                   </div>
@@ -428,7 +434,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                     <textarea
                       value={newIssue.description}
                       onChange={(e) => setNewIssue({ ...newIssue, description: e.target.value })}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-white h-32 resize-none"
+                      className="w-full bg-app-tertiary border border-app-primary rounded-lg px-4 py-2 focus:outline-none focus:border-app-primary h-32 resize-none text-app-primary"
                       placeholder="Share more details..."
                     />
                   </div>
@@ -439,7 +445,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                     <select
                       value={newIssue.category}
                       onChange={(e) => setNewIssue({ ...newIssue, category: e.target.value })}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-white"
+                      className="w-full bg-app-tertiary border border-app-primary rounded-lg px-4 py-2 focus:outline-none focus:border-app-primary text-app-primary"
                     >
                       {categories.map((category) => (
                         <option key={category} value={category}>{category}</option>
@@ -451,11 +457,11 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
                   <button
                     onClick={handleAddIssue}
                     disabled={submitting || !newIssue.title.trim() || !newIssue.description.trim()}
-                    className="w-full bg-gray-800 text-white rounded-lg px-4 py-2 hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                    className="w-full bg-app-tertiary text-app-primary rounded-lg px-4 py-2 hover-bg-app transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                   >
                     {submitting ? (
                       <div className="flex items-center justify-center">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        <div className="w-5 h-5 border-2 border-app-primary border-t-transparent rounded-full animate-spin mr-2" />
                         <span>Posting...</span>
                       </div>
                     ) : (

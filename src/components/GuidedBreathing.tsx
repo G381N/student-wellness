@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FiPlay, FiPause, FiSquare, FiWind } from 'react-icons/fi';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface BreathingPattern {
   name: string;

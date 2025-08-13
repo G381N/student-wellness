@@ -27,21 +27,21 @@ export default function WellnessCard({ resource }: WellnessCardProps) {
   const { theme } = useTheme();
 
   const categoryStyles = {
-    'Mental Health': { bg: 'bg-bg-tertiary', text: 'text-text-primary', border: 'border-border-primary' },
-    'Physical Health': { bg: 'bg-bg-tertiary', text: 'text-text-primary', border: 'border-border-primary' },
-    'Academic Support': { bg: 'bg-bg-tertiary', text: 'text-text-primary', border: 'border-border-primary' },
-    'Crisis Support': { bg: 'bg-bg-tertiary', text: 'text-text-primary', border: 'border-border-primary' },
-    'Counseling': { bg: 'bg-bg-tertiary', text: 'text-text-primary', border: 'border-border-primary' }
+    'Mental Health': { bg: 'bg-gray-100 dark:bg-bg-tertiary', text: 'text-gray-800 dark:text-text-primary', border: 'border-gray-200 dark:border-border-primary' },
+    'Physical Health': { bg: 'bg-gray-100 dark:bg-bg-tertiary', text: 'text-gray-800 dark:text-text-primary', border: 'border-gray-200 dark:border-border-primary' },
+    'Academic Support': { bg: 'bg-gray-100 dark:bg-bg-tertiary', text: 'text-gray-800 dark:text-text-primary', border: 'border-gray-200 dark:border-border-primary' },
+    'Crisis Support': { bg: 'bg-gray-100 dark:bg-bg-tertiary', text: 'text-gray-800 dark:text-text-primary', border: 'border-gray-200 dark:border-border-primary' },
+    'Counseling': { bg: 'bg-gray-100 dark:bg-bg-tertiary', text: 'text-gray-800 dark:text-text-primary', border: 'border-gray-200 dark:border-border-primary' }
   };
 
   const categoryStyle = categoryStyles[resource.category] || categoryStyles['Mental Health'];
 
   return (
-    <div className="card p-6 hover:bg-hover-bg transition-all duration-300 cursor-pointer rounded-xl mb-4">
+    <div className="card p-6 hover:bg-gray-50 dark:hover:bg-hover-bg transition-all duration-300 cursor-pointer rounded-xl mb-4 bg-white dark:bg-transparent shadow-sm dark:shadow-none">
       <div className="flex space-x-4">
         {/* Icon */}
         <div className={`w-12 h-12 ${categoryStyle.bg} rounded-full flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105`}>
-          <FiHeart className={`text-lg ${resource.isEmergency ? 'text-text-primary' : 'text-text-secondary'}`} />
+          <FiHeart className={`text-lg ${resource.isEmergency ? 'text-accent-blue' : 'text-gray-600 dark:text-text-secondary'}`} />
         </div>
 
         {/* Main Content */}
@@ -49,12 +49,12 @@ export default function WellnessCard({ resource }: WellnessCardProps) {
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3 flex-wrap">
-              <h3 className="font-bold text-text-primary text-lg">{resource.title}</h3>
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">{resource.title}</h3>
               <span className={`px-3 py-1.5 rounded-full text-sm font-semibold ${categoryStyle.bg} ${categoryStyle.text} border ${categoryStyle.border} border-opacity-30`}>
                 {resource.category}
               </span>
               {resource.isEmergency && (
-                <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-bg-tertiary text-text-primary border border-border-primary border-opacity-30 animate-pulse">
+                <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-red-50 dark:bg-bg-tertiary text-red-600 dark:text-text-primary border border-red-200 dark:border-border-primary border-opacity-30 animate-pulse">
                   Emergency
                 </span>
               )}
@@ -63,14 +63,14 @@ export default function WellnessCard({ resource }: WellnessCardProps) {
 
           {/* Description */}
           <div className="mb-4">
-            <p className="text-text-primary text-lg leading-relaxed">{resource.description}</p>
+            <p className="text-gray-700 dark:text-text-primary text-lg leading-relaxed">{resource.description}</p>
           </div>
 
           {/* Availability */}
           {resource.availability && (
-            <div className="flex items-center space-x-2 mb-4 bg-bg-tertiary px-3 py-2 rounded-lg w-fit">
-              <FiClock className="text-lg text-text-secondary" />
-              <span className="text-text-secondary font-medium">{resource.availability}</span>
+            <div className="flex items-center space-x-2 mb-4 bg-gray-50 dark:bg-bg-tertiary px-3 py-2 rounded-lg w-fit">
+              <FiClock className="text-lg text-gray-500 dark:text-text-secondary" />
+              <span className="text-gray-600 dark:text-text-secondary font-medium">{resource.availability}</span>
             </div>
           )}
 
@@ -79,12 +79,12 @@ export default function WellnessCard({ resource }: WellnessCardProps) {
             <div className="space-y-3 mb-4">
               {resource.contact.phone && (
                 <div className="flex items-center space-x-3">
-                  <div className="p-3 rounded-full bg-bg-tertiary transition-all duration-200 transform hover:scale-110">
-                    <FiPhone className="text-xl text-text-secondary" />
+                  <div className="p-3 rounded-full bg-gray-50 dark:bg-bg-tertiary transition-all duration-200 transform hover:scale-110">
+                    <FiPhone className="text-xl text-gray-500 dark:text-text-secondary" />
                   </div>
                   <a 
                     href={`tel:${resource.contact.phone}`}
-                    className="text-text-secondary hover:text-text-primary transition-colors duration-200 font-medium text-base"
+                    className="text-gray-600 hover:text-gray-900 dark:text-text-secondary dark:hover:text-text-primary transition-colors duration-200 font-medium text-base"
                   >
                     {resource.contact.phone}
                   </a>

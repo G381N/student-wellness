@@ -392,45 +392,45 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'activity' 
-                            ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('activity')}
                       >
-                        <FiCalendar className={`text-lg mb-1 ${postType === 'activity' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : ''}`} />
+                        <FiCalendar className={`text-lg mb-1 ${postType === 'activity' ? 'text-blue-600' : ''}`} />
                         <span className={postType === 'activity' ? 'font-medium' : ''}>Activity</span>
                       </button>
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'concern' 
-                            ? theme === 'dark' ? 'border-orange-500 bg-orange-900 bg-opacity-20 text-orange-400' : 'border-orange-500 bg-orange-50 text-orange-600'
+                            ? 'border-orange-500 bg-orange-50 text-orange-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('concern')}
                       >
-                        <FiAlertTriangle className={`text-lg mb-1 ${postType === 'concern' ? (theme === 'dark' ? 'text-orange-400' : 'text-orange-600') : ''}`} />
+                        <FiAlertTriangle className={`text-lg mb-1 ${postType === 'concern' ? 'text-orange-600' : ''}`} />
                         <span className={postType === 'concern' ? 'font-medium' : ''}>Concern</span>
                       </button>
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'general' 
-                            ? theme === 'dark' ? 'border-green-500 bg-green-900 bg-opacity-20 text-green-400' : 'border-green-500 bg-green-50 text-green-600'
+                            ? 'border-green-500 bg-green-50 text-green-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('general')}
                       >
-                        <FiGlobe className={`text-lg mb-1 ${postType === 'general' ? (theme === 'dark' ? 'text-green-400' : 'text-green-600') : ''}`} />
+                        <FiGlobe className={`text-lg mb-1 ${postType === 'general' ? 'text-green-600' : ''}`} />
                         <span className={postType === 'general' ? 'font-medium' : ''}>General</span>
                       </button>
                       <button
                         className={`p-3 rounded-xl flex flex-col items-center justify-center text-sm border-2 transition-all duration-200 ${
                           postType === 'anonymous-complaint' 
-                            ? theme === 'dark' ? 'border-purple-500 bg-purple-900 bg-opacity-20 text-purple-400' : 'border-purple-500 bg-purple-50 text-purple-600'
+                            ? 'border-purple-500 bg-purple-50 text-purple-600' 
                             : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                         }`}
                         onClick={() => setPostType('anonymous-complaint')}
                       >
-                        <FiEyeOff className={`text-lg mb-1 ${postType === 'anonymous-complaint' ? (theme === 'dark' ? 'text-purple-400' : 'text-purple-600') : ''}`} />
+                        <FiEyeOff className={`text-lg mb-1 ${postType === 'anonymous-complaint' ? 'text-purple-600' : ''}`} />
                         <span className={postType === 'anonymous-complaint' ? 'font-medium' : ''}>Anonymous</span>
                       </button>
                     </div>
@@ -575,12 +575,12 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 className={`p-3 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
                                   formData.severity === sev
                                     ? sev === 'Critical' 
-                                      ? theme === 'dark' ? 'border-red-500 bg-red-900 bg-opacity-20 text-red-400' : 'border-red-500 bg-red-50 text-red-600'
+                                      ? 'border-red-500 bg-red-50 text-red-600' 
                                       : sev === 'High'
-                                        ? theme === 'dark' ? 'border-yellow-500 bg-yellow-900 bg-opacity-20 text-yellow-400' : 'border-yellow-500 bg-yellow-50 text-yellow-600'
+                                        ? 'border-yellow-500 bg-yellow-50 text-yellow-600'
                                         : sev === 'Medium'
-                                          ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
-                                          : theme === 'dark' ? 'border-green-500 bg-green-900 bg-opacity-20 text-green-400' : 'border-green-500 bg-green-50 text-green-600'
+                                          ? 'border-blue-500 bg-blue-50 text-blue-600'
+                                          : 'border-green-500 bg-green-50 text-green-600'
                                     : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                                 }`}
                               >
@@ -635,7 +635,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 onClick={() => setFormData({ ...formData, visibility: option.value })}
                                 className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                                   formData.visibility === option.value
-                                    ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
+                                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                                     : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
                                 }`}
                               >

@@ -29,7 +29,7 @@ const DEFAULT_IMAGES = {
   'Other': '/images/other.jpg'
 };
 
-// Fallback image if category doesn't match
+// Fallback image if category doesn't matc
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
 
 // Category styling

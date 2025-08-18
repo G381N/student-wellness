@@ -148,7 +148,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
     { bg: 'bg-gray-800', text: 'text-gray-300' };
   
   return (
-    <div className={`px-4 py-3 transition-all duration-300 cursor-pointer border-b ${theme === 'light' ? 'hover:bg-gray-100 border-gray-200' : 'hover:bg-gray-950 hover:bg-opacity-40 border-gray-800'}`}>
+    <div className={`px-4 py-3 transition-all duration-300 cursor-pointer border-b ${theme === 'light' ? 'hover:bg-gray-100 border-gray-200' : 'hover:bg-gray-950 hover:bg-opacity-40 border-gray-800'} border rounded-lg`}>
       <div className="flex space-x-3">
         {/* Profile Picture */}
         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'}`}>
@@ -245,17 +245,13 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                 hasUpvoted ? 'text-green-500' : 'hover:text-green-500'
               }`}
             >
-              <div className={`p-2 rounded-full transition-colors ${
-                hasUpvoted 
-                  ? (theme === 'light' ? 'bg-green-100' : 'bg-gray-700')
-                  : (theme === 'light' ? 'group-hover:bg-green-100' : 'group-hover:bg-gray-800')
-              }`}>
+              
                 {loading.upvote ? (
                   <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <FiThumbsUp className="w-[18px] h-[18px]" />
                 )}
-              </div>
+              
               <span className="text-sm">{concern.upvotes || 0}</span>
             </button>
           </div>

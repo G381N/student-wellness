@@ -296,17 +296,13 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 }`}
                 data-upvote={tweet.id}
               >
-                <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
-                  hasUpvoted 
-                    ? 'bg-vote-up bg-opacity-10' 
-                    : 'group-hover:bg-hover-bg'
-                }`}>
+                
                   {isVoting ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <FiChevronUp className="text-lg" />
                   )}
-                </div>
+                
                 <span className="text-sm font-medium">{tweet.upvotes || 0}</span>
               </button>
 
@@ -318,17 +314,13 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
                 }`}
                 data-downvote={tweet.id}
               >
-                <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
-                  hasDownvoted 
-                    ? 'bg-vote-down bg-opacity-10' 
-                    : 'group-hover:bg-hover-bg'
-                }`}>
+                
                   {isVoting ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <FiChevronDown className="text-lg" />
                   )}
-                </div>
+                
                 <span className="text-sm font-medium">{tweet.downvotes || 0}</span>
               </button>
             </div>

@@ -19,7 +19,11 @@ interface ActivityCardProps {
 // Default activity images by category
 const DEFAULT_IMAGES = {
   'Academic': '/images/academic.jpg',
+<<<<<<< HEAD
   'Sports': '/images/sports.jpg',
+=======
+  'Sports': '/images/sports1.jpeg',
+>>>>>>> 84208e60da8d66fb0419027e8389f9ab984fd357
   'Cultural': '/images/cultural.jpg',
   'Social': '/images/social.jpg',
   'Wellness': '/images/wellness.jpg',

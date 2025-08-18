@@ -142,7 +142,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {/* Category Tag - Small subtle style */}
           <div className="flex items-center mb-3">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal ${theme === 'light' ? 'bg-opacity-20' : categoryStyle.bg} ${categoryStyle.text} border border-opacity-50 border-current`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-transparent ${categoryStyle.text} border border-opacity-50 border-current`}>
               {activity.category}
             </span>
           </div>

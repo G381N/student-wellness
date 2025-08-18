@@ -6,8 +6,10 @@ import { FiUsers, FiPlus, FiEdit2, FiTrash2, FiMail, FiPhone, FiCode, FiUser, Fi
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getDepartments, addDepartment, updateDepartment, Department } from '@/lib/firebase-utils';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ManageDepartmentsPage() {
+  const { theme } = useTheme();
   const { user, loading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -165,10 +167,10 @@ export default function ManageDepartmentsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-bg-primary">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading departments...</p>
+          <p className="text-text-primary text-lg">Loading departments...</p>
         </div>
       </div>
     );
@@ -176,7 +178,7 @@ export default function ManageDepartmentsPage() {
 
   if (!user || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-bg-primary">
         <div className="text-center">
           <FiUsers className="text-gray-600 text-6xl mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-400 mb-2">Access Denied</h3>
@@ -187,7 +189,7 @@ export default function ManageDepartmentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className={`min-h-screen bg-bg-primary text-text-primary ${theme}`}>
       {/* Header */}
       <div className="mb-8">
         <motion.div
@@ -199,10 +201,10 @@ export default function ManageDepartmentsPage() {
           <div className="flex items-center">
             <FiUsers className="text-blue-500 text-4xl mr-3" />
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white">
+              <h1 className="text-3xl md:text-4xl font-bold text-text-primary">
                 Manage Departments
               </h1>
-              <p className="text-gray-400 text-lg">
+              <p className="text-text-secondary text-lg">
                 Create and manage academic departments
               </p>
             </div>
@@ -223,91 +225,91 @@ export default function ManageDepartmentsPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-gray-900 rounded-2xl p-6 border border-gray-700 mb-8"
+          className="bg-bg-tertiary rounded-2xl p-6 border border-border-primary mb-8"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Add New Department</h2>
+            <h2 className="text-xl font-semibold text-text-primary">Add New Department</h2>
             <button
               onClick={() => setShowAddForm(false)}
-              className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+              className="p-2 hover:bg-hover-bg rounded-full transition-colors"
             >
-              <FiX className="text-gray-400" />
+              <FiX className="text-text-secondary" />
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Department Code *
               </label>
               <div className="relative">
-                <FiCode className="absolute left-3 top-3 text-gray-400" />
+                <FiCode className="absolute left-3 top-3 text-text-tertiary" />
                 <input
                   type="text"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-bg-secondary border border-border-secondary rounded-lg pl-10 pr-4 py-3 text-text-primary focus:outline-none focus:border-blue-500"
                   placeholder="e.g., MSC_AIML"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Department Name *
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-bg-secondary border border-border-secondary rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-blue-500"
                 placeholder="e.g., MSc Artificial Intelligence & Machine Learning"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Head Phone Number
               </label>
               <div className="relative">
-                <FiPhone className="absolute left-3 top-3 text-gray-400" />
+                <FiPhone className="absolute left-3 top-3 text-text-tertiary" />
                 <input
                   type="tel"
                   value={formData.headPhoneNumber}
                   onChange={(e) => setFormData({ ...formData, headPhoneNumber: e.target.value })}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-bg-secondary border border-border-secondary rounded-lg pl-10 pr-4 py-3 text-text-primary focus:outline-none focus:border-blue-500"
                   placeholder="+91 9876543210"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Department Head Email
               </label>
               <div className="relative">
-                <FiMail className="absolute left-3 top-3 text-gray-400" />
+                <FiMail className="absolute left-3 top-3 text-text-tertiary" />
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-bg-secondary border border-border-secondary rounded-lg pl-10 pr-4 py-3 text-text-primary focus:outline-none focus:border-blue-500"
                   placeholder="head@university.edu"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Created By
               </label>
               <div className="relative">
-                <FiUser className="absolute left-3 top-3 text-gray-400" />
+                <FiUser className="absolute left-3 top-3 text-text-tertiary" />
                 <input
                   type="text"
                   value={formData.createdBy}
                   onChange={(e) => setFormData({ ...formData, createdBy: e.target.value })}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-bg-secondary border border-border-secondary rounded-lg pl-10 pr-4 py-3 text-text-primary focus:outline-none focus:border-blue-500"
                   placeholder="Admin name"
                 />
               </div>
@@ -319,9 +321,9 @@ export default function ManageDepartmentsPage() {
                 id="isActive"
                 checked={formData.isActive}
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 bg-bg-secondary border-border-secondary rounded focus:ring-blue-500"
               />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-300">
+              <label htmlFor="isActive" className="text-sm font-medium text-text-secondary">
                 Active Department
               </label>
             </div>
@@ -330,7 +332,7 @@ export default function ManageDepartmentsPage() {
           <div className="flex justify-end space-x-4 mt-6">
             <button
               onClick={() => setShowAddForm(false)}
-              className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="px-6 py-3 bg-bg-secondary text-text-primary rounded-lg hover:bg-hover-bg transition-colors"
             >
               Cancel
             </button>
@@ -366,65 +368,65 @@ export default function ManageDepartmentsPage() {
           departments.map((department) => (
             <div
               key={department.id}
-              className="bg-gray-900 rounded-2xl p-6 border border-gray-700"
+              className="bg-bg-tertiary rounded-2xl p-6 border border-border-primary"
             >
               {editingDepartment?.id === department.id ? (
                 // Edit Form
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
                         Department Code *
                       </label>
                       <input
                         type="text"
                         value={formData.code}
                         onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-bg-secondary border border-border-secondary rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
                         Department Name *
                       </label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-bg-secondary border border-border-secondary rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
                         Head Phone Number
                       </label>
                       <input
                         type="tel"
                         value={formData.headPhoneNumber}
                         onChange={(e) => setFormData({ ...formData, headPhoneNumber: e.target.value })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-bg-secondary border border-border-secondary rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
                         Department Head Email
                       </label>
                       <input
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-bg-secondary border border-border-secondary rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
                         Created By
                       </label>
                       <input
                         type="text"
                         value={formData.createdBy}
                         onChange={(e) => setFormData({ ...formData, createdBy: e.target.value })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-bg-secondary border border-border-secondary rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div className="flex items-center space-x-3">
@@ -433,9 +435,9 @@ export default function ManageDepartmentsPage() {
                         id={`isActive-${department.id}`}
                         checked={formData.isActive}
                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                        className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-blue-600 bg-bg-secondary border-border-secondary rounded focus:ring-blue-500"
                       />
-                      <label htmlFor={`isActive-${department.id}`} className="text-sm font-medium text-gray-300">
+                      <label htmlFor={`isActive-${department.id}`} className="text-sm font-medium text-text-secondary">
                         Active Department
                       </label>
                     </div>
@@ -443,7 +445,7 @@ export default function ManageDepartmentsPage() {
                   <div className="flex justify-end space-x-4">
                     <button
                       onClick={cancelEdit}
-                      className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                      className="px-4 py-2 bg-bg-secondary text-text-primary rounded-lg hover:bg-hover-bg transition-colors"
                     >
                       Cancel
                     </button>
@@ -484,10 +486,10 @@ export default function ManageDepartmentsPage() {
                         </span>
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-xl font-semibold text-text-primary mb-2">
                       {department.name}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-secondary">
                       <div className="flex items-center space-x-2">
                         <FiPhone className="text-blue-400" />
                         <span>{department.headPhoneNumber || 'Not provided'}</span>
@@ -519,9 +521,9 @@ export default function ManageDepartmentsPage() {
           ))
         ) : (
           <div className="text-center py-16">
-            <FiUsers className="text-gray-600 text-6xl mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">No departments yet</h3>
-            <p className="text-gray-500 mb-6">Create your first department to get started</p>
+            <FiUsers className="text-text-tertiary text-6xl mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-text-secondary mb-2">No departments yet</h3>
+            <p className="text-text-tertiary mb-6">Create your first department to get started</p>
             <button
               onClick={() => setShowAddForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
@@ -533,4 +535,4 @@ export default function ManageDepartmentsPage() {
       </motion.div>
     </div>
   );
-} 
+}

@@ -124,7 +124,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
         {/* Main Scrollable Content */}
         <motion.main
-          className={`flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 pt-20 pb-20 md:pb-8 ${!rightSidebarCollapsed ? 'overflow-hidden' : ''}`}
+          className={`flex-grow overflow-y-auto bg-bg-secondary px-4 sm:px-6 md:px-8 pt-20 pb-20 md:pb-8 ${!rightSidebarCollapsed ? 'overflow-hidden' : ''}`}
         >
           {children}
         </motion.main>

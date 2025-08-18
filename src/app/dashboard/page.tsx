@@ -93,7 +93,8 @@ export default function DashboardPage() {
   };
 
   const handlePostCreated = (newPost: any) => {
-    setForceRefresh(prev => prev + 1);
+    setPosts(prevPosts => [newPost, ...prevPosts]);
+    setShowCreateModal(false);
   };
 
   const getSearchResults = () => {

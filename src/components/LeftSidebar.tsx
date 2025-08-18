@@ -100,7 +100,7 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
                   href={item.path}
                   className={`flex items-center px-3 py-2.5 rounded-xl transition-colors relative ${
                     isActive(item.path) 
-                      ? 'bg-accent-blue/10 text-accent-blue before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-8 before:bg-accent-blue before:rounded-r' 
+                      ? 'bg-accent-blue/10 text-accent-blue' 
                       : 'hover:bg-hover-bg text-text-secondary'
                   }`}
                 >

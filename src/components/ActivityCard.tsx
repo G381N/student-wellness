@@ -23,7 +23,7 @@ const DEFAULT_IMAGES = {
   'Cultural': '/images/cultural.jpg',
   'Social': '/images/social.jpg',
   'Wellness': '/images/wellness.jpg',
-  'Professional': '/images/professional.jpeg',
+  'Professional': '/images/professional.jpg',
   'Volunteer': '/images/volunteer.jpg',
   'Entertainment': '/images/entertainment.jpg',
   'Other': '/images/other.jpg'

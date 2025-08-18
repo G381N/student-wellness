@@ -42,6 +42,9 @@ export const joinActivity = async (postId: string) => {
       joinedAt: new Date(),
     }),
   });
+
+  const updatedPostSnap = await getDoc(postRef);
+  return { id: updatedPostSnap.id, ...updatedPostSnap.data() } as Post;
 };
 
 export const leaveActivity = async (postId: string) => {
@@ -61,10 +64,14 @@ export const leaveActivity = async (postId: string) => {
 
   if (!participantToRemove) {
     // User is not a participant, do nothing.
-    return;
+    const updatedPostSnap = await getDoc(postRef);
+    return { id: updatedPostSnap.id, ...updatedPostSnap.data() } as Post;
   }
 
   await updateDoc(postRef, {
     participants: arrayRemove(participantToRemove),
   });
+
+  const updatedPostSnap = await getDoc(postRef);
+  return { id: updatedPostSnap.id, ...updatedPostSnap.data() } as Post;
 };

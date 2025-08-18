@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCalendar, FiClock, FiMapPin, FiUsers, FiUser, FiCheck, FiX, FiMoreHorizontal } from 'react-icons/fi';
+import { joinActivity, leaveActivity } from '@/lib/activity-actions';
+import { toast } from 'react-hot-toast';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Post } from '@/lib/firebase-utils';
 import Image from 'next/image';
-import { useTheme } from '@/contexts/ThemeContext';
 
 // Default activity images by category
 const DEFAULT_IMAGES = {
@@ -78,8 +80,7 @@ interface ActivityDetailsModalProps {
   activity: Post;
   isOpen: boolean;
   onClose: () => void;
-  onJoin: () => Promise<void>;
-  onLeave: () => Promise<void>;
+  onUpdate: (updatedActivity: Post) => void;
   isParticipating: boolean;
 }
 
@@ -87,8 +88,7 @@ export default function ActivityDetailsModal({
   activity, 
   isOpen, 
   onClose, 
-  onJoin, 
-  onLeave, 
+  onUpdate,
   isParticipating 
 }: ActivityDetailsModalProps) {
   const { theme } = useTheme();
@@ -110,17 +110,21 @@ export default function ActivityDetailsModal({
   
   const handleAction = async () => {
     setLoading(true);
-    try {
-      if (isParticipating) {
-        await onLeave();
-      } else {
-        await onJoin();
-      }
-    } catch (error) {
-      console.error('Error with activity participation:', error);
-    } finally {
+    const actionPromise = isParticipating ? leaveActivity(activity.id) : joinActivity(activity.id);
+    
+    toast.promise(actionPromise, {
+      loading: isParticipating ? 'Leaving activity...' : 'Joining activity...',
+      success: (updatedActivity) => {
+        onUpdate(updatedActivity);
+        return isParticipating ? 'Successfully left the activity!' : 'Successfully joined the activity!';
+      },
+      error: (err) => {
+        console.error(err);
+        return err.message || 'An unexpected error occurred.';
+      },
+    }).finally(() => {
       setLoading(false);
-    }
+    });
   };
 
   // Get visible participants (limit to 3) and remaining count

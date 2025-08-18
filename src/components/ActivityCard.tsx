@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import ActivityDetailsModal from './ActivityDetailsModal';
 
+import { useTheme } from '@/contexts/ThemeContext';
+
 interface ActivityCardProps {
   activity: Post;
   onUpdate: (updatedActivity: Post) => void;
@@ -44,6 +46,7 @@ const CATEGORIES = {
 
 export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityCardProps) {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState({
@@ -80,7 +83,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
     { bg: 'bg-bg-tertiary', text: 'text-text-secondary' };
 
   return (
-    <div className="card rounded-xl overflow-hidden transition-all duration-300">
+    <div className={`card rounded-xl overflow-hidden transition-all duration-300 ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'}`}>
       {/* Header with Image */}
       <div className="relative">
         {/* Activity Image */}

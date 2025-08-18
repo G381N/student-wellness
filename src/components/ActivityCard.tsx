@@ -1,8 +1,8 @@
-                                                            'use client';
+'use client';
 
 import { useState, useRef } from 'react';
-import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight, FiThumbsUp, FiMessageCircle } from 'react-icons/fi';
-import { Post, upvotePost, addComment } from '@/lib/firebase-utils';
+import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight, FiThumbsUp, FiMessageCircle, FiTrash2 } from 'react-icons/fi';
+import { Post, upvotePost, addComment, deletePost } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import ActivityDetailsModal from './ActivityDetailsModal';
@@ -46,13 +46,14 @@ const CATEGORIES = {
 };
 
 export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityCardProps) {
-  const { user } = useAuth();
+  const { user, isModerator } = useAuth();
   const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const hasUpvoted = activity.upvotedBy?.includes(user?.uid || '');
 
@@ -93,6 +94,25 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
       toast.error('Failed to add comment. Please try again.');
     } finally {
       setIsCommenting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete || isDeleting) return;
+    
+    const confirmDelete = window.confirm('Are you sure you want to delete this activity? This action cannot be undone.');
+    if (!confirmDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deletePost(activity.id);
+      onDelete(activity.id);
+      toast.success('Activity deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error('Failed to delete activity. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -140,9 +160,9 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         
         {/* Overlay Content */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* Category Tag - Small subtle style */}
+          {/* Category Tag - Now with solid background */}
           <div className="flex items-center mb-3">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-transparent ${categoryStyle.text} border border-opacity-50 border-current`}>
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-gray-900 ${categoryStyle.bg.replace('bg-opacity-20', '')}`}>
               {activity.category}
             </span>
           </div>
@@ -232,6 +252,21 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
             <span>View Details</span>
             <FiArrowRight />
           </button>
+          {isModerator && (
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-all duration-200 group custom-cursor"
+            >
+              <div className="p-2 rounded-full group-hover:bg-red-500/10 transition-all duration-200 transform group-hover:scale-110">
+                {isDeleting ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <FiTrash2 className="text-lg" />
+                )}
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Comments Section */}
@@ -294,4 +329,4 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
       />
     </div>
   );
-} 
+}

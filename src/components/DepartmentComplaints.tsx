@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiUser, FiX, FiCheck, FiEye, FiBriefcase } from 'react-icons/fi';
 import { getDepartmentComplaints, getDepartmentComplaintsByDepartment, updateDepartmentComplaintStatus, DepartmentComplaint, checkDepartmentHeadStatus, Department } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function DepartmentComplaints() {
+  const { theme } = useTheme();
   const { user, isAdmin, isDepartmentHead } = useAuth();
   const [complaints, setComplaints] = useState<DepartmentComplaint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,10 +145,10 @@ export default function DepartmentComplaints() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-bg-primary">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading Complaints...</p>
+          <div className="w-8 h-8 border-2 border-text-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading Complaints...</p>
         </div>
       </div>
     );
@@ -154,38 +156,26 @@ export default function DepartmentComplaints() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="text-center bg-gray-900 p-8 rounded-lg">
+      <div className="flex items-center justify-center min-h-screen bg-bg-primary">
+        <div className="text-center bg-bg-tertiary p-8 rounded-lg">
           <FiAlertTriangle className="mx-auto text-6xl text-red-400 mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">An Error Occurred</h2>
-          <p className="text-gray-400">{error}</p>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">An Error Occurred</h2>
+          <p className="text-text-secondary">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white p-3 sm:p-6">
+    <div className={`min-h-screen bg-bg-primary text-text-primary p-3 sm:p-6 ${theme}`}>
       <div className="max-w-6xl mx-auto">
-        {/* Top header section - ADAPTED FOR LIGHT MODE */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <FiBriefcase className="text-2xl text-blue-600 dark:text-blue-400" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Department Complaints</h1>
-          </div>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            {isAdmin 
-              ? 'Reviewing complaints from all departments.' 
-              : `Reviewing complaints for the ${departmentInfo?.name || '...'} department.`
-            }
-          </p>
-        </div>
-
+        {/* This header is now removed as requested */}
+        
         {complaints.length === 0 ? (
-          <div className="text-center py-12 bg-gray-900/50 rounded-lg">
+          <div className="text-center py-12 bg-bg-tertiary rounded-lg">
             <FiCheck className="mx-auto text-6xl text-green-500 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">All Clear!</h3>
-            <p className="text-gray-400">There are no complaints to review at this time.</p>
+            <h3 className="text-xl font-semibold text-text-primary mb-2">All Clear!</h3>
+            <p className="text-text-secondary">There are no complaints to review at this time.</p>
           </div>
         ) : (
           <div className="grid gap-6">
@@ -194,23 +184,23 @@ export default function DepartmentComplaints() {
                 key={complaint.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-blue-500 transition-colors shadow-sm dark:shadow-none"
+                className="bg-bg-secondary border border-border-primary rounded-lg p-6 hover:border-blue-500 transition-colors shadow-sm"
               >
                 <div className="flex flex-col sm:flex-row justify-between gap-4">
                   <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{complaint.title}</h3>
+                            <h3 className="text-lg font-semibold text-text-primary">{complaint.title}</h3>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(complaint.urgency)}`}>{complaint.urgency}</span>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(complaint.status)}`}>{complaint.status}</span>
                         </div>
-                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                            <span className="font-semibold text-gray-700 dark:text-gray-300">Department:</span> {complaint.department}
+                         <p className="text-sm text-text-secondary mb-1">
+                            <span className="font-semibold text-text-primary">Department:</span> {complaint.department}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                            <span className="font-semibold text-gray-700 dark:text-gray-300">Category:</span> {complaint.category}
+                        <p className="text-sm text-text-secondary mb-4">
+                            <span className="font-semibold text-text-primary">Category:</span> {complaint.category}
                         </p>
-                        <p className="text-gray-700 dark:text-gray-300 mb-4">{complaint.description}</p>
-                        <div className="flex items-center text-xs text-gray-500">
+                        <p className="text-text-primary mb-4">{complaint.description}</p>
+                        <div className="flex items-center text-xs text-text-tertiary">
                             <FiClock className="mr-1.5" />
                             Submitted: {formatTimestamp(complaint.createdAt)}
                     </div>
@@ -241,39 +231,39 @@ export default function DepartmentComplaints() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-bg-tertiary border border-border-primary rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
                 <div className="flex items-start justify-between mb-6">
                 <div>
-                        <h2 className="text-xl font-bold text-white">{selectedComplaint.title}</h2>
-                        <p className="text-sm text-gray-400">{selectedComplaint.department} / {selectedComplaint.category}</p>
+                        <h2 className="text-xl font-bold text-text-primary">{selectedComplaint.title}</h2>
+                        <p className="text-sm text-text-secondary">{selectedComplaint.department} / {selectedComplaint.category}</p>
                 </div>
-                    <button onClick={() => setSelectedComplaint(null)} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={() => setSelectedComplaint(null)} className="text-text-secondary hover:text-text-primary transition-colors">
                         <FiX size={24} />
                     </button>
                 </div>
                 
                 <div className="space-y-4">
                     <div>
-                        <h3 className="font-semibold text-white mb-2">Description</h3>
-                        <p className="text-gray-300 bg-gray-800 p-3 rounded-md">{selectedComplaint.description}</p>
+                        <h3 className="font-semibold text-text-primary mb-2">Description</h3>
+                        <p className="text-text-secondary bg-bg-secondary p-3 rounded-md">{selectedComplaint.description}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                            <h3 className="font-semibold text-white mb-2">Student Name</h3>
-                            <p className="text-gray-300">{selectedComplaint.studentName}</p>
+                            <h3 className="font-semibold text-text-primary mb-2">Student Name</h3>
+                            <p className="text-text-secondary">{selectedComplaint.studentName}</p>
                   </div>
                   <div>
-                            <h3 className="font-semibold text-white mb-2">Student Email</h3>
-                            <p className="text-gray-300">{selectedComplaint.studentEmail}</p>
+                            <h3 className="font-semibold text-text-primary mb-2">Student Email</h3>
+                            <p className="text-text-secondary">{selectedComplaint.studentEmail}</p>
                   </div>
               </div>
                     <div>
-                        <label className="block text-sm font-medium text-white mb-2">Admin/HOD Notes</label>
+                        <label className="block text-sm font-medium text-text-primary mb-2">Admin/HOD Notes</label>
                 <textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                          className="w-full px-3 py-2 bg-bg-secondary border border-border-secondary rounded-lg text-text-primary focus:outline-none focus:border-blue-500"
                           rows={4}
                           placeholder="Add notes here..."
                         />
@@ -286,7 +276,7 @@ export default function DepartmentComplaints() {
                         <button onClick={() => handleUpdateStatus('Resolved')} disabled={updating} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">Mark Resolved</button>
                         <button onClick={() => handleUpdateStatus('Closed')} disabled={updating} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50">Close</button>
                     </div>
-                     <p className="text-xs text-gray-500">
+                     <p className="text-xs text-text-tertiary">
                         Complaint ID: {selectedComplaint.id}
                     </p>
               </div>

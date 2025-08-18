@@ -100,8 +100,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               displayName: firebaseUser.displayName || existingUserData.displayName,
               photoURL: firebaseUser.photoURL || existingUserData.photoURL,
               lastLogin: serverTimestamp(),
-              // Update role if user is department head
-              role: isDeptHead ? 'department_head' : (existingUserData.role || 'user'),
+              // Update role, but preserve admin/moderator status
+              role: (existingUserData.role === 'admin' || existingUserData.role === 'moderator') 
+                ? existingUserData.role 
+                : (isDeptHead ? 'department_head' : (existingUserData.role || 'user')),
               department: departmentInfo?.id || existingUserData.department
             };
             

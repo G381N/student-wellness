@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Post, addComment, upvotePost, downvotePost, deletePost, deletePostAsModeratorOrAdmin, joinActivity, leaveActivity } from '@/lib/firebase-utils';
 import { formatDistanceToNow } from 'date-fns';
 
+import { useTheme } from '@/contexts/ThemeContext';
+
 interface TweetCardProps {
   tweet: Post;
   onUpdate: (updatedPost: Post) => void;
@@ -15,6 +17,7 @@ interface TweetCardProps {
 
 export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps) {
   const { user, isAdmin, isModerator } = useAuth();
+  const { theme } = useTheme();
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
@@ -190,7 +193,7 @@ export default function TweetCard({ tweet, onUpdate, onDelete }: TweetCardProps)
       <div 
         className={`card rounded-xl overflow-hidden transition-all duration-300 ${
           tweet.priority === 'urgent' ? 'border-error border-2' : ''
-        }`}
+        } ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'}`}
       >
         {/* Card Header */}
         <div className="p-4 flex items-start justify-between">

@@ -65,11 +65,13 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
       
       {/* Sidebar */}
       <motion.div
-        className={`fixed top-0 left-0 h-full bg-bg-secondary border-r border-border-primary z-30 transition-all duration-300 ${
-          isMobile ? 'w-64' : isCollapsed ? 'w-16' : 'w-64'
-        } ${isMobile && !showMobileMenu ? '-translate-x-full' : 'translate-x-0'}`}
-        animate={{ width: isMobile ? 256 : (isCollapsed ? 64 : 256) }}
+        initial={false}
+        animate={{ 
+          width: isMobile ? 256 : (isCollapsed ? 64 : 256),
+          x: isMobile ? (showMobileMenu ? 0 : -256) : 0
+        }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className={`fixed top-0 left-0 h-full bg-bg-secondary border-r border-border-primary z-30`}
       >
         {/* Logo and Toggle */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border-primary">

@@ -137,51 +137,51 @@ export default function ManageModerators() {
   const inactiveModerators = moderators.filter(mod => !mod.isActive);
 
   return (
-    <div className="p-2 sm:p-6 space-y-3 sm:space-y-6 max-w-full overflow-hidden min-h-screen">
+    <div className="p-2 sm:p-6 space-y-3 sm:space-y-6 max-w-full overflow-hidden min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white">
       {/* Header */}
       <div className="text-center mb-4 sm:mb-8">
         <div className="flex items-center justify-center mb-3 sm:mb-4">
-          <FiUsers className="text-white text-xl sm:text-3xl mr-2 sm:mr-3 flex-shrink-0" />
-          <h1 className="text-xl sm:text-3xl font-bold text-white break-words leading-tight">Manage Moderators</h1>
+          <FiUsers className="text-blue-600 dark:text-white text-xl sm:text-3xl mr-2 sm:mr-3 flex-shrink-0" />
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white break-words leading-tight">Manage Moderators</h1>
         </div>
-        <p className="text-gray-400 text-sm sm:text-lg px-2 break-words">Add and manage moderators for the platform</p>
+        <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-lg px-2 break-words">Add and manage moderators for the platform</p>
       </div>
 
       {/* Statistics */}
       <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-3 sm:mb-6">
-        <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
-          <div className="text-lg sm:text-2xl font-bold text-blue-400">{activeModerators.length}</div>
-          <div className="text-xs sm:text-sm text-gray-400 break-words">Active Moderators</div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-200 dark:border-gray-800 text-center min-w-0 shadow-sm">
+          <div className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{activeModerators.length}</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">Active Moderators</div>
         </div>
-        <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-800 text-center min-w-0">
+        <div className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-2xl p-2 sm:p-4 border border-gray-200 dark:border-gray-800 text-center min-w-0 shadow-sm">
           <div className="text-lg sm:text-2xl font-bold text-gray-400">{inactiveModerators.length}</div>
-          <div className="text-xs sm:text-sm text-gray-400 break-words">Inactive Moderators</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">Inactive Moderators</div>
         </div>
       </div>
 
       {/* Add Moderator Form */}
-      <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800 mb-3 sm:mb-6">
-        <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Add New Moderator</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-200 dark:border-gray-800 mb-3 sm:mb-6 shadow-sm">
+        <h3 className="text-base sm:text-xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4 break-words">Add New Moderator</h3>
         <form onSubmit={handleAddModerator} className="space-y-3 sm:space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="text-gray-400 text-xs sm:text-sm block mb-2">Name</label>
+              <label className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm block mb-2">Name</label>
               <input
                 type="text"
                 value={newModeratorName}
                 onChange={(e) => setNewModeratorName(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 dark:focus:border-white text-sm sm:text-base break-words"
                 placeholder="Enter moderator's full name"
                 required
               />
             </div>
             <div>
-              <label className="text-gray-400 text-xs sm:text-sm block mb-2">Email Address</label>
+              <label className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm block mb-2">Email Address</label>
               <input
                 type="email"
                 value={newModeratorEmail}
                 onChange={(e) => setNewModeratorEmail(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 sm:p-3 text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base break-words"
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 dark:focus:border-white text-sm sm:text-base break-words"
                 placeholder="Enter moderator's email"
                 required
               />
@@ -211,8 +211,8 @@ export default function ManageModerators() {
       </div>
 
       {/* Current Moderators */}
-      <div className="bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-800">
-        <h3 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4 break-words">Current Moderators</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <h3 className="text-base sm:text-xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4 break-words">Current Moderators</h3>
         
         {moderators.length === 0 ? (
           <div className="text-center py-6 sm:py-12 px-4">
@@ -225,7 +225,7 @@ export default function ManageModerators() {
             {moderators.map((moderator, index) => (
               <div
                 key={moderator.id}
-                className="bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-700 hover:border-gray-600 transition-all"
+                className="bg-gray-100 dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-300 dark:border-gray-700 hover:border-blue-600 dark:hover:border-gray-600 transition-all"
               >
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
@@ -233,8 +233,8 @@ export default function ManageModerators() {
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${moderator.isActive ? 'bg-green-500' : 'bg-gray-500'}`}></div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="text-white font-semibold text-sm sm:text-base break-words">{moderator.name || moderator.email}</h4>
-                          <p className="text-gray-400 text-xs sm:text-sm break-all">{moderator.email}</p>
+                          <h4 className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base break-words">{moderator.name || moderator.email}</h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm break-all">{moderator.email}</p>
                         </div>
                       </div>
                       

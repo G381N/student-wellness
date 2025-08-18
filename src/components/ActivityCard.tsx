@@ -323,8 +323,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         activity={activity}
-        onJoin={handleJoinActivity}
-        onLeave={handleLeaveActivity}
+        onUpdate={onUpdate}
         isParticipating={!!isParticipating}
       />
     </div>

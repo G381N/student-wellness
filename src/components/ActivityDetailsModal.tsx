@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCalendar, FiClock, FiMapPin, FiUsers, FiUser, FiCheck, FiX, FiMoreHorizontal } from 'react-icons/fi';
+import { joinActivity, leaveActivity } from '@/lib/activity-actions';
+import { toast } from 'react-hot-toast';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Post } from '@/lib/firebase-utils';
 import Image from 'next/image';
 
@@ -32,6 +35,7 @@ const ParticipantsModal = ({
   isOpen: boolean, 
   onClose: () => void 
 }) => {
+  const { theme } = useTheme();
   if (!isOpen) return null;
   
   return (
@@ -41,13 +45,13 @@ const ParticipantsModal = ({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
-          className="bg-white rounded-3xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+          className={`card rounded-3xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto ${theme === 'light' ? 'bg-white' : 'bg-bg-secondary'}`}
         >
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-bold text-gray-900">All Participants</h3>
+            <h3 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>All Participants</h3>
             <button 
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+              className={`w-8 h-8 flex items-center justify-center rounded-full ${theme === 'light' ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' : 'text-gray-500 hover:text-gray-300 hover:bg-bg-tertiary'}`}
             >
               <FiX className="text-xl" />
             </button>
@@ -55,13 +59,13 @@ const ParticipantsModal = ({
           
           <div className="space-y-3">
             {participants.map((participant, index) => (
-              <div key={index} className="flex items-center space-x-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <FiUser className="text-white text-lg" />
+              <div key={index} className={`flex items-center space-x-4 p-4 rounded-2xl border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-bg-tertiary border-border-primary'}`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${theme === 'light' ? 'bg-gray-200' : 'bg-bg-tertiary'}`}>
+                  <FiUser className={`${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'} text-lg`} />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-900">{participant.displayName}</p>
-                  <p className="text-sm text-gray-500">Joined {new Date(participant.joinedAt.toDate()).toLocaleDateString()}</p>
+                  <p className={`font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>{participant.displayName}</p>
+                  <p className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-text-secondary'}`}>Joined {new Date(participant.joinedAt.toDate()).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}
@@ -76,8 +80,7 @@ interface ActivityDetailsModalProps {
   activity: Post;
   isOpen: boolean;
   onClose: () => void;
-  onJoin: () => Promise<void>;
-  onLeave: () => Promise<void>;
+  onUpdate: (updatedActivity: Post) => void;
   isParticipating: boolean;
 }
 
@@ -85,10 +88,10 @@ export default function ActivityDetailsModal({
   activity, 
   isOpen, 
   onClose, 
-  onJoin, 
-  onLeave, 
+  onUpdate,
   isParticipating 
 }: ActivityDetailsModalProps) {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [showAllParticipants, setShowAllParticipants] = useState(false);
@@ -107,17 +110,21 @@ export default function ActivityDetailsModal({
   
   const handleAction = async () => {
     setLoading(true);
-    try {
-      if (isParticipating) {
-        await onLeave();
-      } else {
-        await onJoin();
-      }
-    } catch (error) {
-      console.error('Error with activity participation:', error);
-    } finally {
+    const actionPromise = isParticipating ? leaveActivity(activity.id) : joinActivity(activity.id);
+    
+    toast.promise(actionPromise, {
+      loading: isParticipating ? 'Leaving activity...' : 'Joining activity...',
+      success: (updatedActivity) => {
+        onUpdate(updatedActivity);
+        return isParticipating ? 'Successfully left the activity!' : 'Successfully joined the activity!';
+      },
+      error: (err) => {
+        console.error(err);
+        return err.message || 'An unexpected error occurred.';
+      },
+    }).finally(() => {
       setLoading(false);
-    }
+    });
   };
 
   // Get visible participants (limit to 3) and remaining count
@@ -132,7 +139,7 @@ export default function ActivityDetailsModal({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-3xl overflow-hidden max-w-2xl w-full max-h-[95vh] flex flex-col shadow-2xl"
+            className={`card rounded-3xl overflow-hidden max-w-2xl w-full max-h-[95vh] flex flex-col shadow-2xl ${theme === 'light' ? 'bg-white' : 'bg-bg-secondary'}`}
           >
             {/* Header Image - Stretches to borders */}
             <div className="relative h-64 md:h-80 overflow-hidden">
@@ -154,7 +161,7 @@ export default function ActivityDetailsModal({
               
               {/* Category badge overlay */}
               <div className="absolute top-4 left-4">
-                <span className="px-4 py-2 bg-white bg-opacity-90 backdrop-blur-sm text-gray-800 rounded-full text-sm font-semibold">
+                <span className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ${theme === 'light' ? 'bg-white bg-opacity-90 text-gray-800' : 'bg-black bg-opacity-50 text-white'}`}>
                   {activity.category}
                 </span>
               </div>
@@ -163,44 +170,44 @@ export default function ActivityDetailsModal({
             {/* Content Area */}
             <div className="flex-1 p-6 overflow-y-auto">
               {/* Activity Title */}
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className={`text-2xl md:text-3xl font-bold mb-6 leading-tight ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>
                 {activity.content}
               </h1>
               
               {/* Activity Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 {activity.location && (
-                  <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <FiMapPin className="text-blue-600 text-lg" />
+                  <div className={`flex items-center space-x-3 p-4 rounded-2xl ${theme === 'light' ? 'bg-gray-50' : 'bg-bg-tertiary'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-gray-200' : 'bg-bg-secondary'}`}>
+                      <FiMapPin className={`${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'} text-lg`} />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Location</p>
-                      <p className="font-semibold text-gray-900">{activity.location}</p>
+                      <p className={`text-xs font-medium uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-text-secondary'}`}>Location</p>
+                      <p className={`font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>{activity.location}</p>
                     </div>
                   </div>
                 )}
                 
                 {activity.date && (
-                  <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <FiCalendar className="text-green-600 text-lg" />
+                  <div className={`flex items-center space-x-3 p-4 rounded-2xl ${theme === 'light' ? 'bg-gray-50' : 'bg-bg-tertiary'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-gray-200' : 'bg-bg-secondary'}`}>
+                      <FiCalendar className={`${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'} text-lg`} />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date</p>
-                      <p className="font-semibold text-gray-900">{new Date(activity.date).toLocaleDateString()}</p>
+                      <p className={`text-xs font-medium uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-text-secondary'}`}>Date</p>
+                      <p className={`font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>{new Date(activity.date).toLocaleDateString()}</p>
                     </div>
                   </div>
                 )}
                 
                 {activity.time && (
-                  <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      <FiClock className="text-purple-600 text-lg" />
+                  <div className={`flex items-center space-x-3 p-4 rounded-2xl ${theme === 'light' ? 'bg-gray-50' : 'bg-bg-tertiary'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-gray-200' : 'bg-bg-secondary'}`}>
+                      <FiClock className={`${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'} text-lg`} />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Time</p>
-                      <p className="font-semibold text-gray-900">{activity.time}</p>
+                      <p className={`text-xs font-medium uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-text-secondary'}`}>Time</p>
+                      <p className={`font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>{activity.time}</p>
                     </div>
                   </div>
                 )}
@@ -208,29 +215,29 @@ export default function ActivityDetailsModal({
             </div>
             
             {/* Footer - Participants and Action */}
-            <div className="border-t border-gray-100 p-6 bg-gray-50">
+            <div className={`border-t p-6 ${theme === 'light' ? 'border-gray-100 bg-gray-50' : 'border-border-primary bg-bg-secondary'}`}>
               <div className="flex items-center justify-between">
                 {/* Participants Display */}
                 <div className="flex items-center space-x-3">
                   <div className="flex -space-x-2">
                     {visibleParticipants.map((participant, index) => (
                       <div key={index} className="relative">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center border-2 border-white">
-                          <FiUser className="text-white text-sm" />
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${theme === 'light' ? 'bg-gray-200 border-white' : 'bg-bg-tertiary border-bg-secondary'}`}>
+                          <FiUser className={`${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'} text-sm`} />
                         </div>
                       </div>
                     ))}
                     
                     {remainingCount > 0 && (
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center border-2 border-white">
-                        <span className="text-xs font-semibold text-gray-600">+{remainingCount}</span>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${theme === 'light' ? 'bg-gray-100 border-white' : 'bg-bg-tertiary border-bg-secondary'}`}>
+                        <span className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'}`}>+{remainingCount}</span>
                       </div>
                     )}
                   </div>
                   
                   <button 
                     onClick={() => setShowAllParticipants(true)}
-                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                    className={`text-sm font-medium transition-colors ${theme === 'light' ? 'text-gray-700 hover:text-gray-900' : 'text-text-secondary hover:text-text-primary'}`}
                   >
                     {activity.participants?.length || 0} {activity.participants?.length === 1 ? 'participant' : 'participants'}
                   </button>
@@ -243,7 +250,7 @@ export default function ActivityDetailsModal({
                   className={`py-3 px-6 rounded-2xl font-semibold flex items-center space-x-2 transition-all ${
                     isParticipating
                       ? 'bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/25'
-                      : 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/25'
+                      : `${theme === 'light' ? 'bg-gray-800 text-white hover:bg-black' : 'bg-bg-tertiary text-text-primary hover:bg-hover-bg'}`
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {loading ? (

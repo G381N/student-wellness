@@ -6,6 +6,7 @@ import { FiThumbsUp, FiMessageCircle, FiSend, FiAlertCircle, FiUser, FiX, FiTras
 import { Post, upvotePost, downvotePost, addComment, processTimestamp, deletePost, deletePostAsModeratorOrAdmin } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserInfo } from '@/hooks/useUserInfo';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Fallback image if category doesn't match
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
@@ -38,6 +39,7 @@ interface ConcernCardProps {
 
 export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCardProps) {
   const { user, isModerator, isAdmin } = useAuth();
+  const { theme } = useTheme();
   const { userInfo: authorInfo, loading: authorLoading } = useUserInfo(concern.authorId);
   const [isCommenting, setIsCommenting] = useState(false);
   const [comment, setComment] = useState('');
@@ -146,11 +148,11 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
     { bg: 'bg-gray-800', text: 'text-gray-300' };
   
   return (
-    <div className="px-4 py-3 hover:bg-gray-950 hover:bg-opacity-40 transition-all duration-300 cursor-pointer border-b border-gray-800">
+    <div className={`px-4 py-3 transition-all duration-300 cursor-pointer border-b ${theme === 'light' ? 'hover:bg-gray-100 border-gray-200' : 'hover:bg-gray-950 hover:bg-opacity-40 border-gray-800'}`}>
       <div className="flex space-x-3">
         {/* Profile Picture */}
-        <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-          <FiUser className="text-white text-base" />
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'}`}>
+          <FiUser className={`text-base ${theme === 'light' ? 'text-gray-600' : 'text-white'}`} />
         </div>
 
         {/* Main Content */}
@@ -160,28 +162,28 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
             <div className="flex items-center space-x-3 flex-wrap gap-y-1">
               {authorLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 bg-gray-600 rounded animate-pulse"></div>
-                  <div className="w-20 h-4 bg-gray-600 rounded animate-pulse"></div>
+                  <div className={`w-4 h-4 rounded animate-pulse ${theme === 'light' ? 'bg-gray-300' : 'bg-gray-600'}`}></div>
+                  <div className={`w-20 h-4 rounded animate-pulse ${theme === 'light' ? 'bg-gray-300' : 'bg-gray-600'}`}></div>
                 </div>
               ) : (
                 <>
-                  <span className="font-bold text-white text-base">
+                  <span className={`font-bold text-base ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                     {concern.isAnonymous ? 'Anonymous' : (authorInfo?.displayName || 'Unknown User')}
                   </span>
                   {!concern.isAnonymous && authorInfo?.realName && authorInfo.realName !== authorInfo.displayName && (
-                    <span className="text-gray-500 text-sm">
+                    <span className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
                       @{authorInfo.realName}
                     </span>
                   )}
                   {concern.isAnonymous && (
-                    <span className="text-gray-500 text-sm">
+                    <span className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
                       @anonymous
                     </span>
                   )}
                 </>
               )}
-              <span className="text-gray-500">·</span>
-              <span className="text-gray-500 text-sm bg-gray-800 bg-opacity-40 px-2 py-1 rounded border border-gray-700 border-opacity-30">
+              <span className={`${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>·</span>
+              <span className={`text-sm px-2 py-1 rounded ${theme === 'light' ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-gray-800 bg-opacity-40 text-gray-500 border border-gray-700 border-opacity-30'}`}>
                 {concern.timestamp && (
                   typeof concern.timestamp.toDate === 'function' 
                     ? new Date(concern.timestamp.toDate()).toLocaleDateString()
@@ -195,7 +197,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
               <button
                 onClick={handleDeletePost}
                 disabled={loading.delete}
-                className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110"
+                className={`p-2 rounded-full transition-all duration-200 custom-cursor transform hover:scale-110 ${theme === 'light' ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-200' : 'text-gray-500 hover:text-white hover:bg-gray-700'}`}
                 title={isAuthor ? "Delete your concern" : "Delete as moderator"}
               >
                 {loading.delete ? (
@@ -209,28 +211,28 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
 
           {/* Content */}
           <div className="mb-3">
-            <p className="text-white text-[15px] leading-normal">{concern.content}</p>
+            <p className={`text-[15px] leading-normal ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>{concern.content}</p>
           </div>
 
           {/* Category and Status Tags - Subtle style */}
           <div className="flex flex-wrap gap-2 mb-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-gray-800 bg-opacity-50 text-gray-400 border border-gray-700 border-opacity-50">
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal ${theme === 'light' ? 'bg-gray-100 text-gray-700 border border-gray-200' : 'bg-gray-800 bg-opacity-50 text-gray-400 border border-gray-700 border-opacity-50'}`}>
               {concern.category}
             </span>
             {concern.status && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-gray-800 bg-opacity-40 text-gray-500 border border-gray-600 border-opacity-40">
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal ${theme === 'light' ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-gray-800 bg-opacity-40 text-gray-500 border border-gray-600 border-opacity-40'}`}>
                 {concern.status}
               </span>
             )}
           </div>
 
           {/* Action Buttons - Twitter style */}
-          <div className="flex items-center space-x-6 text-gray-500">
+          <div className={`flex items-center space-x-6 ${theme === 'light' ? 'text-gray-600' : 'text-gray-500'}`}>
             <button
               onClick={handleToggleComment}
-              className="flex items-center space-x-2 hover:text-white transition-colors group"
+              className="flex items-center space-x-2 hover:text-blue-500 transition-colors group"
             >
-              <div className="p-2 rounded-full group-hover:bg-gray-800 transition-colors">
+              <div className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'group-hover:bg-blue-100' : 'group-hover:bg-gray-800'}`}>
                 <FiMessageCircle className="w-[18px] h-[18px]" />
               </div>
               <span className="text-sm">{concern.comments?.length || 0}</span>
@@ -240,13 +242,13 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
               onClick={handleEscalate}
               disabled={loading.upvote}
               className={`flex items-center space-x-2 transition-colors group ${
-                hasUpvoted ? 'text-white' : 'hover:text-white'
+                hasUpvoted ? 'text-green-500' : 'hover:text-green-500'
               }`}
             >
               <div className={`p-2 rounded-full transition-colors ${
                 hasUpvoted 
-                  ? 'bg-gray-700' 
-                  : 'group-hover:bg-gray-800'
+                  ? (theme === 'light' ? 'bg-green-100' : 'bg-gray-700')
+                  : (theme === 'light' ? 'group-hover:bg-green-100' : 'group-hover:bg-gray-800')
               }`}>
                 {loading.upvote ? (
                   <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
@@ -265,20 +267,20 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-3 pt-3 border-t border-gray-800"
+                className={`mt-3 pt-3 border-t ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}
               >
                 {/* Comments list */}
                 {concern.comments && concern.comments.length > 0 && (
                   <div className="space-y-3 mb-3 max-h-40 overflow-y-auto">
                     {concern.comments.map((comment) => (
                       <div key={comment.id} className="flex space-x-3">
-                        <div className="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                          <FiUser className="text-gray-400 text-xs" />
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'}`}>
+                          <FiUser className={`text-xs ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`} />
                         </div>
                         <div className="flex-grow min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-sm font-medium text-white">{comment.authorName}</span>
-                            <span className="text-xs text-gray-500">
+                            <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{comment.authorName}</span>
+                            <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
                               {comment.timestamp && (
                                 typeof comment.timestamp.toDate === 'function'
                                   ? new Date(comment.timestamp.toDate()).toLocaleDateString()
@@ -286,7 +288,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                               )}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-300 leading-normal">{comment.content}</p>
+                          <p className={`text-sm leading-normal ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>{comment.content}</p>
                         </div>
                       </div>
                     ))}
@@ -295,8 +297,8 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                 
                 {/* Add comment form */}
                 <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                    <FiUser className="text-gray-400 text-xs" />
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'}`}>
+                    <FiUser className={`text-xs ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`} />
                   </div>
                   <div className="flex-grow relative">
                     <input
@@ -305,7 +307,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="w-full bg-transparent border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                      className={`w-full border rounded-full py-2 px-4 text-sm ${theme === 'light' ? 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500' : 'bg-transparent border-gray-700 text-white placeholder-gray-500 focus:border-gray-500'}`}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -316,7 +318,7 @@ export default function ConcernCard({ concern, onUpdate, onDelete }: ConcernCard
                     <button
                       onClick={handleAddComment}
                       disabled={!comment.trim() || loading.comment}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 disabled:text-gray-600 text-sm font-medium"
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-sm font-medium ${theme === 'light' ? 'text-gray-600 hover:text-gray-900 disabled:text-gray-400' : 'text-gray-500 hover:text-gray-400 disabled:text-gray-600'}`}
                     >
                       {loading.comment ? (
                         <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>

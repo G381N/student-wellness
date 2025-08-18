@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlus, FiHeart, FiMessageCircle, FiUser, FiCalendar, FiMapPin, FiClock, FiAlertCircle, FiRefreshCw, FiTrendingUp, FiUsers, FiActivity, FiHome, FiFileText } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { getPosts, processTimestamp, MindWallIssue, getMindWallIssues } from '@/lib/firebase-utils';
 import type { Post } from '@/lib/firebase-utils';
@@ -31,6 +32,7 @@ interface Comment {
 
 export default function DashboardPage() {
   const { user, userData, loading: authLoading, refreshUserData, isModerator, isAdmin } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [mindWallIssues, setMindWallIssues] = useState<MindWallIssue[]>([]);
@@ -134,10 +136,10 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className={`flex items-center justify-center min-h-screen ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading your dashboard...</p>
+          <div className={`w-16 h-16 border-4 rounded-full animate-spin mx-auto mb-4 ${theme === 'light' ? 'border-gray-300 border-t-transparent' : 'border-gray-500 border-t-transparent'}`}></div>
+          <p className={`text-lg ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -148,16 +150,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-8">
+    <div className="min-h-screen pt-8">
       {/* Search Results */}
       {searchQuery && (
         <div className="mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-900 rounded-2xl p-6 border border-gray-700"
+            className={`${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700'} rounded-2xl p-6 border`}
           >
-            <h2 className="text-xl font-semibold text-white mb-4">
+            <h2 className={`text-xl font-semibold mb-4 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
               Search Results for "{searchQuery}"
             </h2>
             {(() => {
@@ -190,10 +192,10 @@ export default function DashboardPage() {
                       </div>
                     ))}
                   {results.issues.map((issue) => (
-                    <div key={issue.id} className="bg-gray-800 rounded-xl p-4 border border-gray-600">
-                      <h3 className="font-semibold text-white mb-2">{issue.title}</h3>
-                      <p className="text-gray-300 text-sm mb-2">{issue.description}</p>
-                      <div className="flex items-center justify-between text-xs text-gray-400">
+                    <div key={issue.id} className={`${theme === 'light' ? 'bg-gray-100 border-gray-200' : 'bg-gray-800 border-gray-600'} rounded-xl p-4 border`}>
+                      <h3 className={`font-semibold mb-2 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>{issue.title}</h3>
+                      <p className={`text-sm mb-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>{issue.description}</p>
+                      <div className={`flex items-center justify-between text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
                         <span>{issue.category}</span>
                         <span>{issue.count} voices</span>
                   </div>
@@ -201,7 +203,7 @@ export default function DashboardPage() {
                   ))}
                     </div>
               ) : (
-                <p className="text-gray-400">No results found for your search.</p>
+                <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>No results found for your search.</p>
               );
             })()}
           </motion.div>
@@ -243,9 +245,9 @@ export default function DashboardPage() {
                     ))
                   ) : (
           <div className="text-center py-16">
-            <FiHome className="text-gray-600 text-6xl mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">It's quiet in here...</h3>
-            <p className="text-gray-500">Be the first to share something with the community!</p>
+            <FiHome className={`text-6xl mx-auto mb-4 ${theme === 'light' ? 'text-gray-400' : 'text-gray-600'}`} />
+            <h3 className={`text-xl font-semibold mb-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>It's quiet in here...</h3>
+            <p className={`${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>Be the first to share something with the community!</p>
                         </div>
                       )}
         </motion.div>
@@ -254,7 +256,7 @@ export default function DashboardPage() {
         <div className="text-center pt-8">
                   <button
             onClick={handleRefresh}
-            className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto"
+            className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 mx-auto ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : 'bg-gray-800 hover:bg-gray-700 text-white'}`}
           >
             <FiRefreshCw className="text-lg" />
             <span>Refresh Feed</span>

@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiUser, FiX, FiCheck, FiEye } from 'react-icons/fi';
 import { getAnonymousComplaints, updateComplaintStatus, AnonymousComplaint } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function AnonymousComplaints() {
   const { user, isAdmin } = useAuth();
+  const { theme } = useTheme();
   const [complaints, setComplaints] = useState<AnonymousComplaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedComplaint, setSelectedComplaint] = useState<AnonymousComplaint | null>(null);
@@ -70,30 +72,30 @@ export default function AnonymousComplaints() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'Low': return 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800';
-      case 'Medium': return 'text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-800';
-      case 'High': return 'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900 border border-orange-200 dark:border-orange-800';
-      case 'Critical': return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800';
-      default: return 'text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800';
+      case 'Low': return 'text-green-700 bg-green-50 border border-green-200';
+      case 'Medium': return 'text-yellow-700 bg-yellow-50 border border-yellow-200';
+      case 'High': return 'text-orange-700 bg-orange-50 border border-orange-200';
+      case 'Critical': return 'text-red-700 bg-red-50 border border-red-200';
+      default: return 'text-gray-700 bg-gray-50 border border-gray-200';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Open': return 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800';
-      case 'Under Review': return 'text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-800';
-      case 'Resolved': return 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800';
-      case 'Closed': return 'text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800';
-      default: return 'text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800';
+      case 'Open': return 'text-blue-700 bg-blue-50 border border-blue-200';
+      case 'Under Review': return 'text-yellow-700 bg-yellow-50 border border-yellow-200';
+      case 'Resolved': return 'text-green-700 bg-green-50 border border-green-200';
+      case 'Closed': return 'text-gray-700 bg-gray-50 border border-gray-200';
+      default: return 'text-gray-700 bg-gray-50 border border-gray-200';
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-app-primary">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading complaints...</p>
+          <div className="w-8 h-8 border-2 border-app-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-app-secondary">Loading complaints...</p>
         </div>
       </div>
     );
@@ -102,29 +104,29 @@ export default function AnonymousComplaints() {
   // Redirect non-admin users
   if (!isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-app-primary">
         <div className="text-center">
           <FiAlertTriangle className="mx-auto text-6xl text-red-400 mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
-          <p className="text-gray-400">Only administrators can access anonymous complaints.</p>
+          <h2 className="text-2xl font-bold text-app-primary mb-2">Access Denied</h2>
+          <p className="text-app-secondary">Only administrators can access anonymous complaints.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white p-3 sm:p-6">
+    <div className="min-h-screen bg-app-primary text-app-primary p-3 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">Anonymous Complaints</h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage and review anonymous complaints from students</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-app-primary mb-2">Anonymous Complaints</h1>
+          <p className="text-sm sm:text-base text-app-secondary">Manage and review anonymous complaints from students</p>
         </div>
 
         {complaints.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
-            <FiAlertTriangle className="mx-auto text-4xl sm:text-6xl text-gray-600 mb-4" />
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Complaints</h3>
-            <p className="text-sm sm:text-base text-gray-400">There are currently no anonymous complaints to review.</p>
+            <FiAlertTriangle className="mx-auto text-4xl sm:text-6xl text-app-tertiary mb-4" />
+            <h3 className="text-lg sm:text-xl font-semibold text-app-primary mb-2">No Complaints</h3>
+            <p className="text-sm sm:text-base text-app-secondary">There are currently no anonymous complaints to review.</p>
           </div>
         ) : (
           <div className="grid gap-4 sm:gap-6">
@@ -133,12 +135,12 @@ export default function AnonymousComplaints() {
                 key={complaint.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:border-gray-300 dark:hover:border-gray-600 transition-colors shadow-sm"
+                className="bg-app-secondary border border-app-primary rounded-lg p-4 sm:p-6 hover:border-app-primary transition-colors shadow-sm"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-4">
                   <div className="flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">{complaint.title}</h3>
-                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">{complaint.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-app-primary mb-2">{complaint.title}</h3>
+                    <p className="text-sm sm:text-base text-app-secondary mb-4">{complaint.description}</p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(complaint.severity)}`}>
@@ -147,12 +149,12 @@ export default function AnonymousComplaints() {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
                         {complaint.status}
                       </span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium text-gray-400 bg-gray-800">
+                      <span className="px-2 py-1 rounded-full text-xs font-medium text-app-secondary bg-app-tertiary">
                         {complaint.category}
                       </span>
                     </div>
                     
-                    <div className="flex items-center text-xs sm:text-sm text-gray-500">
+                    <div className="flex items-center text-xs sm:text-sm text-app-tertiary">
                       <FiClock className="mr-1" />
                       {formatTimestamp(complaint.timestamp)}
                     </div>
@@ -163,7 +165,11 @@ export default function AnonymousComplaints() {
                       setSelectedComplaint(complaint);
                       setAdminNotes(complaint.adminNotes || '');
                     }}
-                    className="w-full sm:w-auto sm:ml-4 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                    className={`w-full sm:w-auto sm:ml-4 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
+                      theme === 'dark' 
+                        ? 'bg-white text-black hover:bg-gray-200' 
+                        : 'bg-black text-white hover:bg-gray-800'
+                    }`}
                   >
                     <FiEye className="text-sm" />
                     Review
@@ -171,9 +177,9 @@ export default function AnonymousComplaints() {
                 </div>
                 
                 {complaint.adminNotes && (
-                  <div className="mt-4 p-3 bg-blue-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
-                    <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                      <strong className="text-blue-700 dark:text-blue-400">Admin Notes:</strong> {complaint.adminNotes}
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                    <p className="text-xs sm:text-sm text-app-secondary">
+                      <strong className="text-blue-600">Admin Notes:</strong> {complaint.adminNotes}
                     </p>
                   </div>
                 )}
@@ -196,13 +202,13 @@ export default function AnonymousComplaints() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg"
+              className="bg-app-primary border border-app-primary rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg"
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-bold text-white">Review Complaint</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-app-primary">Review Complaint</h2>
                 <button
                   onClick={() => setSelectedComplaint(null)}
-                  className="text-gray-400 hover:text-white transition-colors p-1"
+                  className="text-app-tertiary hover:text-app-primary transition-colors p-1"
                 >
                   <FiX className="text-lg sm:text-xl" />
                 </button>
@@ -210,22 +216,22 @@ export default function AnonymousComplaints() {
 
               <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                 <div>
-                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Title</h3>
-                  <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.title}</p>
+                  <h3 className="font-semibold text-app-primary mb-2 text-sm sm:text-base">Title</h3>
+                  <p className="text-app-secondary text-sm sm:text-base">{selectedComplaint.title}</p>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Description</h3>
-                  <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.description}</p>
+                  <h3 className="font-semibold text-app-primary mb-2 text-sm sm:text-base">Description</h3>
+                  <p className="text-app-secondary text-sm sm:text-base">{selectedComplaint.description}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Category</h3>
-                    <p className="text-gray-300 text-sm sm:text-base">{selectedComplaint.category}</p>
+                    <h3 className="font-semibold text-app-primary mb-2 text-sm sm:text-base">Category</h3>
+                    <p className="text-app-secondary text-sm sm:text-base">{selectedComplaint.category}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Severity</h3>
+                    <h3 className="font-semibold text-app-primary mb-2 text-sm sm:text-base">Severity</h3>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedComplaint.severity)}`}>
                       {selectedComplaint.severity}
                     </span>
@@ -233,7 +239,7 @@ export default function AnonymousComplaints() {
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Current Status</h3>
+                  <h3 className="font-semibold text-app-primary mb-2 text-sm sm:text-base">Current Status</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedComplaint.status)}`}>
                     {selectedComplaint.status}
                   </span>
@@ -241,13 +247,13 @@ export default function AnonymousComplaints() {
               </div>
 
               <div className="mb-4 sm:mb-6">
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-app-primary mb-2">
                   Admin Notes
                 </label>
                 <textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white text-sm sm:text-base"
+                  className="w-full px-3 py-2 bg-app-secondary border border-app-primary rounded-lg text-app-primary placeholder:text-app-tertiary focus:outline-none focus:border-app-primary text-sm sm:text-base"
                   rows={3}
                   placeholder="Add notes about this complaint..."
                 />
@@ -282,4 +288,4 @@ export default function AnonymousComplaints() {
       </AnimatePresence>
     </div>
   );
-} 
+}

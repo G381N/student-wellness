@@ -193,38 +193,13 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
         return;
       }
 
-      // Handle general posts separately
-      if (postType === 'general') {
-        const generalPost = await addGeneralPost({
-          content: formData.content.trim(),
-          category: formData.category,
-          author: '',  // Will be set by addGeneralPost
-          authorId: '', // Will be set by addGeneralPost
-          timestamp: null, // Will be set by addGeneralPost
-          upvotes: 0,
-          downvotes: 0,
-          upvotedBy: [],
-          downvotedBy: [],
-          comments: []
-        });
-        
-        if (mountedRef.current) {
-          onPostCreated(generalPost);
-          setTimeout(() => {
-            if (mountedRef.current) {
-              onClose();
-            }
-          }, 100);
-        }
-        return;
-      }
-
       // For activity and concern posts
       const postData: any = {
         type: postType,
         content: formData.content.trim(),
         category: formData.category,
-        isAnonymous: postType === 'concern' ? formData.isAnonymous : false
+        isAnonymous: postType === 'concern' ? formData.isAnonymous : false,
+        imageURL: formData.imageURL || null,
       };
 
       // Activity-specific fields
@@ -623,31 +598,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
 
                       {/* Moderator visibility options */}
                       {(isModerator || isAdmin) && postType === 'general' && (
-                        <div>
-                          <label className="block text-app-secondary text-sm font-medium mb-2">
-                            Visibility
-                          </label>
-                          <div className="grid grid-cols-2 gap-3">
-                            {getVisibilityOptions().map((option) => (
-                              <button
-                                key={option.value}
-                                type="button"
-                                onClick={() => setFormData({ ...formData, visibility: option.value })}
-                                className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                                  formData.visibility === option.value
-                                    ? theme === 'dark' ? 'border-blue-500 bg-blue-900 bg-opacity-20 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-600'
-                                    : `border-app-primary bg-app-secondary text-app-secondary hover-bg-app ${theme === 'dark' ? 'hover:border-gray-600' : 'hover:border-gray-300'}`
-                                }`}
-                              >
-                                <div className="flex items-center justify-center">
-                                  {option.icon}
-                                  <span className="ml-2 text-sm font-medium">{option.label}</span>
-                                </div>
-                                <p className="text-xs mt-1 opacity-75">{option.desc}</p>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                        <></>
                       )}
                     </div>
                   </div>
@@ -665,8 +616,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                   {/* Footer with actions */}
                   <div className="p-4 border-t border-app-primary flex justify-between items-center flex-shrink-0">
                     <div className="flex space-x-2">
-                      {/* Image upload button (not for anonymous complaints) */}
-                      {postType !== 'anonymous-complaint' && (
+                      {/* Image upload button (not for anonymous complaints or general posts) */}
+                      {postType !== 'anonymous-complaint' && postType !== 'general' && (
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}

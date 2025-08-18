@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiHome, FiHeart, FiActivity, FiAlertCircle, FiBriefcase, FiUsers, FiUser, FiBell, FiMenu, FiX } from 'react-icons/fi';
+import { FiHome, FiHeart, FiActivity, FiBell, FiShield, FiFileText, FiGrid, FiUsers, FiUserCheck, FiUser, FiMenu, FiX } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchComponent from './SearchComponent';
 
@@ -44,11 +44,11 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
     { icon: <FiHeart />, label: 'Mind Wall', path: '/dashboard/mind-wall', visible: true },
     { icon: <FiActivity />, label: 'Wellness', path: '/dashboard/wellness', visible: true },
     { icon: <FiBell />, label: 'Announcements', path: '/dashboard/announcements', visible: true },
-    { icon: <FiAlertCircle />, label: 'Anonymous Complaints', path: '/dashboard/anonymous-complaints', visible: true },
-    { icon: <FiBriefcase />, label: 'Department Complaints', path: '/dashboard/department-complaints', visible: true },
-    { icon: <FiBriefcase />, label: 'Manage Departments', path: '/dashboard/manage-departments', visible: isAdmin },
+    { icon: <FiShield />, label: 'Anonymous Complaints', path: '/dashboard/anonymous-complaints', visible: true },
+    { icon: <FiFileText />, label: 'Department Complaints', path: '/dashboard/department-complaints', visible: true },
+    { icon: <FiGrid />, label: 'Manage Departments', path: '/dashboard/manage-departments', visible: isAdmin },
     { icon: <FiUsers />, label: 'Manage Moderators', path: '/dashboard/manage-moderators', visible: isAdmin },
-    { icon: <FiUsers />, label: 'Manage Counselors', path: '/dashboard/manage-counselors', visible: isAdmin || isModerator },
+    { icon: <FiUserCheck />, label: 'Manage Counselors', path: '/dashboard/manage-counselors', visible: isAdmin || isModerator },
   ];
 
   return (

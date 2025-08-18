@@ -295,4 +295,4 @@ export default function DepartmentComplaints() {
       </AnimatePresence>
     </div>
   );
-} 
+}

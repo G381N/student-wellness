@@ -160,9 +160,9 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         
         {/* Overlay Content */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* Category Tag - Small subtle style */}
+          {/* Category Tag - Now with solid background */}
           <div className="flex items-center mb-3">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal bg-transparent ${categoryStyle.text} border border-opacity-50 border-current`}>
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-gray-900 ${categoryStyle.bg.replace('bg-opacity-20', '')}`}>
               {activity.category}
             </span>
           </div>

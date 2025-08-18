@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight } from 'react-icons/fi';
-import { Post } from '@/lib/firebase-utils';
+import { FiCalendar, FiMapPin, FiClock, FiUsers, FiArrowRight, FiThumbsUp, FiMessageCircle } from 'react-icons/fi';
+import { Post, upvotePost, addComment } from '@/lib/firebase-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import ActivityDetailsModal from './ActivityDetailsModal';
-
 import { useTheme } from '@/contexts/ThemeContext';
+import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'react-hot-toast';
 
 interface ActivityCardProps {
   activity: Post;
@@ -48,14 +49,53 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
   const { user } = useAuth();
   const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [loading, setLoading] = useState({
-    join: false,
-    delete: false,
-    comment: false
-  });
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
-  // Determine image source (custom or default based on category)
+  const hasUpvoted = activity.upvotedBy?.includes(user?.uid || '');
+
+  const handleUpvote = async () => {
+    if (!user || isVoting) return;
+    setIsVoting(true);
+    try {
+      const upvoted = await upvotePost(activity.id);
+      const updatedPost = {
+        ...activity,
+        upvotes: upvoted ? (activity.upvotes || 0) + 1 : Math.max(0, (activity.upvotes || 0) - 1),
+        upvotedBy: upvoted ? [...(activity.upvotedBy || []), user.uid] : (activity.upvotedBy || []).filter(id => id !== user.uid),
+      };
+      onUpdate(updatedPost);
+    } catch (error) {
+      console.error('Error upvoting post:', error);
+      toast.error('Failed to upvote. Please try again.');
+    } finally {
+      setIsVoting(false);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim() || isCommenting) return;
+    
+    setIsCommenting(true);
+    try {
+      const comment = await addComment(activity.id, newComment.trim());
+      const updatedPost = {
+        ...activity,
+        comments: [...(activity.comments || []), comment],
+      };
+      onUpdate(updatedPost);
+      setNewComment('');
+      setShowComments(true);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast.error('Failed to add comment. Please try again.');
+    } finally {
+      setIsCommenting(false);
+    }
+  };
+
   const getCategoryImage = (category: string) => {
     return DEFAULT_IMAGES[category as keyof typeof DEFAULT_IMAGES] || FALLBACK_IMAGE;
   };
@@ -83,7 +123,7 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
     { bg: 'bg-bg-tertiary', text: 'text-text-secondary' };
 
   return (
-    <div className={`card rounded-xl overflow-hidden transition-all duration-300 ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'}`}>
+    <div className={`card rounded-xl overflow-hidden transition-all duration-300 ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-800'}`}>
       {/* Header with Image */}
       <div className="relative">
         {/* Activity Image */}
@@ -133,20 +173,20 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
       {/* Body Content */}
       <div className="p-4">
         {/* Description */}
-        <p className="text-text-primary mb-4 line-clamp-3">
+        <p className={`text-text-primary mb-4 line-clamp-3 ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'}`}>
           {activity.content}
         </p>
         
         {/* Location & Participants */}
         <div className="flex flex-wrap items-center justify-between mb-4 text-sm">
           {activity.location && (
-            <div className="flex items-center text-text-secondary mb-2 sm:mb-0">
+            <div className={`flex items-center mb-2 sm:mb-0 ${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'}`}>
               <FiMapPin className="mr-1" />
               <span>{activity.location}</span>
             </div>
           )}
           
-          <div className="flex items-center text-text-secondary">
+          <div className={`flex items-center ${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'}`}>
             <FiUsers className="mr-1" />
             <span>
               {activity.participants?.length || 0}/{activity.maxParticipants || '∞'}
@@ -154,14 +194,93 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
           </div>
         </div>
         
-        {/* Action Button */}
-        <button
-          onClick={handleOpenDetails}
-          className="w-full py-2 px-4 rounded-lg bg-bg-tertiary hover:bg-hover-bg text-text-primary transition-colors flex items-center justify-center space-x-2"
-        >
-          <span>View Details</span>
-          <FiArrowRight />
-        </button>
+        {/* Action Buttons */}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleUpvote}
+            disabled={isVoting}
+            className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
+              hasUpvoted ? 'text-vote-up' : 'text-text-tertiary hover:text-text-secondary'
+            }`}
+          >
+            <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
+              hasUpvoted 
+                ? 'bg-vote-up bg-opacity-10' 
+                : 'group-hover:bg-hover-bg'
+            }`}>
+              {isVoting ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <FiThumbsUp className="text-lg" />
+              )}
+            </div>
+            <span className="text-sm font-medium">{activity.upvotes || 0}</span>
+          </button>
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center space-x-2 text-text-tertiary hover:text-text-secondary transition-all duration-200 group custom-cursor"
+          >
+            <div className="p-2 rounded-full group-hover:bg-hover-bg transition-all duration-200 transform group-hover:scale-110">
+              <FiMessageCircle className="text-lg" />
+            </div>
+            <span className="text-sm font-medium">{activity.comments?.length || 0}</span>
+          </button>
+          <button
+            onClick={handleOpenDetails}
+            className={`w-full py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : 'bg-bg-tertiary hover:bg-hover-bg text-text-primary'}`}
+          >
+            <span>View Details</span>
+            <FiArrowRight />
+          </button>
+        </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <div className="mt-4 pt-4 border-t border-border-primary">
+            <div className="relative">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add a comment..."
+                className="w-full bg-bg-tertiary border border-border-primary rounded-full py-3 px-5 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-accent-blue focus:bg-bg-tertiary transition-all duration-200"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAddComment();
+                  }
+                }}
+              />
+              <button
+                onClick={handleAddComment}
+                disabled={!newComment.trim() || isCommenting}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-tertiary hover:text-text-primary disabled:text-text-tertiary transition-colors duration-200 px-2 py-1 rounded"
+              >
+                {isCommenting ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <span className="font-semibold">Post</span>
+                )}
+              </button>
+            </div>
+            <div className="space-y-3 mt-4">
+              {activity.comments?.map((comment, index) => (
+                <div key={index} className="flex items-start space-x-3 bg-bg-tertiary bg-opacity-50 p-4 rounded-xl">
+                  <div className="p-2 bg-bg-tertiary rounded-full">
+                    <FiUsers className="text-text-tertiary text-lg" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-text-primary">{comment.author || 'Anonymous'}</p>
+                    <p className="text-text-secondary mt-1">{comment.content}</p>
+                    <p className="text-sm text-text-tertiary mt-1">
+                      {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Modal */}

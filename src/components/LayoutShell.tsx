@@ -8,6 +8,7 @@ import TopBar from './TopBar';
 import ProfileModal from './ProfileModal';
 import CreatePostModal from './CreatePostModal';
 import BottomNavbar from './BottomNavbar';
+import MobileSidebar from './MobileSidebar';
 import FloatingActionButton from './FloatingActionButton';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
@@ -97,21 +98,25 @@ export default function LayoutShell({ children }: LayoutShellProps) {
   };
 
   return (
-    <div className="flex h-screen bg-bg-primary text-text-primary">
-      {/* Left Sidebar - Desktop Only */}
-      {!isMobile && (
+    <div className="flex h-screen bg-bg-primary text-text-primary overflow-x-hidden">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
         <LeftSidebar
           isCollapsed={leftSidebarCollapsed}
           onToggle={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
         />
-      )}
+      </div>
+
+      {/* Mobile Sidebar */}
+      <div className="md:hidden">
+        <MobileSidebar />
+      </div>
 
       {/* Main Content Area */}
       <div 
         className="flex flex-col flex-grow relative transition-all duration-300"
         style={{
-          marginLeft: isMobile ? '0px' : (leftSidebarCollapsed ? '64px' : '256px'),
-          marginRight: isMobile ? '0px' : (rightSidebarCollapsed ? '0px' : '320px'),
+          marginLeft: isMobile ? '56px' : (leftSidebarCollapsed ? '64px' : '256px'),
         }}
       >
         {/* Top Bar */}
@@ -120,6 +125,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
           rightSidebarCollapsed={rightSidebarCollapsed}
           onRightSidebarToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
           hideProfileButton={!rightSidebarCollapsed}
+          onCreatePost={() => setShowCreateModal(true)}
         />
 
         {/* Main Scrollable Content */}
@@ -161,4 +167,4 @@ export default function LayoutShell({ children }: LayoutShellProps) {
       )}
     </div>
   );
-} 
+}

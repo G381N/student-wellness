@@ -127,9 +127,9 @@ export default function SearchComponent({
           placeholder={placeholder}
           value={searchQuery}
           onChange={handleSearchChange}
-          className="w-full bg-bg-tertiary text-text-primary rounded-full py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue placeholder-text-tertiary"
+          className="w-full h-9 sm:h-10 bg-bg-tertiary text-text-primary rounded-full py-1 sm:py-2 pl-8 pr-8 sm:pl-10 sm:pr-10 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue placeholder-text-tertiary"
         />
-        <div className="absolute left-3 top-2.5 text-text-tertiary">
+        <div className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
           {isSearching ? (
             <FiLoader className="animate-spin" />
           ) : (
@@ -140,7 +140,7 @@ export default function SearchComponent({
           <button
             type="button"
             onClick={handleClearSearch}
-            className="absolute right-3 top-2.5 text-text-tertiary hover:text-text-secondary"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
           >
             <FiX />
           </button>

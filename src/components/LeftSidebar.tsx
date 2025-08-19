@@ -81,14 +81,13 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
             </span>
           </Link>
           
-          {!isMobile && (
-            <button
-              onClick={onToggle}
-              className="p-1 rounded-full hover:bg-hover-bg transition-colors"
-            >
-              <FiMenu className="text-text-secondary" />
-            </button>
-          )}
+          <button
+            onClick={onToggle}
+            className="p-1 rounded-full hover:bg-hover-bg transition-colors"
+          >
+            <FiMenu className="text-text-secondary" />
+          </button>
+          
         </div>
         
         {/* Navigation Links */}
@@ -151,4 +150,4 @@ export default function LeftSidebar({ isCollapsed, onToggle }: LeftSidebarProps)
       </motion.div>
     </>
   );
-}; 
+};

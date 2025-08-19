@@ -215,58 +215,66 @@ export default function ActivityCard({ activity, onUpdate, onDelete }: ActivityC
         </div>
         
         {/* Action Buttons */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleUpvote}
-            disabled={isVoting}
-            className={`flex items-center space-x-2 transition-all duration-200 group custom-cursor ${
-              hasUpvoted ? 'text-vote-up' : 'text-text-tertiary hover:text-text-secondary'
-            }`}
-          >
-            <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
-              hasUpvoted 
-                ? 'bg-vote-up/10' 
-                : 'group-hover:bg-hover-bg'
-            }`}>
-              {isVoting ? (
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <FiThumbsUp className="text-lg" />
-              )}
-            </div>
-            <span className="text-sm font-medium">{activity.upvotes || 0}</span>
-          </button>
-          <button
-            onClick={() => setShowComments(!showComments)}
-            className="flex items-center space-x-2 text-text-tertiary hover:text-text-secondary transition-all duration-200 group custom-cursor"
-          >
-            <div className="p-2 rounded-full group-hover:bg-hover-bg transition-all duration-200 transform group-hover:scale-110">
-              <FiMessageCircle className="text-lg" />
-            </div>
-            <span className="text-sm font-medium">{activity.comments?.length || 0}</span>
-          </button>
-          <button
-            onClick={handleOpenDetails}
-            className={`w-full py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : 'bg-bg-tertiary hover:bg-hover-bg text-text-primary'}`}
-          >
-            <span>View Details</span>
-            <FiArrowRight />
-          </button>
-          {isModerator && (
+        <div className="flex items-center justify-between">
+          {/* Social Buttons */}
+          <div className="flex items-center space-x-1">
             <button
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-all duration-200 group custom-cursor"
+              onClick={handleUpvote}
+              disabled={isVoting}
+              className={`flex items-center space-x-1 transition-all duration-200 group custom-cursor ${
+                hasUpvoted ? 'text-vote-up' : 'text-text-tertiary hover:text-text-secondary'
+              }`}
             >
-              <div className="p-2 rounded-full group-hover:bg-red-500/10 transition-all duration-200 transform group-hover:scale-110">
-                {isDeleting ? (
+              <div className={`p-2 rounded-full transition-all duration-200 transform group-hover:scale-110 ${
+                hasUpvoted 
+                  ? 'bg-vote-up/10' 
+                  : 'group-hover:bg-hover-bg'
+              }`}>
+                {isVoting ? (
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <FiTrash2 className="text-lg" />
+                  <FiThumbsUp className="text-lg" />
                 )}
               </div>
+              <span className="text-sm font-medium">{activity.upvotes || 0}</span>
             </button>
-          )}
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center space-x-1 text-text-tertiary hover:text-text-secondary transition-all duration-200 group custom-cursor"
+            >
+              <div className="p-2 rounded-full group-hover:bg-hover-bg transition-all duration-200 transform group-hover:scale-110">
+                <FiMessageCircle className="text-lg" />
+              </div>
+              <span className="text-sm font-medium">{activity.comments?.length || 0}</span>
+            </button>
+          </div>
+
+          {/* Action/Admin Buttons */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleOpenDetails}
+              className={`py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : 'bg-bg-tertiary hover:bg-hover-bg text-text-primary'}`}
+            >
+              <span className="sm:hidden">View</span>
+              <span className="hidden sm:inline">View Details</span>
+              <FiArrowRight />
+            </button>
+            {isModerator && (
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-all duration-200 group custom-cursor"
+              >
+                <div className="p-2 rounded-full group-hover:bg-red-500/10 transition-all duration-200 transform group-hover:scale-110">
+                  {isDeleting ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <FiTrash2 className="text-lg" />
+                  )}
+                </div>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Comments Section */}

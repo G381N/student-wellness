@@ -170,9 +170,14 @@ export default function ActivityDetailsModal({
             {/* Content Area */}
             <div className="flex-1 p-6 overflow-y-auto">
               {/* Activity Title */}
-              <h1 className={`text-2xl md:text-3xl font-bold mb-6 leading-tight ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>
-                {activity.content}
+              <h1 className={`text-xl md:text-2xl font-bold mb-4 leading-tight ${theme === 'light' ? 'text-gray-900' : 'text-text-primary'}`}>
+                {activity.title}
               </h1>
+              
+              {/* Activity Description */}
+              <p className={`text-sm md:text-base mb-6 ${theme === 'light' ? 'text-gray-600' : 'text-text-secondary'}`}>
+                {activity.content}
+              </p>
               
               {/* Activity Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">

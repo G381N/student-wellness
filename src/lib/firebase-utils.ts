@@ -144,13 +144,18 @@ export interface Counselor {
   id: string;
   name: string;
   email: string;
-  phoneNumber: string;
-  specialization: string;
-  availableHours: string;
-  bio: string;
+  phone: string;
+  specializations: string[];
+  workingHours: string;
+  availableDays: string[];
+  maxSessionsPerDay?: number;
+  qualifications?: string;
+  yearsExperience?: number;
+  languages?: string[];
+  notes: string;
   imageUrl?: string;
   isActive: boolean;
-  addedBy: string;
+  addedBy?: string;
   createdAt: any;
 }
 

@@ -18,7 +18,7 @@ interface ActivityCardProps {
 
 // Default activity images by category
 const DEFAULT_IMAGES = {
-  'Academic': '/images/academic.jpg',
+  'Academic': '/images/academic1.jpeg',
   'Sports': '/images/sports1.jpeg',
   'Cultural': '/images/cultural.jpg',
   'Social': '/images/social.jpg',
@@ -29,7 +29,7 @@ const DEFAULT_IMAGES = {
   'Other': '/images/other.jpg'
 };
 
-// Fallback image if category doesn't match
+// Fallback image if category doesn't matc
 const FALLBACK_IMAGE = '/images/activity-default.jpg';
 
 // Category styling

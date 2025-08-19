@@ -41,6 +41,7 @@ export default function TopBar({
       return {
         left: '56px', // Match exactly with the mobile sidebar width (from LayoutShell)
         right: '0px',
+        marginLeft: '-1px', // Only apply negative margin on mobile to fix the gap
       };
     }
     
@@ -67,7 +68,7 @@ export default function TopBar({
     <>
       <motion.div
         className="fixed top-0 h-16 z-30 bg-bg-secondary bg-opacity-80 backdrop-blur-md border-b border-border-primary flex items-center transition-all duration-300"
-        style={{...getTopBarStyles(), marginLeft: '-1px'}}
+        style={{...getTopBarStyles()}}
         layout
       >
         <div className="w-full px-2 sm:px-4">

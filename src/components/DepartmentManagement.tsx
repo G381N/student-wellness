@@ -182,13 +182,13 @@ const DepartmentManagement: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white p-3 sm:p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white p-2 sm:p-6 overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <FiBriefcase className="text-2xl text-blue-600 dark:text-blue-400" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Department Management</h1>
+        <div className="mb-4 sm:mb-8">
+          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <FiBriefcase className="text-xl sm:text-2xl text-blue-600 dark:text-blue-400" />
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white break-words">Department Management</h1>
             </div>
           <button
               onClick={() => {
@@ -202,13 +202,13 @@ const DepartmentManagement: React.FC = () => {
                   isActive: true
                 });
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm sm:text-base shadow-sm"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-base shadow-sm whitespace-nowrap"
           >
-              <FiPlus className="text-sm" />
+              <FiPlus className="text-xs sm:text-sm" />
             Add Department
           </button>
         </div>
-          <p className="text-sm sm:text-base text-gray-400">
+          <p className="text-xs sm:text-base text-gray-400">
             Manage departments and their information for the complaints system.
           </p>
       </div>
@@ -379,53 +379,53 @@ const DepartmentManagement: React.FC = () => {
         ) : (
           <div className="grid gap-4 sm:gap-6">
               {departments.map((department) => (
-              <motion.div
+              <motion.div 
                 key={department.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:border-blue-500 transition-colors shadow-sm"
+                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-6 hover:border-blue-500 transition-colors shadow-sm"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{department.name}</h3>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white break-words">{department.name}</h3>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50 whitespace-nowrap">
                         {department.code}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       department.isActive 
                           ? 'bg-green-50 dark:bg-green-900/50 text-green-600 dark:text-green-300 border border-green-100 dark:border-green-800/50' 
                           : 'bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 border border-red-100 dark:border-red-800/50'
-                    }`}>
+                    } whitespace-nowrap`}>
                       {department.isActive ? 'Active' : 'Inactive'}
                     </span>
                     </div>
                     
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <FiPhone className="text-xs" />
-                        <span>Head Phone: {department.headPhoneNumber}</span>
+                    <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <FiPhone className="flex-shrink-0 text-xs" />
+                        <span className="truncate">Head Phone: {department.headPhoneNumber}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <FiUser className="text-xs" />
-                        <span>Created by: {department.createdBy}</span>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <FiUser className="flex-shrink-0 text-xs" />
+                        <span className="truncate">Created by: {department.createdBy}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <span>Created: {formatTimestamp(department.createdAt)}</span>
                       </div>
-        </div>
-      </div>
+                    </div>
+                  </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 self-start">
                     <button
                       onClick={() => handleEdit(department)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm"
                     >
-                      <FiEdit className="text-sm" />
+                      <FiEdit className="text-xs sm:text-sm" />
                     </button>
                       <button
                       onClick={() => handleToggleActive(department.id, department.isActive)}
-                      className={`px-3 py-1 rounded-lg transition-colors text-sm ${
+                      className={`px-2 sm:px-3 py-1 rounded-lg transition-colors text-xs sm:text-sm ${
                         department.isActive 
                           ? 'bg-red-600 text-white hover:bg-red-700' 
                           : 'bg-green-600 text-white hover:bg-green-700'
@@ -433,30 +433,30 @@ const DepartmentManagement: React.FC = () => {
                       >
                       {department.isActive ? 'Deactivate' : 'Activate'}
                       </button>
-        </div>
-      </div>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
         )}
 
         {/* Summary Stats */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-gray-800 dark:text-white">{departments.length}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Total Departments</div>
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg p-3 sm:p-4 text-center shadow-sm">
+            <div className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{departments.length}</div>
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Total Departments</div>
           </div>
-          <div className="bg-green-50 dark:bg-gray-900 border border-green-100 dark:border-gray-700 rounded-lg p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <div className="bg-green-50 dark:bg-gray-900 border border-green-100 dark:border-gray-700 rounded-lg p-3 sm:p-4 text-center shadow-sm">
+            <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
               {departments.filter((d: Department) => d.isActive).length}
             </div>
-            <div className="text-sm text-green-600 dark:text-gray-400">Active Departments</div>
+            <div className="text-xs sm:text-sm text-green-600 dark:text-gray-400">Active Departments</div>
           </div>
-          <div className="bg-red-50 dark:bg-gray-900 border border-red-100 dark:border-gray-700 rounded-lg p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+          <div className="bg-red-50 dark:bg-gray-900 border border-red-100 dark:border-gray-700 rounded-lg p-3 sm:p-4 text-center shadow-sm">
+            <div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
               {departments.filter((d: Department) => !d.isActive).length}
             </div>
-            <div className="text-sm text-red-600 dark:text-gray-400">Inactive Departments</div>
+            <div className="text-xs sm:text-sm text-red-600 dark:text-gray-400">Inactive Departments</div>
           </div>
         </div>
       </div>

@@ -121,10 +121,10 @@ export default function ManageCounselors() {
   }
   
   return (
-    <div className="p-4 sm:p-6 min-h-screen text-text-primary">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-3"><FiUsers /> Manage Counselors</h1>
-        <button onClick={() => handleOpenModal()} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors">
+    <div className="p-2 sm:p-6 min-h-screen text-text-primary overflow-x-hidden">
+      <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 sm:gap-0 mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 sm:gap-3"><FiUsers /> Manage Counselors</h1>
+        <button onClick={() => handleOpenModal()} className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg flex items-center gap-1 sm:gap-2 hover:bg-blue-700 transition-colors text-sm whitespace-nowrap">
           <FiPlus /> Add Counselor
         </button>
       </div>
@@ -142,29 +142,29 @@ export default function ManageCounselors() {
               key={counselor.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-bg-secondary rounded-xl p-4 sm:p-6 border border-border-primary hover:border-border-secondary transition-all group"
+              className="bg-bg-secondary rounded-xl p-3 sm:p-6 border border-border-primary hover:border-border-secondary transition-all group"
             >
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiUser className="w-6 h-6 text-white" />
+                  <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <FiUser className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-bold text-text-primary mb-1 break-words">{counselor.name}</h3>
-                      <p className="text-blue-400 text-sm break-all">{counselor.email}</p>
-                      <p className="text-text-tertiary text-sm mt-1">{counselor.phoneNumber}</p>
+                      <h3 className="text-base sm:text-lg font-bold text-text-primary mb-0.5 sm:mb-1 truncate">{counselor.name}</h3>
+                      <p className="text-blue-400 text-xs sm:text-sm truncate">{counselor.email}</p>
+                      <p className="text-text-tertiary text-xs sm:text-sm mt-0.5 sm:mt-1">{counselor.phoneNumber}</p>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {/* Specializations and Available Days in 2 columns on larger screens */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
                       {/* Specializations */}
                       <div>
-                        <h4 className="text-text-secondary text-sm font-medium mb-2">Specializations</h4>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="px-2 py-1 bg-blue-900/30 text-blue-300 rounded-full text-xs font-medium border border-blue-800/50">
+                        <h4 className="text-text-secondary text-xs sm:text-sm font-medium mb-1 sm:mb-2">Specializations</h4>
+                        <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                          <span className="px-2 py-0.5 sm:py-1 bg-blue-900/30 text-blue-300 rounded-full text-xs font-medium border border-blue-800/50">
                             {counselor.specialization}
                           </span>
                         </div>
@@ -172,17 +172,17 @@ export default function ManageCounselors() {
 
                       {/* Available Hours */}
                       <div>
-                        <h4 className="text-text-secondary text-sm font-medium mb-2">Available Hours</h4>
-                        <span className="px-2 py-1 bg-green-900/30 text-green-300 rounded-full text-xs font-medium border border-green-800/50">
+                        <h4 className="text-text-secondary text-xs sm:text-sm font-medium mb-1 sm:mb-2">Available Hours</h4>
+                        <span className="px-2 py-0.5 sm:py-1 bg-green-900/30 text-green-300 rounded-full text-xs font-medium border border-green-800/50">
                           {counselor.availableHours}
                         </span>
                       </div>
                     </div>
 
                     {/* Bio/Notes */}
-                    <div className="pt-4 border-t border-border-primary">
+                    <div className="pt-2 sm:pt-4 border-t border-border-primary">
                       <h4 className="text-text-tertiary text-xs uppercase tracking-wide mb-1">Bio</h4>
-                      <p className="text-text-secondary text-sm break-words">{counselor.bio}</p>
+                      <p className="text-text-secondary text-xs sm:text-sm line-clamp-2 sm:line-clamp-none">{counselor.bio}</p>
                     </div>
                   </div>
                 </div>
@@ -190,32 +190,32 @@ export default function ManageCounselors() {
                 {/* Action Buttons */}
                 <div className="flex sm:flex-col gap-2 flex-shrink-0">
                   <button
-                    onClick={() => setEditingCounselor(counselor)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                    onClick={() => handleOpenModal(counselor)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium"
                   >
-                    <FiEdit2 className="w-4 h-4" />
-                    <span className="sm:inline">Edit</span>
+                    <FiEdit2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Edit</span>
                   </button>
                   <button
                     onClick={() => handleDeleteCounselor(counselor.id)}
                     disabled={deleting === counselor.id}
-                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium"
                   >
                     {deleting === counselor.id ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <FiTrash2 className="w-4 h-4" />
+                      <FiTrash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
-                    <span className="sm:inline">{deleting === counselor.id ? 'Deleting...' : 'Delete'}</span>
+                    <span>{deleting === counselor.id ? 'Deleting...' : 'Delete'}</span>
                   </button>
                 </div>
               </div>
 
               {/* Status Indicator */}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-border-primary">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between mt-2 sm:mt-4 pt-2 sm:pt-3 border-t border-border-primary">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <div className={`w-2 h-2 rounded-full ${counselor.isActive ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                  <span className={`text-sm font-medium ${counselor.isActive ? 'text-green-400' : 'text-text-tertiary'}`}>
+                  <span className={`text-xs sm:text-sm font-medium ${counselor.isActive ? 'text-green-400' : 'text-text-tertiary'}`}>
                     {counselor.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -233,29 +233,29 @@ export default function ManageCounselors() {
 
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="bg-bg-secondary border border-border-primary rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">{editingCounselor ? 'Edit' : 'Add New'} Counselor</h2>
-                <button onClick={handleCloseModal} className="text-text-tertiary hover:text-text-primary"><FiX size={24} /></button>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 sm:p-4">
+            <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="bg-bg-secondary border border-border-primary rounded-lg p-3 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold">{editingCounselor ? 'Edit' : 'Add New'} Counselor</h2>
+                <button onClick={handleCloseModal} className="text-text-tertiary hover:text-text-primary"><FiX size={20} /></button>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className="w-full p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary focus:ring-2 focus:ring-blue-500" required />
-                  <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className="w-full p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary" required />
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className="w-full p-2 sm:p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary focus:ring-2 focus:ring-blue-500 text-sm" required />
+                  <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className="w-full p-2 sm:p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary text-sm" required />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Phone Number" className="w-full p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary" required />
-                  <input name="availableHours" value={formData.availableHours} onChange={handleChange} placeholder="Available Hours (e.g., 9 AM - 5 PM)" className="w-full p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Phone Number" className="w-full p-2 sm:p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary text-sm" required />
+                  <input name="availableHours" value={formData.availableHours} onChange={handleChange} placeholder="Available Hours (e.g., 9 AM - 5 PM)" className="w-full p-2 sm:p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary text-sm" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-text-tertiary mb-2">Specialization</label>
-                    <input name="specialization" value={formData.specialization} onChange={handleChange} placeholder="e.g., Anxiety, Stress, Relationships" className="w-full p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary" />
+                    <label className="block text-xs sm:text-sm font-medium text-text-tertiary mb-1 sm:mb-2">Specialization</label>
+                    <input name="specialization" value={formData.specialization} onChange={handleChange} placeholder="e.g., Anxiety, Stress, Relationships" className="w-full p-2 sm:p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary text-sm" />
                 </div>
-                <textarea name="bio" value={formData.bio || ''} onChange={handleChange} placeholder="Bio/description about the counselor..." className="w-full p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary" rows={3} />
-                <div className="flex justify-end gap-4 pt-4">
-                  <button type="button" onClick={handleCloseModal} className="text-text-tertiary hover:text-text-primary px-6 py-2 rounded-lg">Cancel</button>
-                  <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"><FiCheckCircle/> {editingCounselor ? 'Update Counselor' : 'Add Counselor'}</button>
+                <textarea name="bio" value={formData.bio || ''} onChange={handleChange} placeholder="Bio/description about the counselor..." className="w-full p-2 sm:p-3 bg-bg-tertiary rounded border border-border-primary text-text-primary text-sm" rows={3} />
+                <div className="flex justify-end gap-3 sm:gap-4 pt-2 sm:pt-4">
+                  <button type="button" onClick={handleCloseModal} className="text-text-tertiary hover:text-text-primary px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg text-sm">Cancel</button>
+                  <button type="submit" className="bg-green-600 text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg flex items-center gap-1 sm:gap-2 hover:bg-green-700 text-sm"><FiCheckCircle/> {editingCounselor ? 'Update' : 'Add'}</button>
                 </div>
               </form>
             </motion.div>

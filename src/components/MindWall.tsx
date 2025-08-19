@@ -110,7 +110,7 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
         votedBy: [],
         timestamp: new Date(),
         authorId: user.uid,
-        severity: 'Low'
+        urgency: 'Low'
       });
 
       setIssues([createdIssue, ...issues]);
@@ -184,29 +184,29 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
 
   return (
     <div className="min-h-screen bg-app-primary text-app-primary">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto w-full px-2 sm:px-0">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-app-primary bg-opacity-90 backdrop-blur-sm border-b border-app-primary">
-          <div className="flex items-center justify-between p-4">
-            <h1 className="text-xl font-bold">Mind Wall</h1>
+          <div className="flex items-center justify-between p-2 sm:p-4">
+            <h1 className="text-lg sm:text-xl font-bold">Mind Wall</h1>
             <div className="flex items-center space-x-2">
             <button
                 onClick={() => setShowAnalytics(true)}
-                className="px-3 py-2 bg-app-secondary text-app-primary rounded-full hover-bg-app transition-colors flex items-center space-x-2"
+                className="px-2 sm:px-3 py-1.5 sm:py-2 bg-app-secondary text-app-primary rounded-full hover-bg-app transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <FiBarChart className="text-lg" />
+                <FiBarChart className="text-base sm:text-lg" />
                 <span className="hidden sm:inline">Analytics</span>
-                      </button>
+              </button>
               <button
                 onClick={() => setShowAddForm(true)}
-                className={`px-4 py-2 rounded-full transition-colors flex items-center space-x-2 ${
+                className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-full transition-colors flex items-center space-x-1 sm:space-x-2 ${
                   theme === 'dark' 
                     ? 'bg-white text-black hover:bg-gray-200' 
                     : 'bg-black text-white hover:bg-gray-800'
                 }`}
               >
-                <FiPlus className="text-lg" />
-                <span>Share Thought</span>
+                <FiPlus className="text-base sm:text-lg" />
+                <span className="text-xs sm:text-base">Share Thought</span>
               </button>
             </div>
           </div>
@@ -215,65 +215,65 @@ export default function MindWall({ searchQuery = '' }: MindWallProps) {
         {/* Issues List */}
         <div className="divide-y border-app-primary">
           {filteredIssues.map((issue) => (
-            <div key={issue.id} className="p-4 hover-bg-app transition-colors">
+            <div key={issue.id} className="p-3 sm:p-4 hover-bg-app transition-colors">
               <div className="flex items-start justify-between">
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   {/* Title and Category */}
                   <div className="flex items-center space-x-2 mb-2">
-                    <h2 className="text-lg font-bold">{issue.title}</h2>
+                    <h2 className="text-base sm:text-lg font-bold truncate">{issue.title}</h2>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-app-secondary mb-3">
-                    <span className="px-2 py-1 bg-app-secondary rounded-full">{issue.category}</span>
-                    <span>•</span>
-                    <span>{new Date(issue.timestamp).toLocaleDateString()}</span>
+                  <div className="flex items-center flex-wrap gap-1 sm:gap-2 text-sm text-app-secondary mb-3">
+                    <span className="px-2 py-1 bg-app-secondary rounded-full text-xs sm:text-sm">{issue.category}</span>
+                    <span className="hidden xs:inline">•</span>
+                    <span className="text-xs sm:text-sm">{new Date(issue.timestamp).toLocaleDateString()}</span>
                   </div>
                   
                   {/* Description */}
-                  <p className="text-app-secondary mb-4">{issue.description}</p>
+                  <p className="text-app-secondary mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none">{issue.description}</p>
                   
                   {/* Actions */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 sm:space-x-4">
                       <button
                       onClick={() => handleVote(issue.id)}
                         disabled={votingStates[issue.id]}
-                      className={`flex items-center space-x-2 transition-colors ${
+                      className={`flex items-center space-x-1 sm:space-x-2 transition-colors ${
                         issue.votedBy.includes(user?.uid || '') 
                           ? 'text-green-400' 
                           : 'text-app-secondary hover:text-app-primary'
                       }`}
                     >
-                      <div className={`p-2 rounded-full transition-colors ${
+                      <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${
                         issue.votedBy.includes(user?.uid || '')
                           ? 'bg-green-900 bg-opacity-20'
                           : 'hover-bg-app'
                       }`}>
                         {votingStates[issue.id] ? (
-                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                         ) : (
-                          <FiChevronUp className="w-5 h-5" />
+                          <FiChevronUp className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </div>
-                      <span>{issue.count}</span>
+                      <span className="text-sm sm:text-base">{issue.count}</span>
                     </button>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
                       <button
                         onClick={() => handleShare(issue)}
-                        className="p-2 text-app-secondary hover:text-app-primary hover-bg-app rounded-full transition-colors"
+                        className="p-1.5 sm:p-2 text-app-secondary hover:text-app-primary hover-bg-app rounded-full transition-colors"
                       >
-                        <FiShare className="w-5 h-5" />
+                        <FiShare className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                       
                       {(user?.uid === issue.authorId || isModerator || isAdmin) && (
                         <button
                           onClick={() => handleDeleteIssue(issue.id)}
                           disabled={deleting === issue.id}
-                          className="p-2 text-app-secondary hover:text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-full transition-colors"
+                          className="p-1.5 sm:p-2 text-app-secondary hover:text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-full transition-colors"
                         >
                           {deleting === issue.id ? (
-                            <div className="w-5 h-5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
                           ) : (
-                            <FiTrash2 className="w-5 h-5" />
+                            <FiTrash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                           )}
                         </button>
                       )}

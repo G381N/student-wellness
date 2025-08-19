@@ -51,75 +51,105 @@ export default function WellnessPage() {
       description: 'Find inner peace with meditation',
       component: (
         <div className="space-y-6">
-          <div className="text-center mb-8">
-            <FiSun className="text-yellow-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Meditation Center</h3>
-            <p className="text-text-secondary">Find your inner peace through guided meditation</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Mindfulness Session */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-yellow-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-yellow-400 mb-3">🧘‍♀️ Mindfulness Meditation</h4>
-              <p className="text-text-secondary mb-4">Focus on the present moment and cultivate awareness</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>⏱️ Duration: 10-20 minutes</p>
-                <p>📱 Perfect for: Reducing anxiety, improving focus</p>
-                <p>🎯 Level: Beginner friendly</p>
+          {/* Daily Meditation Quote */}
+          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-bg-tertiary dark:to-bg-secondary p-6 rounded-xl border-l-4 border-yellow-400">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">💭</span>
+              <div>
+                <p className="text-text-primary italic text-lg leading-relaxed mb-2">
+                  "Peace comes from within. Do not seek it without."
+                </p>
+                <p className="text-text-secondary text-sm font-medium">— Buddha</p>
               </div>
-              <button className="w-full mt-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-text-primary rounded-lg transition-colors">
-                Start Session
-              </button>
-            </div>
-            
-            {/* Body Scan */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-yellow-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-yellow-400 mb-3">🌊 Body Scan Meditation</h4>
-              <p className="text-text-secondary mb-4">Release tension and connect with your body</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>⏱️ Duration: 15-30 minutes</p>
-                <p>📱 Perfect for: Stress relief, better sleep</p>
-                <p>🎯 Level: All levels</p>
-              </div>
-              <button className="w-full mt-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-text-primary rounded-lg transition-colors">
-                Start Session
-              </button>
-            </div>
-            
-            {/* Loving Kindness */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-yellow-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-yellow-400 mb-3">💝 Loving-Kindness Meditation</h4>
-              <p className="text-text-secondary mb-4">Cultivate compassion for yourself and others</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>⏱️ Duration: 10-15 minutes</p>
-                <p>📱 Perfect for: Self-compassion, relationships</p>
-                <p>🎯 Level: Beginner friendly</p>
-              </div>
-              <button className="w-full mt-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-text-primary rounded-lg transition-colors">
-                Start Session
-              </button>
-            </div>
-            
-            {/* Stress Relief */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-yellow-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-yellow-400 mb-3">🌿 Quick Stress Relief</h4>
-              <p className="text-text-secondary mb-4">5-minute meditation for instant calm</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>⏱️ Duration: 5 minutes</p>
-                <p>📱 Perfect for: Busy schedules, exam stress</p>
-                <p>🎯 Level: Beginner friendly</p>
-              </div>
-              <button className="w-full mt-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-text-primary rounded-lg transition-colors">
-                Start Session
-              </button>
             </div>
           </div>
-          
-          <div className="bg-gradient-to-r from-yellow-900 to-orange-900 p-6 rounded-xl border border-yellow-600">
-            <h4 className="text-lg font-semibold text-yellow-200 mb-3">✨ Today's Meditation Quote</h4>
-            <p className="text-yellow-100 italic text-center text-lg">
-              "Peace comes from within. Do not seek it without." - Buddha
-            </p>
+
+          {/* Meditation Benefits */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-bg-tertiary p-4 rounded-xl">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-xl">🧠</span>
+                <h4 className="font-semibold text-text-primary">Mental Benefits</h4>
+              </div>
+              <ul className="space-y-2 text-text-secondary text-sm">
+                <li>• Reduces stress and anxiety</li>
+                <li>• Improves focus and concentration</li>
+                <li>• Enhances emotional well-being</li>
+                <li>• Increases self-awareness</li>
+              </ul>
+            </div>
+            <div className="bg-bg-tertiary p-4 rounded-xl">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-xl">❤️</span>
+                <h4 className="font-semibold text-text-primary">Physical Benefits</h4>
+              </div>
+              <ul className="space-y-2 text-text-secondary text-sm">
+                <li>• Lowers blood pressure</li>
+                <li>• Improves sleep quality</li>
+                <li>• Boosts immune system</li>
+                <li>• Reduces chronic pain</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Meditation Tips */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">💡</span>
+              <h4 className="font-semibold text-text-primary">Daily Meditation Tips</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-yellow-500 mt-1">✨</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Start Small:</strong> Begin with just 5 minutes daily</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-yellow-500 mt-1">🌅</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Morning Practice:</strong> Meditate right after waking up</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-yellow-500 mt-1">🪑</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Comfortable Space:</strong> Find a quiet, comfortable spot</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-orange-500 mt-1">🎯</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Focus on Breath:</strong> Use breathing as your anchor</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-orange-500 mt-1">🧘</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Be Patient:</strong> Don't judge your thoughts</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-orange-500 mt-1">📅</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Consistency:</strong> Practice daily for best results</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Simple Breathing Exercise */}
+          <div className="bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-bg-tertiary dark:to-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-3">
+              <span className="text-xl">🌬️</span>
+              <h4 className="font-semibold text-text-primary">4-7-8 Breathing Technique</h4>
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">4</div>
+                <p className="text-text-secondary text-sm">Inhale for 4 seconds</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">7</div>
+                <p className="text-text-secondary text-sm">Hold for 7 seconds</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">8</div>
+                <p className="text-text-secondary text-sm">Exhale for 8 seconds</p>
+              </div>
+            </div>
           </div>
         </div>
       )
@@ -131,97 +161,130 @@ export default function WellnessPage() {
       description: 'Improve your sleep quality',
       component: (
         <div className="space-y-6">
-          <div className="text-center mb-8">
-            <FiMoon className="text-blue-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Sleep Wellness Center</h3>
-            <p className="text-text-secondary">Optimize your sleep for better health and wellbeing</p>
+          {/* Sleep Quote */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-bg-tertiary dark:to-bg-secondary p-6 rounded-xl border-l-4 border-blue-400">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">💤</span>
+              <div>
+                <p className="text-text-primary italic text-lg leading-relaxed mb-2">
+                  "Sleep is the golden chain that ties health and our bodies together."
+                </p>
+                <p className="text-text-secondary text-sm font-medium">— Thomas Dekker</p>
+              </div>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Sleep Tracker */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-blue-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-blue-400 mb-3">📊 Sleep Quality Tracker</h4>
-              <p className="text-text-secondary mb-4">Monitor your sleep patterns and quality</p>
+
+          {/* Sleep Hygiene Tips */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🛏️</span>
+              <h4 className="font-semibold text-text-primary">Essential Sleep Hygiene Tips</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Last Night's Sleep:</span>
-                  <span className="text-green-400 font-semibold">7h 32m</span>
+                <div className="flex items-start space-x-3">
+                  <span className="text-blue-500 mt-1">🕘</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Consistent Sleep Schedule</p>
+                    <p className="text-text-secondary text-sm">Go to bed and wake up at the same time daily</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Sleep Quality:</span>
-                  <span className="text-blue-400 font-semibold">Good</span>
+                <div className="flex items-start space-x-3">
+                  <span className="text-blue-500 mt-1">🌡️</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Cool Environment</p>
+                    <p className="text-text-secondary text-sm">Keep bedroom temperature between 60-67°F</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Weekly Average:</span>
-                  <span className="text-yellow-400 font-semibold">7h 15m</span>
-                </div>
-              </div>
-              <button className="w-full mt-4 py-2 bg-blue-600 hover:bg-blue-500 text-text-primary rounded-lg transition-colors">
-                Log Sleep
-              </button>
-            </div>
-            
-            {/* Sleep Stories */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-blue-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-blue-400 mb-3">📚 Bedtime Stories</h4>
-              <p className="text-text-secondary mb-4">Calming stories to help you drift off to sleep</p>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-3 p-2 hover:bg-bg-secondary rounded cursor-pointer">
-                  <span className="text-2xl">🌙</span>
-                  <span className="text-text-secondary">The Moonlit Forest</span>
-                </div>
-                <div className="flex items-center space-x-3 p-2 hover:bg-bg-secondary rounded cursor-pointer">
-                  <span className="text-2xl">🌊</span>
-                  <span className="text-text-secondary">Ocean Waves</span>
-                </div>
-                <div className="flex items-center space-x-3 p-2 hover:bg-bg-secondary rounded cursor-pointer">
-                  <span className="text-2xl">⭐</span>
-                  <span className="text-text-secondary">Stargazing Journey</span>
+                <div className="flex items-start space-x-3">
+                  <span className="text-blue-500 mt-1">🌑</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Dark Room</p>
+                    <p className="text-text-secondary text-sm">Use blackout curtains or eye masks</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Sleep Hygiene Tips */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-blue-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-blue-400 mb-3">💡 Sleep Hygiene Tips</h4>
-              <p className="text-text-secondary mb-4">Evidence-based tips for better sleep</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>• Keep a consistent sleep schedule</p>
-                <p>• Avoid screens 1 hour before bed</p>
-                <p>• Keep bedroom cool and dark</p>
-                <p>• Limit caffeine after 2 PM</p>
-                <p>• Create a relaxing bedtime routine</p>
-              </div>
-            </div>
-            
-            {/* Sleep Sounds */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-blue-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-blue-400 mb-3">🎵 Sleep Sounds</h4>
-              <p className="text-text-secondary mb-4">Soothing sounds for better sleep</p>
-              <div className="grid grid-cols-2 gap-2">
-                <button className="p-2 bg-bg-secondary hover:bg-hover-bg rounded text-sm text-text-secondary transition-colors">
-                  🌧️ Rain
-                </button>
-                <button className="p-2 bg-bg-secondary hover:bg-hover-bg rounded text-sm text-text-secondary transition-colors">
-                  🌊 Waves
-                </button>
-                <button className="p-2 bg-bg-secondary hover:bg-hover-bg rounded text-sm text-text-secondary transition-colors">
-                  🔥 Fireplace
-                </button>
-                <button className="p-2 bg-bg-secondary hover:bg-hover-bg rounded text-sm text-text-secondary transition-colors">
-                  🌿 Forest
-                </button>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">📱</span>
+                  <div>
+                    <p className="text-text-primary font-medium">No Screens Before Bed</p>
+                    <p className="text-text-secondary text-sm">Avoid devices 1 hour before sleep</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">☕</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Limit Caffeine</p>
+                    <p className="text-text-secondary text-sm">No caffeine 6 hours before bedtime</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">🧘</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Relaxation Routine</p>
+                    <p className="text-text-secondary text-sm">Create a calming pre-sleep ritual</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="bg-gradient-to-r from-blue-900 to-purple-900 p-6 rounded-xl border border-blue-600">
-            <h4 className="text-lg font-semibold text-blue-200 mb-3">🎯 Sleep Goal</h4>
-            <p className="text-blue-100 mb-2">Weekly Sleep Target: 49 hours (7h/night)</p>
-            <div className="w-full bg-bg-secondary rounded-full h-3">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full" style={{width: '78%'}}></div>
+
+          {/* Sleep Quality Indicators */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-bg-tertiary p-4 rounded-xl text-center">
+              <div className="text-3xl mb-2">💪</div>
+              <h5 className="font-semibold text-text-primary mb-1">Good Sleep Signs</h5>
+              <ul className="text-text-secondary text-sm space-y-1">
+                <li>• Fall asleep in 15-20 min</li>
+                <li>• Sleep 7-9 hours</li>
+                <li>• Wake up refreshed</li>
+              </ul>
             </div>
-            <p className="text-blue-200 text-sm mt-2">38.5 / 49 hours completed this week</p>
+            <div className="bg-bg-tertiary p-4 rounded-xl text-center">
+              <div className="text-3xl mb-2">⚠️</div>
+              <h5 className="font-semibold text-text-primary mb-1">Warning Signs</h5>
+              <ul className="text-text-secondary text-sm space-y-1">
+                <li>• Trouble falling asleep</li>
+                <li>• Frequent night waking</li>
+                <li>• Morning fatigue</li>
+              </ul>
+            </div>
+            <div className="bg-bg-tertiary p-4 rounded-xl text-center">
+              <div className="text-3xl mb-2">🎯</div>
+              <h5 className="font-semibold text-text-primary mb-1">Sleep Goals</h5>
+              <ul className="text-text-secondary text-sm space-y-1">
+                <li>• 7-9 hours nightly</li>
+                <li>• Same sleep schedule</li>
+                <li>• Quality over quantity</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Natural Sleep Aids */}
+          <div className="bg-gradient-to-r from-blue-100 to-purple-100 dark:from-bg-tertiary dark:to-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-3">
+              <span className="text-xl">🌿</span>
+              <h4 className="font-semibold text-text-primary">Natural Sleep Enhancers</h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl mb-1">🍵</div>
+                <p className="text-text-primary font-medium text-sm">Chamomile Tea</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl mb-1">🛁</div>
+                <p className="text-text-primary font-medium text-sm">Warm Bath</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl mb-1">📖</div>
+                <p className="text-text-primary font-medium text-sm">Reading</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg">
+                <div className="text-2xl mb-1">🎵</div>
+                <p className="text-text-primary font-medium text-sm">Soft Music</p>
+              </div>
+            </div>
           </div>
         </div>
       )
@@ -233,132 +296,139 @@ export default function WellnessPage() {
       description: 'Track your physical wellness',
       component: (
         <div className="space-y-6">
-          <div className="text-center mb-8">
-            <FiActivity className="text-green-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Fitness Tracker</h3>
-            <p className="text-text-secondary">Track your physical activity and health goals</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Daily Stats */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-green-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-green-400 mb-4">📊 Today's Stats</h4>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-400">8,547</div>
-                  <div className="text-text-tertiary text-sm">Steps</div>
-                  <div className="w-full bg-bg-secondary rounded-full h-2 mt-2">
-                    <div className="bg-green-400 h-2 rounded-full" style={{width: '85%'}}></div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className="text-xl font-semibold text-blue-400">6.2km</div>
-                    <div className="text-text-tertiary text-xs">Distance</div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-semibold text-yellow-400">420</div>
-                    <div className="text-text-tertiary text-xs">Calories</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Weekly Progress */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-green-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-green-400 mb-4">📈 Weekly Progress</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Workouts:</span>
-                  <span className="text-green-400 font-semibold">4/5</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Active Days:</span>
-                  <span className="text-blue-400 font-semibold">6/7</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Total Steps:</span>
-                  <span className="text-yellow-400 font-semibold">52,430</span>
-                </div>
-                <div className="mt-4">
-                  <div className="text-sm text-text-tertiary mb-2">Weekly Goal Progress</div>
-                  <div className="w-full bg-bg-secondary rounded-full h-3">
-                    <div className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full" style={{width: '80%'}}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick Workouts */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-green-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-green-400 mb-4">💪 Quick Workouts</h4>
-              <div className="space-y-3">
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">🏃‍♀️</span>
-                    <div>
-                      <div className="text-text-primary font-medium">Morning Cardio</div>
-                      <div className="text-text-tertiary text-sm">15 mins</div>
-                    </div>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">💪</span>
-                    <div>
-                      <div className="text-text-primary font-medium">Strength Training</div>
-                      <div className="text-text-tertiary text-sm">30 mins</div>
-                    </div>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">🧘‍♂️</span>
-                    <div>
-                      <div className="text-text-primary font-medium">Yoga Flow</div>
-                      <div className="text-text-tertiary text-sm">20 mins</div>
-                    </div>
-                  </div>
-                </button>
+          {/* Fitness Quote */}
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-bg-tertiary dark:to-bg-secondary p-6 rounded-xl border-l-4 border-green-400">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">🏃‍♂️</span>
+              <div>
+                <p className="text-text-primary italic text-lg leading-relaxed mb-2">
+                  "The only bad workout is the one that didn't happen."
+                </p>
+                <p className="text-text-secondary text-sm font-medium">— Unknown</p>
               </div>
             </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Water Intake */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-blue-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-blue-400 mb-4">💧 Water Intake</h4>
-              <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-blue-400">6/8</div>
-                <div className="text-text-tertiary text-sm">Glasses today</div>
-              </div>
-              <div className="flex space-x-2 justify-center">
-                {[1,2,3,4,5,6,7,8].map((glass) => (
-                  <div key={glass} className={`w-6 h-8 rounded ${glass <= 6 ? 'bg-blue-400' : 'bg-gray-600'}`}></div>
-                ))}
-              </div>
-              <button className="w-full mt-4 py-2 bg-blue-600 hover:bg-blue-500 text-text-primary rounded-lg transition-colors">
-                Add Glass
-              </button>
+
+          {/* Fitness Guidelines */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">📋</span>
+              <h4 className="font-semibold text-text-primary">Weekly Exercise Guidelines</h4>
             </div>
-            
-            {/* Health Reminders */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-purple-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-purple-400 mb-4">⏰ Health Reminders</h4>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-2 bg-bg-secondary rounded">
-                  <span className="text-text-secondary">Take a break</span>
-                  <span className="text-green-400 text-sm">✓ Done</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-bg-tertiary p-4 rounded-xl">
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="text-xl">❤️</span>
+                  <h5 className="font-semibold text-text-primary">Cardiovascular</h5>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-bg-secondary rounded">
-                  <span className="text-text-secondary">Drink water</span>
-                  <span className="text-yellow-400 text-sm">In 30m</span>
+                <ul className="space-y-2 text-text-secondary text-sm">
+                  <li>• 150 minutes moderate intensity</li>
+                  <li>• OR 75 minutes vigorous intensity</li>
+                  <li>• Walking, running, cycling, swimming</li>
+                  <li>• Break into 10+ minute sessions</li>
+                </ul>
+              </div>
+              <div className="bg-bg-tertiary p-4 rounded-xl">
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="text-xl">🏋️</span>
+                  <h5 className="font-semibold text-text-primary">Strength Training</h5>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-bg-secondary rounded">
-                  <span className="text-text-secondary">Evening walk</span>
-                  <span className="text-blue-400 text-sm">Pending</span>
+                <ul className="space-y-2 text-text-secondary text-sm">
+                  <li>• 2+ days per week</li>
+                  <li>• All major muscle groups</li>
+                  <li>• 8-12 repetitions per exercise</li>
+                  <li>• Bodyweight or weights</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Activity Tips */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">⚡</span>
+              <h4 className="font-semibold text-text-primary">Stay Active Throughout the Day</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="bg-green-100 dark:bg-bg-tertiary p-4 rounded-xl mb-2">
+                  <div className="text-3xl mb-2">🚶</div>
+                  <h5 className="font-semibold text-text-primary">Daily Steps</h5>
+                  <p className="text-text-secondary text-sm">Aim for 8,000-10,000 steps</p>
                 </div>
               </div>
+              <div className="text-center">
+                <div className="bg-blue-100 dark:bg-bg-tertiary p-4 rounded-xl mb-2">
+                  <div className="text-3xl mb-2">🪑</div>
+                  <h5 className="font-semibold text-text-primary">Break Sitting</h5>
+                  <p className="text-text-secondary text-sm">Stand every 30 minutes</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="bg-green-100 dark:bg-bg-tertiary p-4 rounded-xl mb-2">
+                  <div className="text-3xl mb-2">🚲</div>
+                  <h5 className="font-semibold text-text-primary">Active Transport</h5>
+                  <p className="text-text-secondary text-sm">Walk or bike when possible</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Simple Exercises */}
+          <div className="bg-gradient-to-r from-green-100 to-blue-100 dark:from-bg-tertiary dark:to-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🏃</span>
+              <h4 className="font-semibold text-text-primary">Quick Exercises (No Equipment Needed)</h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🏃‍♀️</div>
+                <p className="text-text-primary font-medium text-sm mb-1">Jumping Jacks</p>
+                <p className="text-text-secondary text-xs">30 seconds</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">⬇️</div>
+                <p className="text-text-primary font-medium text-sm mb-1">Push-ups</p>
+                <p className="text-text-secondary text-xs">10-15 reps</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🦵</div>
+                <p className="text-text-primary font-medium text-sm mb-1">Squats</p>
+                <p className="text-text-secondary text-xs">15-20 reps</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🧘‍♂️</div>
+                <p className="text-text-primary font-medium text-sm mb-1">Plank</p>
+                <p className="text-text-secondary text-xs">30-60 seconds</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Health Benefits */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-bg-tertiary p-4 rounded-xl">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-xl">🧠</span>
+                <h5 className="font-semibold text-text-primary">Mental Benefits</h5>
+              </div>
+              <ul className="space-y-1 text-text-secondary text-sm">
+                <li>• Reduces stress and anxiety</li>
+                <li>• Improves mood and self-esteem</li>
+                <li>• Enhances cognitive function</li>
+                <li>• Better sleep quality</li>
+              </ul>
+            </div>
+            <div className="bg-bg-tertiary p-4 rounded-xl">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-xl">❤️</span>
+                <h5 className="font-semibold text-text-primary">Physical Benefits</h5>
+              </div>
+              <ul className="space-y-1 text-text-secondary text-sm">
+                <li>• Strengthens heart and muscles</li>
+                <li>• Improves bone density</li>
+                <li>• Boosts immune system</li>
+                <li>• Increases energy levels</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -371,129 +441,172 @@ export default function WellnessPage() {
       description: 'Track your emotional wellbeing',
       component: (
         <div className="space-y-6">
-          <div className="text-center mb-8">
-            <FiBookOpen className="text-purple-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Mood Journal</h3>
-            <p className="text-text-secondary">Track your emotions and mental wellbeing</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Today's Mood */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-purple-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-purple-400 mb-4">😊 How are you feeling today?</h4>
-              <div className="grid grid-cols-5 gap-3 mb-4">
-                <button className="p-3 text-3xl hover:bg-bg-secondary rounded-lg transition-colors">😢</button>
-                <button className="p-3 text-3xl hover:bg-bg-secondary rounded-lg transition-colors">😐</button>
-                <button className="p-3 text-3xl bg-purple-600 rounded-lg">😊</button>
-                <button className="p-3 text-3xl hover:bg-bg-secondary rounded-lg transition-colors">😁</button>
-                <button className="p-3 text-3xl hover:bg-bg-secondary rounded-lg transition-colors">🤩</button>
+          {/* Mood Quote */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-bg-tertiary dark:to-bg-secondary p-6 rounded-xl border-l-4 border-purple-400">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">💭</span>
+              <div>
+                <p className="text-text-primary italic text-lg leading-relaxed mb-2">
+                  "Your feelings are valid. Your struggles are real. Your healing is important."
+                </p>
+                <p className="text-text-secondary text-sm font-medium">— Unknown</p>
               </div>
-              <textarea 
-                className="w-full p-3 bg-bg-secondary border border-border-primary rounded-lg text-text-primary placeholder-text-tertiary resize-none"
-                placeholder="What's on your mind today? Share your thoughts..."
-                rows={3}
-              />
-              <button className="w-full mt-4 py-2 bg-purple-600 hover:bg-purple-500 text-text-primary rounded-lg transition-colors">
-                Save Entry
-              </button>
             </div>
-            
-            {/* Mood Trends */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-purple-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-purple-400 mb-4">📈 Mood Trends</h4>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">This Week Average:</span>
-                  <span className="text-green-400 font-semibold">Good 😊</span>
+          </div>
+
+          {/* Benefits of Mood Tracking */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🎯</span>
+              <h4 className="font-semibold text-text-primary">Why Track Your Mood?</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">🔍</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Identify Patterns</p>
+                    <p className="text-text-secondary text-sm">Recognize what triggers certain emotions</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Most Common:</span>
-                  <span className="text-blue-400 font-semibold">Happy 😁</span>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">🧠</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Increase Awareness</p>
+                    <p className="text-text-secondary text-sm">Better understand your emotional responses</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-tertiary">Entries This Month:</span>
-                  <span className="text-yellow-400 font-semibold">23 days</span>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">📈</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Track Progress</p>
+                    <p className="text-text-secondary text-sm">See improvements in your mental health</p>
+                  </div>
                 </div>
-                <div className="mt-4">
-                  <div className="text-sm text-text-tertiary mb-2">Weekly Mood Distribution</div>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span>😁</span>
-                      <div className="flex-1 bg-bg-secondary rounded-full h-2">
-                        <div className="bg-green-400 h-2 rounded-full" style={{width: '40%'}}></div>
-                      </div>
-                      <span className="text-xs text-text-tertiary">40%</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span>😊</span>
-                      <div className="flex-1 bg-bg-secondary rounded-full h-2">
-                        <div className="bg-blue-400 h-2 rounded-full" style={{width: '35%'}}></div>
-                      </div>
-                      <span className="text-xs text-text-tertiary">35%</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span>😐</span>
-                      <div className="flex-1 bg-bg-secondary rounded-full h-2">
-                        <div className="bg-yellow-400 h-2 rounded-full" style={{width: '25%'}}></div>
-                      </div>
-                      <span className="text-xs text-text-tertiary">25%</span>
-                    </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">💬</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Improve Communication</p>
+                    <p className="text-text-secondary text-sm">Better express feelings to others</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">🎯</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Set Goals</p>
+                    <p className="text-text-secondary text-sm">Work towards emotional wellness goals</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">🛡️</span>
+                  <div>
+                    <p className="text-text-primary font-medium">Prevent Relapse</p>
+                    <p className="text-text-secondary text-sm">Early warning signs of mental health issues</p>
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Gratitude Section */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-purple-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-purple-400 mb-4">🙏 Daily Gratitude</h4>
-              <p className="text-text-secondary mb-4">What are you grateful for today?</p>
-              <div className="space-y-3">
-                <input 
-                  type="text" 
-                  className="w-full p-2 bg-bg-secondary border border-border-primary rounded text-text-primary placeholder-text-tertiary"
-                  placeholder="I'm grateful for..."
-                />
-                <input 
-                  type="text" 
-                  className="w-full p-2 bg-bg-secondary border border-border-primary rounded text-text-primary placeholder-text-tertiary"
-                  placeholder="Another thing I appreciate..."
-                />
-                <input 
-                  type="text" 
-                  className="w-full p-2 bg-bg-secondary border border-border-primary rounded text-text-primary placeholder-text-tertiary"
-                  placeholder="One more blessing..."
-                />
-              </div>
-              <button className="w-full mt-4 py-2 bg-purple-600 hover:bg-purple-500 text-text-primary rounded-lg transition-colors">
-                Save Gratitude
-              </button>
+          </div>
+
+          {/* Mood Scale Guide */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">📊</span>
+              <h4 className="font-semibold text-text-primary">Understanding Your Mood Scale</h4>
             </div>
-            
-            {/* Emotional Insights */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-purple-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-purple-400 mb-4">🧠 Emotional Insights</h4>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+              <div className="bg-red-100 dark:bg-bg-tertiary p-3 rounded-xl text-center">
+                <div className="text-2xl mb-1">😢</div>
+                <p className="text-text-primary font-semibold text-sm">Very Low</p>
+                <p className="text-text-secondary text-xs">Sad, hopeless, overwhelmed</p>
+              </div>
+              <div className="bg-orange-100 dark:bg-bg-tertiary p-3 rounded-xl text-center">
+                <div className="text-2xl mb-1">😕</div>
+                <p className="text-text-primary font-semibold text-sm">Low</p>
+                <p className="text-text-secondary text-xs">Down, tired, stressed</p>
+              </div>
+              <div className="bg-yellow-100 dark:bg-bg-tertiary p-3 rounded-xl text-center">
+                <div className="text-2xl mb-1">😐</div>
+                <p className="text-text-primary font-semibold text-sm">Neutral</p>
+                <p className="text-text-secondary text-xs">Okay, stable, calm</p>
+              </div>
+              <div className="bg-green-100 dark:bg-bg-tertiary p-3 rounded-xl text-center">
+                <div className="text-2xl mb-1">😊</div>
+                <p className="text-text-primary font-semibold text-sm">Good</p>
+                <p className="text-text-secondary text-xs">Happy, content, positive</p>
+              </div>
+              <div className="bg-blue-100 dark:bg-bg-tertiary p-3 rounded-xl text-center">
+                <div className="text-2xl mb-1">😄</div>
+                <p className="text-text-primary font-semibold text-sm">Great</p>
+                <p className="text-text-secondary text-xs">Joyful, energetic, amazing</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Journaling Tips */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">✍️</span>
+              <h4 className="font-semibold text-text-primary">Effective Journaling Tips</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-3">
-                <div className="p-3 bg-bg-secondary rounded-lg">
-                  <div className="text-yellow-400 font-medium mb-1">✨ Positive Pattern</div>
-                  <div className="text-text-secondary text-sm">You tend to feel better on days when you exercise!</div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">🕐</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Same Time Daily:</strong> Establish a consistent routine</p>
                 </div>
-                <div className="p-3 bg-bg-secondary rounded-lg">
-                  <div className="text-blue-400 font-medium mb-1">🎯 Suggestion</div>
-                  <div className="text-text-secondary text-sm">Try meditation when feeling stressed - it helped you last week.</div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">❤️</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Be Honest:</strong> Write your true feelings without judgment</p>
                 </div>
-                <div className="p-3 bg-bg-secondary rounded-lg">
-                  <div className="text-green-400 font-medium mb-1">🏆 Achievement</div>
-                  <div className="text-text-secondary text-sm">7-day journaling streak! Keep it up!</div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-purple-500 mt-1">🎯</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Focus on Details:</strong> What, where, when, why you feel this way</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">🌟</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Include Gratitude:</strong> Write 3 things you're grateful for</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">📝</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Keep It Simple:</strong> Even a few sentences help</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">🔄</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Review Regularly:</strong> Look back to spot patterns</p>
                 </div>
               </div>
             </div>
           </div>
-          
-          <div className="bg-gradient-to-r from-purple-900 to-pink-900 p-6 rounded-xl border border-purple-600">
-            <h4 className="text-lg font-semibold text-purple-200 mb-3">💫 Motivational Quote</h4>
-            <p className="text-purple-100 italic text-center text-lg">
-              "The only way to make sense out of change is to plunge into it, move with it, and join the dance." - Alan Watts
-            </p>
+
+          {/* Emotional Wellness Activities */}
+          <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-bg-tertiary dark:to-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🌈</span>
+              <h4 className="font-semibold text-text-primary">Mood Boosting Activities</h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🚶‍♀️</div>
+                <p className="text-text-primary font-medium text-sm">Nature Walk</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🎵</div>
+                <p className="text-text-primary font-medium text-sm">Listen to Music</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">📞</div>
+                <p className="text-text-primary font-medium text-sm">Call a Friend</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🧘‍♀️</div>
+                <p className="text-text-primary font-medium text-sm">Practice Mindfulness</p>
+              </div>
+            </div>
           </div>
         </div>
       )
@@ -505,199 +618,180 @@ export default function WellnessPage() {
       description: 'Soothing sounds for relaxation',
       component: (
         <div className="space-y-6">
-          <div className="text-center mb-8">
-            <FiMusic className="text-pink-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Relaxing Music & Sounds</h3>
-            <p className="text-text-secondary">Curated playlists and ambient sounds for relaxation</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Nature Sounds */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-green-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-green-400 mb-4">🌿 Nature Sounds</h4>
-              <div className="space-y-3">
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🌧️</span>
-                      <span className="text-text-primary">Gentle Rain</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🌊</span>
-                      <span className="text-text-primary">Ocean Waves</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🏔️</span>
-                      <span className="text-text-primary">Mountain Wind</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🦅</span>
-                      <span className="text-text-primary">Forest Birds</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-            
-            {/* Instrumental Music */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-blue-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-blue-400 mb-4">🎵 Instrumental</h4>
-              <div className="space-y-3">
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🎹</span>
-                      <span className="text-text-primary">Piano Melodies</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🎻</span>
-                      <span className="text-text-primary">String Quartet</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🪕</span>
-                      <span className="text-text-primary">Acoustic Guitar</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🎶</span>
-                      <span className="text-text-primary">Ambient Sounds</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-            
-            {/* Meditation Music */}
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-purple-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-purple-400 mb-4">🧘‍♀️ Meditation</h4>
-              <div className="space-y-3">
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🕉️</span>
-                      <span className="text-text-primary">Tibetan Bowls</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🎋</span>
-                      <span className="text-text-primary">Bamboo Flute</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🔔</span>
-                      <span className="text-text-primary">Crystal Chimes</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
-                <button className="w-full p-3 bg-bg-secondary hover:bg-hover-bg rounded-lg text-left transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">✨</span>
-                      <span className="text-text-primary">Binaural Beats</span>
-                    </div>
-                    <span className="text-text-tertiary group-hover:text-text-primary">▶️</span>
-                  </div>
-                </button>
+          {/* Music Quote */}
+          <div className="bg-gradient-to-r from-pink-50 to-red-50 dark:from-bg-tertiary dark:to-bg-secondary p-6 rounded-xl border-l-4 border-pink-400">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">🎼</span>
+              <div>
+                <p className="text-text-primary italic text-lg leading-relaxed mb-2">
+                  "Music is the medicine of the mind."
+                </p>
+                <p className="text-text-secondary text-sm font-medium">— John A. Logan</p>
               </div>
             </div>
           </div>
-          
-          {/* Music Player */}
-          <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary">
-            <h4 className="text-lg font-semibold text-pink-400 mb-4">🎧 Now Playing</h4>
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <FiMusic className="text-text-primary text-2xl" />
+
+          {/* Benefits of Music Therapy */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🎯</span>
+              <h4 className="font-semibold text-text-primary">Benefits of Relaxing Music</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-bg-tertiary p-4 rounded-xl">
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="text-xl">🧠</span>
+                  <h5 className="font-semibold text-text-primary">Mental Benefits</h5>
+                </div>
+                <ul className="space-y-2 text-text-secondary text-sm">
+                  <li>• Reduces stress and anxiety</li>
+                  <li>• Improves focus and concentration</li>
+                  <li>• Enhances mood and emotional state</li>
+                  <li>• Promotes mindfulness and presence</li>
+                </ul>
               </div>
-              <div className="flex-1">
-                <div className="text-text-primary font-medium">Gentle Rain & Piano</div>
-                <div className="text-text-tertiary text-sm">Nature Sounds Collection</div>
-                <div className="mt-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-text-tertiary">2:34</span>
-                    <div className="flex-1 bg-bg-secondary rounded-full h-1">
-                      <div className="bg-pink-400 h-1 rounded-full" style={{width: '35%'}}></div>
-                    </div>
-                    <span className="text-xs text-text-tertiary">7:20</span>
-                  </div>
+              <div className="bg-bg-tertiary p-4 rounded-xl">
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="text-xl">❤️</span>
+                  <h5 className="font-semibold text-text-primary">Physical Benefits</h5>
+                </div>
+                <ul className="space-y-2 text-text-secondary text-sm">
+                  <li>• Lowers blood pressure</li>
+                  <li>• Reduces heart rate</li>
+                  <li>• Decreases cortisol levels</li>
+                  <li>• Improves sleep quality</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Music Categories for Different Moods */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🎨</span>
+              <h4 className="font-semibold text-text-primary">Music for Every Mood</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-blue-100 dark:bg-bg-tertiary p-4 rounded-xl">
+                <div className="text-center mb-3">
+                  <div className="text-2xl mb-2">😌</div>
+                  <h5 className="font-semibold text-text-primary">For Relaxation</h5>
+                </div>
+                <ul className="space-y-1 text-text-secondary text-sm">
+                  <li>• Classical piano</li>
+                  <li>• Ambient soundscapes</li>
+                  <li>• Soft acoustic guitar</li>
+                  <li>• Nature sounds</li>
+                </ul>
+              </div>
+              <div className="bg-green-100 dark:bg-bg-tertiary p-4 rounded-xl">
+                <div className="text-center mb-3">
+                  <div className="text-2xl mb-2">🎯</div>
+                  <h5 className="font-semibold text-text-primary">For Focus</h5>
+                </div>
+                <ul className="space-y-1 text-text-secondary text-sm">
+                  <li>• Lo-fi hip hop</li>
+                  <li>• Instrumental music</li>
+                  <li>• White noise</li>
+                  <li>• Binaural beats</li>
+                </ul>
+              </div>
+              <div className="bg-purple-100 dark:bg-bg-tertiary p-4 rounded-xl">
+                <div className="text-center mb-3">
+                  <div className="text-2xl mb-2">💤</div>
+                  <h5 className="font-semibold text-text-primary">For Sleep</h5>
+                </div>
+                <ul className="space-y-1 text-text-secondary text-sm">
+                  <li>• Delta wave music</li>
+                  <li>• Rain sounds</li>
+                  <li>• Soft lullabies</li>
+                  <li>• Brown noise</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Creating Your Musical Environment */}
+          <div className="bg-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🏠</span>
+              <h4 className="font-semibold text-text-primary">Creating Your Musical Sanctuary</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">🎧</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Quality Audio:</strong> Use good headphones or speakers</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">🛏️</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Comfortable Space:</strong> Find a quiet, cozy spot</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1">📱</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Remove Distractions:</strong> Put devices on silent</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <span className="text-red-500 mt-1">🕐</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Set Time Aside:</strong> Dedicate 15-30 minutes daily</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-red-500 mt-1">🌡️</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Ideal Temperature:</strong> Keep room cool and comfortable</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <span className="text-red-500 mt-1">💡</span>
+                  <p className="text-text-secondary"><strong className="text-text-primary">Soft Lighting:</strong> Dim lights or use candles</p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-center space-x-6">
-              <button className="text-text-tertiary hover:text-text-primary transition-colors">⏮️</button>
-              <button className="text-text-primary text-2xl hover:text-pink-400 transition-colors">⏸️</button>
-              <button className="text-text-tertiary hover:text-text-primary transition-colors">⏭️</button>
-              <button className="text-text-tertiary hover:text-text-primary transition-colors">🔄</button>
-              <button className="text-text-tertiary hover:text-text-primary transition-colors">🔉</button>
+          </div>
+
+          {/* Popular Relaxing Music Genres */}
+          <div className="bg-gradient-to-r from-pink-100 to-red-100 dark:from-bg-tertiary dark:to-bg-secondary p-5 rounded-xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-xl">🎭</span>
+              <h4 className="font-semibold text-text-primary">Popular Relaxing Genres</h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🎹</div>
+                <p className="text-text-primary font-medium text-sm">Classical</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🌊</div>
+                <p className="text-text-primary font-medium text-sm">Ambient</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🌿</div>
+                <p className="text-text-primary font-medium text-sm">Nature</p>
+              </div>
+              <div className="bg-white dark:bg-bg-tertiary p-3 rounded-lg text-center">
+                <div className="text-2xl mb-1">🧘</div>
+                <p className="text-text-primary font-medium text-sm">Meditation</p>
+              </div>
             </div>
           </div>
-          
-          {/* Custom Playlists */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-pink-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-pink-400 mb-4">📚 Study Focus</h4>
-              <p className="text-text-secondary mb-4">Background music for concentration and productivity</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>• 12 tracks • 45 minutes</p>
-                <p>• Lo-fi beats and ambient sounds</p>
-                <p>• No lyrics to avoid distraction</p>
-              </div>
-              <button className="w-full mt-4 py-2 bg-pink-600 hover:bg-pink-500 text-text-primary rounded-lg transition-colors">
-                Play Playlist
-              </button>
+
+          {/* Music Listening Tips */}
+          <div className="bg-bg-tertiary p-4 rounded-xl">
+            <div className="flex items-center space-x-2 mb-3">
+              <span className="text-xl">💡</span>
+              <h5 className="font-semibold text-text-primary">Pro Tips for Relaxing Music</h5>
             </div>
-            
-            <div className="bg-bg-tertiary p-6 rounded-xl border border-border-primary hover:border-pink-400 transition-all duration-300">
-              <h4 className="text-lg font-semibold text-pink-400 mb-4">🌙 Sleep Sounds</h4>
-              <p className="text-text-secondary mb-4">Calming sounds for better sleep quality</p>
-              <div className="space-y-2 text-sm text-text-tertiary">
-                <p>• 8 tracks • 60 minutes each</p>
-                <p>• White noise and nature sounds</p>
-                <p>• Loop-friendly for all night</p>
-              </div>
-              <button className="w-full mt-4 py-2 bg-pink-600 hover:bg-pink-500 text-text-primary rounded-lg transition-colors">
-                Play Playlist
-              </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <ul className="space-y-2 text-text-secondary">
+                <li>• Start with 10-15 minutes daily</li>
+                <li>• Experiment with different genres</li>
+                <li>• Combine with deep breathing</li>
+              </ul>
+              <ul className="space-y-2 text-text-secondary">
+                <li>• Create personal playlists</li>
+                <li>• Use music during study breaks</li>
+                <li>• Practice active listening</li>
+              </ul>
             </div>
           </div>
         </div>
